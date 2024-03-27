@@ -1,0 +1,43 @@
+-- Création de la base de données
+CREATE DATABASE IF NOT EXISTS newvet;
+
+
+-- Table pour stocker les utilisateurs
+CREATE TABLE IF NOT EXISTS Utilisateurs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    mot_de_passe VARCHAR(100) NOT NULL,
+    adresse VARCHAR(255) NOT NULL,
+    code_postal VARCHAR(10) NOT NULL,
+    ville VARCHAR(50) NOT NULL,
+    pays VARCHAR(50) NOT NULL
+);
+
+-- Table pour stocker les produits
+CREATE TABLE IF NOT EXISTS Produits (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL,
+    description TEXT,
+    prix DECIMAL(10, 2) NOT NULL,
+    stock INT NOT NULL DEFAULT 0
+);
+
+-- Table pour stocker les commandes
+CREATE TABLE IF NOT EXISTS Commandes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    utilisateur_id INT NOT NULL,
+    date_commande TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (utilisateur_id) REFERENCES Utilisateurs(id)
+);
+
+-- Table pour stocker les détails de la commande (produits achetés)
+CREATE TABLE IF NOT EXISTS Details_Commande (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    commande_id INT NOT NULL,
+    produit_id INT NOT NULL,
+    quantite INT NOT NULL,
+    prix_unitaire DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (commande_id) REFERENCES Commandes(id),
+    FOREIGN KEY (produit_id) REFERENCES Produits(id)
+);
