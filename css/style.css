@@ -1,0 +1,129 @@
+body {
+    height: 100%;
+}
+
+.header {
+    background-color: #fff;
+    color: #333;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-container img {
+    max-width: 50px;
+    height: auto;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+}
+
+
+.header h1 {
+    margin: 0;
+    font-family: 'Century Gothic', sans-serif;
+    align-self: center;
+}
+
+.icone-bouton {
+    height: 20px;
+    margin: 0;
+    margin-right: 5px;
+}
+
+.btn-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header .btn {
+    padding: 15px 30px;
+    background-color: #333;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 25px;
+    margin-left: 15px;
+    font-family: Helvetica, sans-serif;
+    display: flex;
+    align-items: center;
+}
+
+.header .panier {
+    display: flex;
+    align-items: center;
+}
+
+#slogan {
+    text-align: center;
+    font-size: 50px;
+    font-family: 'Century Gothic', sans-serif;
+}
+
+.footer {
+    background-color: #fff;
+    color: #333;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.footer a {
+    color: #333;
+    text-decoration: none;
+    margin: 0 10px;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+
+div.categories {
+    background-color: #333;
+    overflow: auto;
+    align-items: center;
+    display: flex;
+    justify-content: safe center;
+    margin: 30px 0px 20px;
+}
+
+div.categories a {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 14px;
+    text-decoration: none;
+    font-size: 20px;
+    font-family: Helvetica, sans-serif;
+}
+
+div.categories a:hover {
+    background-color: #777;
+}
+
+#highlandersTitre {
+    text-align: center;
+    font-family: 'Century Gothic', sans-serif;
+    margin: 50px 0 10px;
+}
+
+.highlanders {
+    white-space: nowrap;
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 30px 0px 20px;
+    position: relative;
+    overflow: auto;
+}
+
+.highlanders a {
+    margin: 5px 10px;
+}
