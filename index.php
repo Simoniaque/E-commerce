@@ -1,160 +1,109 @@
+<?php
+session_start();
+
+include ("config.php");
+include ("functions.php");
+
+$userData = checkLogin($con);
+
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>New Vet</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/logo-black.png" />
 
-	<title>Accueil</title>
-
-	<link rel="shortcut icon" type="image/png" href="assets/img/favicon.png">
-	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="assets/css/all.min.css">
-	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-	<link rel="stylesheet" href="assets/css/owl.carousel.css">
-	<link rel="stylesheet" href="assets/css/magnific-popup.css">
-	<link rel="stylesheet" href="assets/css/animate.css">
-	<link rel="stylesheet" href="assets/css/meanmenu.min.css">
-	<link rel="stylesheet" href="assets/css/main.css">
-	<link rel="stylesheet" href="assets/css/responsive.css">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
+
 <body>
+    <?php include "header.php"; ?>
 
-    <?php include 'header.php'; ?>
-	
-	<!-- search area -->
-	<div class="search-area">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12">
-					<span class="close-btn"><i class="fas fa-window-close"></i></span>
-					<div class="search-bar">
-						<div class="search-bar-tablecell">
-							<h3>Search For:</h3>
-							<input type="text" placeholder="Keywords">
-							<button type="submit">Search <i class="fas fa-search"></i></button>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end search area -->
+    <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="https://imgproduitnewvet.blob.core.windows.net/imagescarousel/img_carousel_1.jpg" class="d-block w-100" alt="pic1">
+            </div>
+            <div class="carousel-item">
+                <img src="https://imgproduitnewvet.blob.core.windows.net/imagescarousel/img_carousel_2.jpg" class="d-block w-100" alt="pic2">
+            </div>
+            <div class="carousel-item">
+                <img src="https://imgproduitnewvet.blob.core.windows.net/imagescarousel/img_carousel_3.jpg" class="d-block w-100" alt="pic3">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying"
+            data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying"
+            data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
 
-	<!-- home page slider -->
-	<div class="homepage-slider">
-		<div class="single-homepage-slider homepage-bg-1">
-		</div>
-		<div class="single-homepage-slider homepage-bg-2">
-		</div>
-		<div class="single-homepage-slider homepage-bg-3">
-		</div>
-	</div>
-	<!-- end home page slider -->
+    <div class="bg-dark py-5">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="text-center text-white">
+                <h1 class="display-4 fw-bolder">New Vet</h1>
+                <p class="lead fw-normal text-white-50 mb-0">C'est la fête à la maison!</p>
+            </div>
+        </div>
+    </div>
 
-	<!-- features list section -->
-	<div class="list-section pt-80 pb-80">
-		<div class="container">
+    <section class="py-5">
+        <div class="container px-4 px-lg-5 mt-5">
+            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                <?php
+                $sqlrequest = "SELECT * FROM produits;";
+                $result = $con->query($sqlrequest);
 
-			<div class="row">
-				<div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
-					<div class="list-box d-flex align-items-center">
-						<div class="list-icon">
-							<i class="fas fa-shipping-fast"></i>
-						</div>
-						<div class="content">
-							<h3>Livraison Gratuite</h3>
-							<p>Commandes au dessus de 75€</p>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
-					<div class="list-box d-flex align-items-center">
-						<div class="list-icon">
-							<i class="fas fa-phone-volume"></i>
-						</div>
-						<div class="content">
-							<h3>Support 24/7</h3>
-							<p>Support à tout moment</p>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-4 col-md-6">
-					<div class="list-box d-flex justify-content-start align-items-center">
-						<div class="list-icon">
-							<i class="fas fa-sync"></i>
-						</div>
-						<div class="content">
-							<h3>Remboursement</h3>
-							<p>Remboursement dans les 3 jours</p>
-						</div>
-					</div>
-				</div>
-			</div>
+                while ($row = $result->fetch_assoc()) {
+                    $productID = $row['id'];
+                    $productName = $row['nom'];
+                    $productPrice = $row['prix'];
 
-		</div>
-	</div>
-	<!-- end features list section -->
+                    $pathProductImg = PATH_PRODUCTS_IMAGES . $productID . ".webp";
 
-	<!-- product section -->
-	<div class="product-section mt-150 mb-150">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-8 offset-lg-2 text-center">
-					<div class="section-title">	
-						<h3><span class="orange-text">Nos</span> Produits</h3>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid, fuga quas itaque eveniet beatae optio.</p>
-					</div>
-				</div>
-			</div>
+                    echo
+                        "<div class='col mb-5'>
+                        <div class='card h-100'>
+                            <img class='card-img-top height='768' width='768' src='$pathProductImg' alt='produit' />
+                            <div class='card-body p-4'>
+                                <div class='text-center'>
+                                    <h5 class='fw-bolder'>$productName</h5>
+                                    $25.00
+                                </div>
+                            </div>
+                            <div class='card-footer p-4 pt-0 border-top-0 bg-transparent'>
+                                <div class='text-center'><a class='btn btn-outline-dark mt-auto' href='#'>Ajouter au panier</a></div>
+                            </div>
+                        </div>
+                    </div>";
+                }
+                ?>
+            </div>
+        </div>
+    </section>
 
-			<div class="row">
-				<div class="col-lg-4 col-md-6 text-center">
-					<div class="single-product-item">
-						<div class="product-image">
-							<a href="produit.php"><img src="assets/img/products/produit1.jpg" alt=""></a>
-						</div>
-						<h3>Culottes Hipster</h3>
-						<a href="panier.php" class="cart-btn"><i class="fas fa-shopping-cart"></i> Ajouter au panier</a>
-					</div>
-				</div>
-				<div class="col-lg-4 col-md-6 text-center">
-					<div class="single-product-item">
-						<div class="product-image">
-							<a href="produit.php"><img src="assets/img/products/produit2.jpg" alt=""></a>
-						</div>
-						<h3>Soutien-gorge</h3>
-						<a href="panier.php" class="cart-btn"><i class="fas fa-shopping-cart"></i> Ajouter au panier</a>
-					</div>
-				</div>
-				<div class="col-lg-4 col-md-6 offset-md-3 offset-lg-0 text-center">
-					<div class="single-product-item">
-						<div class="product-image">
-							<a href="produit.php"><img src="assets/img/products/produit3.jpg" alt=""></a>
-						</div>
-						<h3>Culottes Thong</h3>
-						<a href="panier.php" class="cart-btn"><i class="fas fa-shopping-cart"></i> Ajouter au panier</a>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end product section -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  
+    <script src="assets/js/uploadImagesAzure.js"></script>
 
-	<!-- footer -->
-    <?php include 'footer.php'; ?>
-	
-	<script src="assets/js/jquery-1.11.3.min.js"></script>
-	<script src="assets/bootstrap/js/bootstrap.min.js"></script>
-	<script src="assets/js/jquery.countdown.js"></script>
-	<script src="assets/js/jquery.isotope-3.0.6.min.js"></script>
-	<script src="assets/js/waypoints.js"></script>
-	<script src="assets/js/owl.carousel.min.js"></script>
-	<script src="assets/js/jquery.magnific-popup.min.js"></script>
-	<script src="assets/js/jquery.meanmenu.min.js"></script>
-	<script src="assets/js/sticker.js"></script>
-	<script src="assets/js/main.js"></script>
+    <script>
+        // Fonction pour afficher ou masquer l'indicateur de chargement
+        function toggleLoadingIndicator(show) {
+            const indicator = document.getElementById('loadingIndicator');
+            indicator.style.display = show ? 'block' : 'none';
+        }
+    </script>
 </body>
+
 </html>
