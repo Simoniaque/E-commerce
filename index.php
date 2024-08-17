@@ -1,8 +1,8 @@
 <?php
 session_start();
 
-include ("config.php");
-include ("functions.php");
+include("config.php");
+include("functions.php");
 
 $userData = checkLogin($con);
 
@@ -20,60 +20,67 @@ $userData = checkLogin($con);
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 
 <body>
+    <main>
     <?php include "header.php"; ?>
 
-    <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <img src="https://imgproduitnewvet.blob.core.windows.net/imagescarousel/img_carousel_1.jpg" class="d-block w-100" alt="pic1">
+    
+        <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="https://imgproduitnewvet.blob.core.windows.net/imagescarousel/img_carousel_1.jpg"
+                        class="d-block w-100" alt="pic1">
+                </div>
+                <div class="carousel-item">
+                    <img src="https://imgproduitnewvet.blob.core.windows.net/imagescarousel/img_carousel_2.jpg"
+                        class="d-block w-100" alt="pic2">
+                </div>
+                <div class="carousel-item">
+                    <img src="https://imgproduitnewvet.blob.core.windows.net/imagescarousel/img_carousel_3.jpg"
+                        class="d-block w-100" alt="pic3">
+                </div>
             </div>
-            <div class="carousel-item">
-                <img src="https://imgproduitnewvet.blob.core.windows.net/imagescarousel/img_carousel_2.jpg" class="d-block w-100" alt="pic2">
-            </div>
-            <div class="carousel-item">
-                <img src="https://imgproduitnewvet.blob.core.windows.net/imagescarousel/img_carousel_3.jpg" class="d-block w-100" alt="pic3">
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying"
+                data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying"
+                data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+
+        <div class="bg-dark py-5">
+            <div class="container px-4 px-lg-5 my-5">
+                <div class="text-center text-white">
+                    <h1 class="display-4 fw-bolder">New Vet</h1>
+                    <p class="lead fw-normal text-white-50 mb-0">C'est la fête à la maison!</p>
+                </div>
             </div>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying"
-            data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying"
-            data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
-    </div>
 
-    <div class="bg-dark py-5">
-        <div class="container px-4 px-lg-5 my-5">
-            <div class="text-center text-white">
-                <h1 class="display-4 fw-bolder">New Vet</h1>
-                <p class="lead fw-normal text-white-50 mb-0">C'est la fête à la maison!</p>
-            </div>
-        </div>
-    </div>
+        <section class="py-5">
+            <div class="container px-4 px-lg-5 mt-5">
+                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                    <?php
+                    $sqlrequest = "SELECT * FROM produits;";
+                    $result = $con->query($sqlrequest);
 
-    <section class="py-5">
-        <div class="container px-4 px-lg-5 mt-5">
-            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-                <?php
-                $sqlrequest = "SELECT * FROM produits;";
-                $result = $con->query($sqlrequest);
+                    while ($row = $result->fetch_assoc()) {
+                        $productID = $row['id'];
+                        $productName = $row['nom'];
+                        $productPrice = $row['prix'];
 
-                while ($row = $result->fetch_assoc()) {
-                    $productID = $row['id'];
-                    $productName = $row['nom'];
-                    $productPrice = $row['prix'];
+                        $pathProductImg = PATH_PRODUCTS_IMAGES . $productID . ".webp";
 
-                    $pathProductImg = PATH_PRODUCTS_IMAGES . $productID . ".webp";
-
-                    echo
-                        "<div class='col mb-5'>
+                        echo
+                            "<div class='col mb-5'>
                         <div class='card h-100'>
                             <img class='card-img-top height='768' width='768' src='$pathProductImg' alt='produit' />
                             <div class='card-body p-4'>
@@ -87,14 +94,18 @@ $userData = checkLogin($con);
                             </div>
                         </div>
                     </div>";
-                }
-                ?>
+                    }
+                    ?>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+        <div class="push"></div>
+    </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-  
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
     <script src="assets/js/uploadImagesAzure.js"></script>
 
     <script>
@@ -104,6 +115,8 @@ $userData = checkLogin($con);
             indicator.style.display = show ? 'block' : 'none';
         }
     </script>
+
+    <?php include "footer.php"; ?>
 </body>
 
 </html>

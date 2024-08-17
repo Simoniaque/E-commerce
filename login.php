@@ -1,7 +1,7 @@
 <?php
 session_start();
-include ("config.php");
-include ("functions.php");
+include("config.php");
+include("functions.php");
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $email = $_POST['userEmail'];
@@ -56,36 +56,39 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 
 <body>
+    <main>
+        <?php include "header.php"; ?>
+
+        <div class="col-12 col-md-6 col-lg-4 m-2 align-self-stretch">
+            <form class="p-4 border rounded bg-light" method="post">
+                <div class="form-group mb-3">
+                    <label>Adresse email</label>
+                    <input name="userEmail" type="email" class="form-control">
+                </div>
+                <div class="form-group mb-3">
+                    <label>Mot de passe</label>
+                    <input name="userPassword" type="password" class="form-control" id="password">
+                </div>
+                <div class="form-group form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="togglePassword">
+                    <label class="form-check-label">Afficher mot de passe</label>
+                </div>
+                <button type="submit" class="btn btn-dark mb-2">Se connecter</button>
+                <br />
+                <a href="signup.php" class="text-xs link-opacity-50">Nouveau sur New Vet ? Creez ici votre
+                    compte</a>
+            </form>
+        </div>
+        <div class="push"></div>
+    </main>
 
     <?php
-    include ("header.php");
-    ?>
-    <div class="col-12 col-md-6 col-lg-4 m-2 align-self-stretch">
-        <form class="p-4 border rounded bg-light" method="post">
-            <div class="form-group mb-3">
-                <label>Adresse email</label>
-                <input name="userEmail" type="email" class="form-control">
-            </div>
-            <div class="form-group mb-3">
-                <label>Mot de passe</label>
-                <input name="userPassword" type="password" class="form-control" id="password">
-            </div>
-            <div class="form-group form-check mb-3">
-                <input type="checkbox" class="form-check-input" id="togglePassword">
-                <label class="form-check-label">Afficher mot de passe</label>
-            </div>
-            <button type="submit" class="btn btn-dark mb-2">Se connecter</button>
-            <br />
-            <a href="signup.php" class="text-xs link-opacity-50">Nouveau sur New Vet ? Creez ici votre
-                compte</a>
-        </form>
-    </div>
-
-    <?php
-    include ("footer.php");
+    include("footer.php");
     ?>
 
     <script>
