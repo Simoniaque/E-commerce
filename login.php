@@ -64,26 +64,30 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     <main>
         <?php include "header.php"; ?>
 
-        <div class="col-12 col-md-6 col-lg-4 m-2 align-self-stretch">
-            <form class="p-4 border rounded bg-light" method="post">
-                <div class="form-group mb-3">
-                    <label>Adresse email</label>
-                    <input name="userEmail" type="email" class="form-control">
-                </div>
-                <div class="form-group mb-3">
-                    <label>Mot de passe</label>
-                    <input name="userPassword" type="password" class="form-control" id="password">
-                </div>
-                <div class="form-group form-check mb-3">
-                    <input type="checkbox" class="form-check-input" id="togglePassword">
-                    <label class="form-check-label">Afficher mot de passe</label>
-                </div>
-                <button type="submit" class="btn btn-dark mb-2">Se connecter</button>
-                <br />
-                <a href="signup.php" class="text-xs link-opacity-50">Nouveau sur New Vet ? Creez ici votre
-                    compte</a>
-            </form>
+        <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <form class="p-4 border rounded bg-light" method="post">
+                    <div class="form-group mb-3">
+                        <label>Adresse email</label>
+                        <input name="userEmail" type="email" class="form-control">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label>Mot de passe</label>
+                        <input name="userPassword" type="password" class="form-control" id="password">
+                    </div>
+                    <div class="form-group form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="togglePassword">
+                        <label class="form-check-label">Afficher mot de passe</label>
+                    </div>
+                    <button type="submit" class="btn btn-dark mb-2">Se connecter</button>
+                    <br />
+                    <a href="signup.php" class="text-xs link-opacity-50">Nouveau sur New Vet ? Creez ici votre
+                        compte</a>
+                </form>
+            </div>
         </div>
+
         <div class="push"></div>
     </main>
 

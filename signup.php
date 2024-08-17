@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     <main>
         <?php include "header.php"; ?>
 
-        <div class="d-flex justify-content-center align-items-center vh-80">
+        <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
             <div class="col-12 col-md-6 col-lg-4">
                 <form class="p-4 border rounded bg-light" method="post">
                     <div class="form-group mb-3">
