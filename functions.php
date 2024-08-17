@@ -138,4 +138,44 @@ function getOrdersByUserIdAndNumber($con, $userId, $orderNumber) {
     return $result->fetch_all(MYSQLI_ASSOC);
 }
 
+function getProductById($con, $productId){
+    $query = "SELECT * FROM produits WHERE id = '$productId'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $product = mysqli_fetch_assoc($result);
+        return $product;
+    }
+}
+
+function getCategoryById($con, $category_id){
+    $query = "SELECT * FROM categories WHERE id = '$category_id' limit 1";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $category = mysqli_fetch_assoc($result);
+        return $category;
+    }
+}
+function show_404() {
+    header("HTTP/1.1 404 Not Found");
+    exit();
+}
+
+function getProductsByCategory($con, $category_id){
+    $query = "SELECT * FROM produits WHERE categorie_id = '$category_id'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $products = mysqli_fetch_all($result, MYSQLI_ASSOC);
+        return $products;
+    }
+}
+
+function addItemToCart(){
+
+}
 ?>

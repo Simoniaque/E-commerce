@@ -26,9 +26,9 @@ $userData = checkLogin($con);
 
 <body>
     <main>
-    <?php include "header.php"; ?>
+        <?php include "header.php"; ?>
 
-    
+
         <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
                 <div class="carousel-item active">
@@ -82,15 +82,15 @@ $userData = checkLogin($con);
                         echo
                             "<div class='col mb-5'>
                         <div class='card h-100'>
-                            <img class='card-img-top height='768' width='768' src='$pathProductImg' alt='produit' />
+                            <a href='product.php?id=$productID' style='text-decoration:none;' class='text-black'><img class='card-img-top' height='400' src='$pathProductImg' alt='produit' />
                             <div class='card-body p-4'>
                                 <div class='text-center'>
                                     <h5 class='fw-bolder'>$productName</h5>
-                                    $25.00
+                                    $productPrice €
                                 </div>
-                            </div>
+                            </div></a>
                             <div class='card-footer p-4 pt-0 border-top-0 bg-transparent'>
-                                <div class='text-center'><a class='btn btn-outline-dark mt-auto' href='#'>Ajouter au panier</a></div>
+                                <div class='text-center'><a class='btn btn-dark mt-auto' href='#'>Ajouter au panier</a></div>
                             </div>
                         </div>
                     </div>";
