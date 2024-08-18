@@ -86,7 +86,7 @@ if ($searchOrderNumber > 0) {
                                 $orderDetails = getOrderDetails($con, $order['id']);
                                 $orderId = $order['id'];
                                 $orderDate = $order['date_creation'];
-                                $orderTotal = $order['total'];
+                                $orderTotal = $order['prix_total'];
                                 $orderStatus = $order['statut'];
                                 $orderStatusTag = "<p class='badge rounded-pill bg-danger text-black'>Etat Inconnu</p>";
 
@@ -111,7 +111,7 @@ if ($searchOrderNumber > 0) {
                                                 <div class='col-lg-5'>
                                                     <div class='mt-3 mt-lg-0'>
                                                         <h5 class='fs-19 mb-4'>
-                                                            <a class='primary-link' href='#'>Commande n° $orderId</a>
+                                                            <a class='primary-link' href='order.php?id=$orderId'>Commande n° $orderId</a>
                                                         </h5>
                                                         <h5>$orderTotal €</h5>
                                                     </div>

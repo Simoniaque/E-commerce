@@ -11,7 +11,7 @@
                     <!--<li class="nav-item"><a class="nav-link" href="about.php">A propos</a></li>
                     <li class="nav-item"><a class="nav-link" href="#!">Contact</a></li>-->
                     
-                    <li class="nav-item"><a class="nav-link" href="#!">Tous nos produits</a></li>
+                    <li class="nav-item"><a class="nav-link" href="allproducts.php">Tous nos produits</a></li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">Catégories</a>

@@ -211,17 +211,6 @@ function getHighlightCategories($con){
     }
 }
 
-function getCategorieById($con, $id){
-    $query = "SELECT * FROM categories WHERE id = '$id'";
-
-    $result = mysqli_query($con,$query);
-
-    if($result && mysqli_num_rows($result)> 0){
-        $category = mysqli_fetch_assoc($result);
-        return $category;
-    }
-}
-
 function getHighlightProducts($con){
     $query = "SELECT * FROM produits_en_avant";
 
@@ -242,5 +231,65 @@ function getHighlightProducts($con){
     }
 }
 
+function getProductsByCategories($con, $idsCategories){
+    $query = "SELECT * FROM produits WHERE categorie_id IN (".implode(',',$idsCategories).")";
 
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $products = mysqli_fetch_all($result, MYSQLI_ASSOC);
+        return $products;
+    }
+}
+
+
+function getAllProducts($con){
+    $query = "SELECT * FROM produits";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $products = mysqli_fetch_all($result, MYSQLI_ASSOC);
+        return $products;
+    }
+}
+
+function orderProductsByPrice($products){
+    usort($products, function($a, $b) {
+        return $a['prix'] <=> $b['prix'];
+    });
+    return $products;
+}
+
+function orderProductsByDate($products){
+    usort($products, function($a, $b) {
+        return $a['date_ajout'] <=> $b['date_ajout'];
+    });
+    return $products;
+}
+
+function filterProductsByMinPrice($products, $minPrice){
+    $filteredProducts = array_filter($products, function($product) use ($minPrice){
+        return $product['prix'] >= $minPrice;
+    });
+    return $filteredProducts;
+}
+
+function filterProductsByMaxPrice($products, $maxPrice){
+    $filteredProducts = array_filter($products, function($product) use ($maxPrice){
+        return $product['prix'] <= $maxPrice;
+    });
+    return $filteredProducts;
+}
+
+function getOrderById($con, $orderId){
+    $query = "SELECT * FROM commandes WHERE id = '$orderId'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $order = mysqli_fetch_assoc($result);
+        return $order;
+    }
+}
 ?>
