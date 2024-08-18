@@ -8,16 +8,15 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
                     <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.php">Accueil</a></li>
-                    <li class="nav-item"><a class="nav-link" href="about.php">A propos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#!">Contact</a></li>
+                    <!--<li class="nav-item"><a class="nav-link" href="about.php">A propos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#!">Contact</a></li>-->
+                    
+                    <li class="nav-item"><a class="nav-link" href="#!">Tous nos produits</a></li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">Catégories</a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#!">Tous les produits</a></li>
-                            <li>
-                                <hr class="dropdown-divider" />
-                            </li>
+                            
                             <?php
                             $sqlrequest = "SELECT * FROM categories;";
                             $result = $con->query($sqlrequest);
@@ -34,9 +33,19 @@
                 <?php
                 $userData = checkLogin($con);
                 if ($userData) {
-                    echo "<button class='btn btn-outline-dark' type='submit'>
+
+                    $codeBadge ="";
+                    if(getCart($con, $userData['id'])){
+                        $codeBadge = "<span class='position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle'>
+                                <span class='visually-hidden'>New alerts</span>
+                            </span>";
+
+                    }
+
+                    echo "<button class='btn btn-outline-dark position-relative' type='submit'>
                             <i class='bi-cart-fill me-1'></i>
                             Panier
+                            $codeBadge
                           </button>
                           <a class='btn btn-outline-dark ms-3' href='profile.php'>Mon compte</a>
                           <a class='btn btn-outline-dark ms-3' href='logout.php'>Se déconnecter</a>";

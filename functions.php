@@ -175,7 +175,72 @@ function getProductsByCategory($con, $category_id){
     }
 }
 
+function getCart($con, $userId){
+    $query = "SELECT * FROM paniers WHERE utilisateur_id = '$userId'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $cart = mysqli_fetch_assoc($result);
+        return $cart;
+    }
+}
+
 function addItemToCart(){
 
 }
+
+function getHighlightCategories($con){
+    $query = "SELECT * FROM categories_en_avant";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        
+        //recupérer les categories selon les id dans $result
+        $categoriesIDs = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+        $categories = array();
+
+        foreach ($categoriesIDs as $categoryID) {
+            $category = getCategoryById($con, $categoryID['categorie_id']);
+            $categories[] = $category;
+        }
+
+        return $categories;
+    }
+}
+
+function getCategorieById($con, $id){
+    $query = "SELECT * FROM categories WHERE id = '$id'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $category = mysqli_fetch_assoc($result);
+        return $category;
+    }
+}
+
+function getHighlightProducts($con){
+    $query = "SELECT * FROM produits_en_avant";
+
+    $result = mysqli_query($con,$query);
+
+
+    if($result && mysqli_num_rows($result)> 0){
+        $productsIDs = mysqli_fetch_all($result, MYSQLI_ASSOC);
+        
+        $products = array();
+
+        foreach ($productsIDs as $productID) {
+            $product = getProductById($con, $productID['produit_id']);
+            $products[] = $product;
+        }
+
+        return $products;
+    }
+}
+
+
 ?>

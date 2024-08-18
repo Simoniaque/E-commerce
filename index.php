@@ -60,37 +60,61 @@ $userData = checkLogin($con);
             <div class="container px-4 px-lg-5 my-5">
                 <div class="text-center text-white">
                     <h1 class="display-4 fw-bolder">New Vet</h1>
-                    <p class="lead fw-normal text-white-50 mb-0">C'est la fête à la maison!</p>
+                    <p class="lead fw-normal text-white-50 mb-0">Révélez votre style, réinventez-vous !</p>
                 </div>
             </div>
         </div>
 
+        <br />
+        <br />
+        <h2 class="text-center text-decoration-underline">Les Highlanders du moment</h2>
+
         <section class="py-5">
-            <div class="container px-4 px-lg-5 mt-5">
-                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+            <div class="container mt-5">
+                <div class="row gx-4 row-cols-2 row-cols-md-3 row-cols-lg-4 justify-content-center mt-5">
                     <?php
-                    $sqlrequest = "SELECT * FROM produits;";
-                    $result = $con->query($sqlrequest);
+                    $highlightCategories = getHighlightCategories($con);
+                    foreach ($highlightCategories as $category) {
+                        $categoryID = $category['id'];
+                        $categoryName = $category['nom'];
+                        $pathCategoryImg = PATH_CATEGORY_IMAGES . $categoryID . ".png";
+                        echo "<div class='col mb-5'>
+                        <div class='card h-100 mx-2 border-0 shadow rounded-0'>
+                            <div class='bg-image'>
+                                <a href='categories.php?id=$categoryID'><img src='$pathCategoryImg' class='w-100' /></a>
+                            </div>
+                            <div class='card-body'>
+                                <a href='categories.php?id=$categoryID' class='text-decoration-none text-black text-center'>
+                                    <h4 class='card-title mb-3'>$categoryName</h4>
+                                </a>
+                            </div>
+                        </div>
+                    </div>";
+                    }
+                    ?>
+                </div>
 
-                    while ($row = $result->fetch_assoc()) {
-                        $productID = $row['id'];
-                        $productName = $row['nom'];
-                        $productPrice = $row['prix'];
 
+                <hr />
+                <div class="row gx-4 row-cols-2 row-cols-md-3 row-cols-lg-4 justify-content-center mt-5">
+                    <?php
+                    $highlightProducts = getHighlightProducts($con);
+                    foreach ($highlightProducts as $product) {
+                        $productID = $product['id'];
+                        $productName = $product['nom'];
+                        $productPrice = $product['prix'];
                         $pathProductImg = PATH_PRODUCTS_IMAGES . $productID . ".webp";
-
-                        echo
-                            "<div class='col mb-5'>
-                        <div class='card h-100'>
-                            <a href='product.php?id=$productID' style='text-decoration:none;' class='text-black'><img class='card-img-top' height='400' src='$pathProductImg' alt='produit' />
-                            <div class='card-body p-4'>
-                                <div class='text-center'>
-                                    <h5 class='fw-bolder'>$productName</h5>
-                                    $productPrice €
-                                </div>
-                            </div></a>
-                            <div class='card-footer p-4 pt-0 border-top-0 bg-transparent'>
-                                <div class='text-center'><a class='btn btn-dark mt-auto' href='#'>Ajouter au panier</a></div>
+                        echo "<div class='col mb-5'>
+                        <div class='card h-100 mx-2 border-0 shadow'>
+                            <div class='bg-image'>
+                                <a href='product.php?id=$productID'><img src='$pathProductImg' class='w-100' /></a>
+                            </div>
+                            <div class='card-body'>
+                                <a href='product.php?id=$productID' class='text-reset'>
+                                    <h5 class='card-title mb-3'>$productName</h5>
+                                </a>
+                                <h6 class='mb-3'>$productPrice €</h6>
+                                <a href='#' class='btn btn-dark btn-sm'>Ajouter au panier</a>
                             </div>
                         </div>
                     </div>";

@@ -114,10 +114,16 @@ if (!isset($_GET['id'])) {
             return $product['id'] != $productID;
         });
 
+        if(!$products){
+            echo "<div class='push'></div>
+            </main>";
+            include 'footer.php';
+            exit();
+        }
+
         $nbRandomProducts = 6;
         if ($nbRandomProducts > count($products)) {
             $nbRandomProducts = count($products);
-
         }
 
         $randomProductKeys = array_rand($products, $nbRandomProducts);
@@ -136,50 +142,44 @@ if (!isset($_GET['id'])) {
         <section class="py-5">
             <?php
             if (is_null($randomProductKeys)) {
+                
+            echo "<div class='push'></div>
+            </main>
+            <?php include 'footer.php'; ?>";
+
                 exit();
             }
             ?>
             <h2 class="mx-5">Produits Similaires</h2>
             <hr />
-            <div class="container px-4 px-lg-5 mt-5">
-                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+            <div class="container mt-5">
+                <div class="row gx-4 row-cols-2 row-cols-md-3 row-cols-lg-4 justify-content-center mt-5">
                     <?php
-
                     foreach ($productsToDisplay as $product) {
                         $productID = $product['id'];
                         $productName = $product['nom'];
                         $productPrice = $product['prix'];
-
                         $pathProductImg = PATH_PRODUCTS_IMAGES . $productID . ".webp";
-
                         echo "<div class='col mb-5'>
-                                <div class='card h-100'>
-                                    <a href='product.php?id=$productID' style='text-decoration:none;' class='text-black'><img class='card-img-top' height='400' src='$pathProductImg' alt='produit' />
-                                        <div class='card-body p-4'>
-                                            <div class='text-center'>
-                                                <h5 class='fw-bolder'>$productName</h5>
-                                                    $productPrice €
-                                            </div>
-                                        </div>
-                                    </a>
-                                    <div class='card-footer p-4 pt-0 border-top-0 bg-transparent'>
-                                        <div class='text-center'><a class='btn btn-dark mt-auto' href='#'>Ajouter au panier</a></div>
-                                    </div>
-                                </div>
-                            </div>";
+                        <div class='card h-100 mx-2 border-0 shadow'>
+                            <div class='bg-image'>
+                                <a href='product.php?id=$productID'><img src='$pathProductImg' class='w-100' /></a>
+                            </div>
+                            <div class='card-body'>
+                                <a href='product.php?id=$productID' class='text-reset'>
+                                    <h5 class='card-title mb-3'>$productName</h5>
+                                </a>
+                                <h6 class='mb-3'>$productPrice €</h6>
+                                <a href='#' class='btn btn-dark btn-sm'>Ajouter au panier</a>
+                            </div>
+                        </div>
+                    </div>";
                     }
                     ?>
                 </div>
             </div>
             <hr />
         </section>
-
-
-
-
-
-
-
         <div class='push'></div>
     </main>
 
