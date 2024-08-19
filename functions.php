@@ -1,4 +1,5 @@
 <?php
+
 function debugToConsole($data) {
     $output = $data;
     if (is_array($output))
@@ -18,6 +19,17 @@ function checkLogin($con){
             $userData = mysqli_fetch_assoc($result);
             return $userData;
         }
+    }
+}
+
+function getUserByID($con, $id){
+    $query = "SELECT * FROM utilisateurs WHERE id = '$id' limit 1";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $userData = mysqli_fetch_assoc($result);
+        return $userData;
     }
 }
 
@@ -350,4 +362,91 @@ function verifyAccount($con, $userID, $token){
 
 }
 
-?>
+function generateURLVerifyAccount($con, $id){
+    
+    $query = "SELECT * FROM tokens_verification_mail WHERE utilisateur_id = '$id'";
+    $result = mysqli_query($con,$query);
+    
+    if($result && mysqli_num_rows($result)> 0){
+        $deleteTokenQuery = "DELETE FROM tokens_verification_mail WHERE utilisateur_id = '$id'";
+        mysqli_query($con,$deleteTokenQuery);
+    }
+
+    $token = bin2hex(random_bytes(32));
+    $dateMax = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+
+    $queryCreateToken = "INSERT INTO tokens_verification_mail (utilisateur_id, token, date_max) VALUES ('$id', '$token', '$dateMax')";
+    $resultCreateToken = mysqli_query($con,$queryCreateToken);
+
+    if (!$resultCreateToken) {
+        echo "Error executing insert query: " . mysqli_error($con);
+        return false; 
+    }else{
+        $url = WEBSITE_URL . "verifyaccount.php?email=".getUserByID($con, $id)['email']."&token=".$token; 
+        return $url;
+    }
+}
+
+function generateURLResetPassword($con, $id){
+        
+        $query = "SELECT * FROM tokens_reinitialisation_mdp WHERE utilisateur_id = '$id'";
+        $result = mysqli_query($con,$query);
+        
+        if($result && mysqli_num_rows($result)> 0){
+            $deleteTokenQuery = "DELETE FROM tokens_reinitialisation_mdp WHERE utilisateur_id = '$id'";
+            mysqli_query($con,$deleteTokenQuery);
+        }
+    
+        $token = bin2hex(random_bytes(32));
+        $dateMax = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+    
+        $queryCreateToken = "INSERT INTO tokens_reinitialisation_mdp (utilisateur_id, token, date_max) VALUES ('$id', '$token', '$dateMax')";
+        $resultCreateToken = mysqli_query($con,$queryCreateToken);
+    
+        if (!$resultCreateToken) {
+            echo "Error executing insert query: " . mysqli_error($con);
+            return false; 
+        }else{
+            $url = WEBSITE_URL . "resetpassword.php?email=".getUserByID($con, $id)['email']."&token=".$token; 
+            return $url;
+        }
+
+}
+
+function checkPasswordResetToken($con, $userID, $token){
+    $query = "SELECT * FROM tokens_reinitialisation_mdp WHERE utilisateur_id = '$userID' AND token = '$token' AND date_max > NOW()";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        return true;
+    }
+    return false;
+}
+
+function resetPassword($con, $userID, $password){
+    $query = "UPDATE utilisateurs SET mot_de_passe = '$password' WHERE id = '$userID'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_affected_rows($con) > 0){
+
+        //check si l'utilisateur a encore un token, si oui le supprimer 
+        $queryCheckToken = "SELECT * FROM tokens_reinitialisation_mdp WHERE utilisateur_id = '$userID'";
+        $resultCheckToken = mysqli_query($con, $queryCheckToken);
+
+        if ($resultCheckToken && mysqli_num_rows($resultCheckToken) > 0) {
+            $deleteTokenQuery = "DELETE FROM tokens_reinitialisation_mdp WHERE utilisateur_id = '$userID'";
+            mysqli_query($con, $deleteTokenQuery);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+
+function addProductToCart(){
+    
+}

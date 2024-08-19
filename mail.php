@@ -4,9 +4,8 @@ require 'vendor/autoload.php';
 
 use \Mailjet\Resources;
 
-function sendAccountCreatedEmail($emailAddress, $name)
+function sendAccountCreatedEmail($emailAddress, $name, $urlVerif)
 {
-    $url = 'localhost/E-Commerce/verifyaccount.php';
 
     $subject = 'Bienvenue chez New Vet !';
     $textPart = 'Votre compte a bien été créé';
@@ -16,7 +15,7 @@ function sendAccountCreatedEmail($emailAddress, $name)
                     </div>
                     <div style=\'margin: 20px 0; background-color: #ffffff; padding: 20px; border-radius: 2px;\'>
                         <p>Bonjour '.$name.',</p>
-                        <p>Merci de vous être inscrit sur notre site web. Pour valider votre adresse mail, veuillez cliquer sur le lien suivant : '.$url.'</p>
+                        <p>Merci de vous être inscrit sur notre site web. Pour valider votre adresse mail, veuillez cliquer sur le lien suivant : '.$urlVerif.'</p>
                         <br/>
                         <p>Si vous avez des questions, n\'hésitez pas à nous contacter à l\'adresse mail suivante : contact.newvet@gmail.com.</p>
                         <p>Merci et à bientôt !</p>
@@ -41,7 +40,7 @@ function sendAccountDeleteEmail($emailAddress, $name)
                     <div style=\'margin: 20px 0; background-color: #ffffff; padding: 20px; border-radius: 2px;\'>
                         <p>Bonjour '.$name.',</p>
                         <p>Nous sommes désolés de vous voir partir.</p>
-                        <p>Vous pouvez recréer un compte quand vous voudrez à l\'adresse suivante : localhost/E-Commerce/singup.php
+                        <p>Vous pouvez recréer un compte quand vous voudrez à l\'adresse suivante : '.WEBSITE_URL.'signup.php
                         <br/>
                         <p>Si vous avez des questions, n\'hésitez pas à nous contacter à l\'adresse mail suivante : contact.newvet@gmail.com.</p>
                         <p>Merci et à bientôt !</p>
@@ -93,9 +92,7 @@ function sendMail($emailAddress, $name, $subject, $textPart, $htmlPart)
     }
 }
 
-function sendMailResetPassword($emailAddress, $name){
-
-    $url = 'localhost/E-Commerce/singup.php';
+function sendMailResetPassword($emailAddress, $name, $urlResetPassword){
 
     $subject = 'Réinitialisation de votre mot de passe';
     $textPart = 'Mot de passe oublié';
@@ -106,7 +103,7 @@ function sendMailResetPassword($emailAddress, $name){
                     <div style=\'margin: 20px 0; background-color: #ffffff; padding: 20px; border-radius: 2px;\'>
                         <p>Bonjour '.$name.',</p>
                         <p>Vous avez effectué une demande pour réinitialiser votre mot de passe.</p>
-                        <p>Cliquez sur le lien suivant pour réinitialiser votre mot de passe : '.$url.'</p>
+                        <p>Cliquez sur le lien suivant pour réinitialiser votre mot de passe : '.$urlResetPassword.'</p>
                         <br/>
                         <p>Si vous avez des questions, n\'hésitez pas à nous contacter à l\'adresse mail suivante : contact.newvet@gmail.com.</p>
                         <p>Merci et à bientôt !</p>
@@ -119,9 +116,8 @@ function sendMailResetPassword($emailAddress, $name){
     return sendMail($emailAddress, $name, $subject, $textPart, $htmlPart);
 }
 
-function sendMailVerifyAccount($emailAddress, $name){
+function sendMailVerifyAccount($emailAddress, $name, $urlVerif){
     
-        $url = 'localhost/E-Commerce/verifyaccount.php';
     
         $subject = 'Vérification de votre adresse mail';
         $textPart = 'Vérification de votre adresse mail';
@@ -131,7 +127,7 @@ function sendMailVerifyAccount($emailAddress, $name){
                         </div>
                         <div style=\'margin: 20px 0; background-color: #ffffff; padding: 20px; border-radius: 2px;\'>
                             <p>Bonjour '.$name.',</p>
-                            <p>Merci de vous être inscrit sur notre site web. Pour valider votre adresse mail, veuillez cliquer sur le lien suivant : '.$url.'</p>
+                            <p>Merci de vous être inscrit sur notre site web. Pour valider votre adresse mail, veuillez cliquer sur le lien suivant : '.$urlVerif.'</p>
                             <br/>
                             <p>Si vous avez des questions, n\'hésitez pas à nous contacter à l\'adresse mail suivante : contact.newvet@gmail.com.</p>
                             <p>Merci et à bientôt !</p>

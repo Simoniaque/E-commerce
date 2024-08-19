@@ -4,11 +4,6 @@ include("config.php");
 include("functions.php");
 include("mail.php");
 
-if(!isset($_SESSION['user_id'])){
-    header("Location: login.php");
-    die;
-}
-
 $user = checkLogin($con);
 if($user != null &&  $user['mail_verifie'] != 0){
     header("Location: index.php");
@@ -35,7 +30,7 @@ if (!empty($_GET)) {
                 $message = "Lien de vérification invalide !";
             }
         }else{
-            sendMailVerifyAccount($user['email'], $user['nom']);
+            sendMailVerifyAccount($user['email'], $user['nom'],generateURLVerifyAccount($con, $user['id']));
             
             $message = "Un email de vérification vous a été envoyé à l'adresse : ".$user['email'] .".";
         }

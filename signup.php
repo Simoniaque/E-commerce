@@ -28,8 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             $newUserId = addUser($con, $name, $email, $password);
 
             if ($newUserId > 0) {
-                var_dump($resultAjouterUtilisateur);
-                sendAccountCreatedEmail($email, $name);
+                sendAccountCreatedEmail($email, $name, generateURLVerifyAccount($con, $newUserId));
                 $_SESSION['user_id'] = $newUserId;
                 header("Location: index.php");
                 die;

@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     </div>
                     <button type="submit" class="btn btn-dark mb-2">Se connecter</button>
                     <br />
-                    <a href="resetpasswordform.php" class="link-opacity-50">Mot de passe oublié</a>
+                    <a href="resetpassword.php" class="link-opacity-50">Mot de passe oublié</a>
                     <br />
                     <a href="signup.php" class="link-opacity-50">Nouveau sur New Vet ? Creez ici votre
                         compte</a>
