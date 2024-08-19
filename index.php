@@ -21,6 +21,8 @@ $userData = checkLogin($con);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
     <link rel="stylesheet" href="assets/css/style.css" />
+    
+    <script src="assets/js/addToCart.js"></script>
 </head>
 
 <body>
@@ -113,7 +115,7 @@ $userData = checkLogin($con);
                                     <h5 class='card-title mb-3'>$productName</h5>
                                 </a>
                                 <h6 class='mb-3'>$productPrice €</h6>
-                                <a href='#' class='btn btn-dark btn-sm'>Ajouter au panier</a>
+                                <button class='btn btn-dark btn-sm' onclick=\"addToCart('$productID', 1)\">Ajouter au panier</button>
                             </div>
                         </div>
                     </div>";

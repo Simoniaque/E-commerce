@@ -22,6 +22,9 @@ if (!isset($_GET['id'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <script src="assets/js/addToCart.js"></script>
+
     <script>
         //Empêcher les utilisateurs de saisir une valeur à la main (potentiellement négative)
         window.onload = () => {
@@ -29,6 +32,13 @@ if (!isset($_GET['id'])) {
             mouseOnlyNumberInputField.addEventListener("keypress", (event) => {
                 event.preventDefault();
             });
+        }
+    </script>
+
+    <script>
+        function addProductToCart(productID) {
+            const quantity = document.getElementById("mouse-only-number-input").value;
+            addToCart(productID, quantity);
         }
     </script>
 
@@ -58,7 +68,7 @@ if (!isset($_GET['id'])) {
         $addToCartButton = "<a href='#' class='btn btn-lg disabled'>Stock Epuisé</a>";
 
         if ($stock > 0) {
-            $addToCartButton = "<a href='#' class='btn btn-dark shadow-0'>Ajouter au panier</a>";
+            $addToCartButton = "<a href='' class='btn btn-dark shadow-0' onclick=\"addProductToCart('$productID')\">Ajouter au panier</a>";
         }
 
 
@@ -170,7 +180,7 @@ if (!isset($_GET['id'])) {
                                     <h5 class='card-title mb-3'>$productName</h5>
                                 </a>
                                 <h6 class='mb-3'>$productPrice €</h6>
-                                <a href='#' class='btn btn-dark btn-sm'>Ajouter au panier</a>
+                                <button class='btn btn-dark btn-sm' onclick=\"addToCart('$productID', 1)\">Ajouter au panier</button>
                             </div>
                         </div>
                     </div>";

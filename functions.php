@@ -447,6 +447,142 @@ function resetPassword($con, $userID, $password){
 }
 
 
-function addProductToCart(){
+function addToCart($con, $userId, $productId, $quantity){
+
+    // Check if the user already has a cart
+    $cart = getCart($con, $userId);
+
+    if($cart){
+        $cartID = $cart['id'];
+    }else{
+        // If the user doesn't have a cart, create a new one
+        $query1 = "INSERT INTO paniers (utilisateur_id) VALUES ('$userId')";
+
+        $result1 = mysqli_query($con,$query1);
+
+        if($result1){
+            $cartID = mysqli_insert_id($con);
+        }
+    }
+
+    // Check if the product is already in the cart
+    $query2 = "SELECT * FROM details_panier WHERE panier_id = '$cartID' AND produit_id = '$productId'";
+
+    $result2 = mysqli_query($con,$query2);
+
+    if($result2 && mysqli_num_rows($result2)> 0){
+        // If the product is already in the cart, update the quantity
+        $cartDetail = mysqli_fetch_assoc($result2);
+        $newQuantity = $cartDetail['quantite'] + $quantity;
+
+        $query3 = "UPDATE details_panier SET quantite = '$newQuantity' WHERE panier_id = '$cartID' AND produit_id = '$productId'";
+
+        $result3 = mysqli_query($con,$query3);
+
+        if($result3){
+            return true;
+        }
+    }else{
+        // If the product is not in the cart, add it with the specified quantity
+        $query4 = "INSERT INTO details_panier (panier_id, produit_id, quantite) VALUES ('$cartID', '$productId', '$quantity')";
+
+        $result4 = mysqli_query($con,$query4);
+
+        if($result4){
+            return true;
+        }
+    }
+    return false;
+
+}
+
+function getCartID($con, $userID){
+    $query = "SELECT * FROM paniers WHERE utilisateur_id = '$userID' limit 1";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $cart = mysqli_fetch_assoc($result);
+        return $cart['id'];
+    }
+}
+
+function getCartDetails($con, $cartID){
+    $query = "SELECT * FROM details_panier WHERE panier_id = '$cartID'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $cartDetails = mysqli_fetch_all($result, MYSQLI_ASSOC);
+        return $cartDetails;
+    }
+}
+
+function getCartProducts($con, $cartID){
+    $query = "SELECT * FROM details_panier WHERE panier_id = '$cartID'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $cartDetails = mysqli_fetch_all($result, MYSQLI_ASSOC);
+        $products = array();
+        foreach ($cartDetails as $cartDetail) {
+            $product = getProductById($con, $cartDetail['produit_id']);
+            $product['quantite'] = $cartDetail['quantite'];
+            $products[] = $product;
+        }
+        return $products;
+    }
+}
+
+function updateCartQuantity($con, $userID, $productID, $quantity){
+
     
+    $cartID = getCartID($con, $userID);
+
+    $queryCheckExist = "SELECT * FROM details_panier WHERE panier_id = '$cartID' AND produit_id = '$productID'";
+    $resultCheckExist = mysqli_query($con,$queryCheckExist);
+
+    if($resultCheckExist && mysqli_num_rows($resultCheckExist)> 0){
+        $cartDetail = mysqli_fetch_assoc($resultCheckExist);
+        $quantity += $cartDetail['quantite'];
+    }else{
+        //Ajouter le produit au panier
+        return addToCart($con, $userID, $productID, $quantity);
+    }
+
+    $query = "UPDATE details_panier SET quantite = '$quantity' WHERE panier_id = '$cartID' AND produit_id = '$productID'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result){
+        return true;
+    }
+    return false;
+}
+
+function calculateTotalCartPrice($con, $userID){
+    $cartID = getCartID($con, $userID);
+
+    $query = "SELECT SUM(prix * quantite) as total FROM details_panier JOIN produits ON details_panier.produit_id = produits.id WHERE panier_id = '$cartID'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $total = mysqli_fetch_assoc($result);
+        return $total['total'];
+    }
+}
+
+function deleteProductFromCart($con, $userID, $productID){
+    $cartID = getCartID($con, $userID);
+
+    $query = "DELETE FROM details_panier WHERE panier_id = '$cartID' AND produit_id = '$productID'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result){
+        return true;
+    }
+    return false;
 }

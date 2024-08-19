@@ -42,11 +42,11 @@
 
                     }
 
-                    echo "<button class='btn btn-outline-dark position-relative' type='submit'>
+                    echo "<a href='cart.php' class='btn btn-outline-dark position-relative' type='submit'>
                             <i class='bi-cart-fill me-1'></i>
                             Panier
                             $codeBadge
-                          </button>
+                          </a>
                           <a class='btn btn-outline-dark ms-3' href='profile.php'>Mon compte</a>
                           <a class='btn btn-outline-dark ms-3' href='logout.php'>Se déconnecter</a>";
                 } else {
