@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : dim. 18 août 2024 à 18:10
+-- Généré le : lun. 19 août 2024 à 04:00
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -73,26 +73,26 @@ INSERT INTO `categories_en_avant` (`id`, `categorie_id`) VALUES
 CREATE TABLE `commandes` (
   `id` int(11) NOT NULL,
   `utilisateur_id` int(11) NOT NULL,
-  `total` decimal(10,2) NOT NULL,
   `date_creation` date NOT NULL DEFAULT current_timestamp(),
   `prix_total` decimal(10,2) NOT NULL DEFAULT 0.00,
-  `statut` int(1) NOT NULL DEFAULT 1
+  `statut` int(1) NOT NULL DEFAULT 1,
+  `chiffres_cb` int(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `commandes`
 --
 
-INSERT INTO `commandes` (`id`, `utilisateur_id`, `total`, `date_creation`, `prix_total`, `statut`) VALUES
-(1, 1, 139.98, '2024-06-21', 119.98, 4),
-(2, 2, 209.97, '2024-06-21', 89.97, 2),
-(3, 1, 219.96, '2024-08-22', 219.96, 3),
-(4, 2, 299.97, '2024-08-23', 299.97, 2),
-(5, 3, 79.98, '2024-08-24', 79.98, 4),
-(6, 1, 159.98, '2024-08-25', 159.98, 1),
-(7, 2, 49.99, '2024-08-26', 49.99, 4),
-(8, 3, 249.95, '2024-08-27', 249.95, 3),
-(9, 1, 399.95, '2024-08-28', 399.95, 2);
+INSERT INTO `commandes` (`id`, `utilisateur_id`, `date_creation`, `prix_total`, `statut`, `chiffres_cb`) VALUES
+(1, 1, '2024-06-21', 119.98, 4, 1234),
+(2, 2, '2024-06-21', 89.97, 2, 5678),
+(3, 1, '2024-08-22', 219.96, 3, 9123),
+(4, 2, '2024-08-23', 299.97, 2, 4567),
+(5, 3, '2024-08-24', 79.98, 4, 8912),
+(6, 1, '2024-08-25', 159.98, 1, 3456),
+(7, 2, '2024-08-26', 49.99, 4, 7891),
+(8, 3, '2024-08-27', 249.95, 3, 2345),
+(9, 1, '2024-08-28', 399.95, 2, 6789);
 
 -- --------------------------------------------------------
 
@@ -218,22 +218,23 @@ CREATE TABLE `produits` (
   `description` text DEFAULT NULL,
   `materiaux` varchar(50) NOT NULL,
   `prix` decimal(10,2) NOT NULL,
-  `stock` int(11) DEFAULT 0
+  `stock` int(11) DEFAULT 0,
+  `date_ajout` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `produits`
 --
 
-INSERT INTO `produits` (`id`, `categorie_id`, `nom`, `description`, `materiaux`, `prix`, `stock`) VALUES
-(1, 1, 'Robe Midi Élégante', 'Robe midi élégante pour toutes les occasions.', 'Soie', 59.99, 50),
-(2, 1, 'Robe Maxi Florale', 'Robe longue avec motif floral, parfaite pour l\'été.', 'Soie', 79.99, 30),
-(3, 2, 'Chemisier à Manches Longues', 'Chemisier féminin à manches longues.', 'Soie', 29.99, 80),
-(4, 2, 'Débardeur Basique', 'Débardeur confortable pour une tenue décontractée.', 'Coton', 14.99, 100),
-(5, 3, 'Jean Skinny Stretch', 'Jean stretch et ajusté pour un look moderne.', 'Jean', 49.99, 0),
-(6, 4, 'Bottes Hautes', 'Bottes élégantes pour l\'hiver.', 'Cuire', 89.99, 40),
-(7, 4, 'Sandales à Talons', 'Sandales à talons pour les soirées.', 'Liège et cuir', 69.99, 60),
-(10, 4, 'Chaussure à talon', 'Chaussure à talon en cuir', 'Cuir', 49.00, 20);
+INSERT INTO `produits` (`id`, `categorie_id`, `nom`, `description`, `materiaux`, `prix`, `stock`, `date_ajout`) VALUES
+(1, 1, 'Robe Midi Élégante', 'Robe midi élégante pour toutes les occasions.', 'Soie', 59.99, 50, '2024-08-13'),
+(2, 1, 'Robe Maxi Florale', 'Robe longue avec motif floral, parfaite pour l\'été.', 'Soie', 79.99, 30, '2024-08-09'),
+(3, 2, 'Chemisier à Manches Longues', 'Chemisier féminin à manches longues.', 'Soie', 29.99, 80, '2024-04-24'),
+(4, 2, 'Débardeur Basique', 'Débardeur confortable pour une tenue décontractée.', 'Coton', 14.99, 100, '2024-02-16'),
+(5, 3, 'Jean Skinny Stretch', 'Jean stretch et ajusté pour un look moderne.', 'Jean', 49.99, 0, '2024-08-21'),
+(6, 4, 'Bottes Hautes', 'Bottes élégantes pour l\'hiver.', 'Cuire', 89.99, 40, '2024-08-28'),
+(7, 4, 'Sandales à Talons', 'Sandales à talons pour les soirées.', 'Liège et cuir', 69.99, 60, '2024-01-10'),
+(10, 4, 'Chaussure à talon', 'Chaussure à talon en cuir', 'Cuir', 49.00, 20, '2018-08-15');
 
 -- --------------------------------------------------------
 
@@ -259,6 +260,28 @@ INSERT INTO `produits_en_avant` (`id`, `produit_id`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `tokens_verification_mail`
+--
+
+CREATE TABLE `tokens_verification_mail` (
+  `utilisateur_id` int(11) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `date_max` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `tokens_verification_mail`
+--
+
+INSERT INTO `tokens_verification_mail` (`utilisateur_id`, `token`, `date_max`) VALUES
+(1, 'token123456', '2024-12-31 23:59:59'),
+(2, 'token789012', '2024-12-31 23:59:59'),
+(3, 'token345678', '2024-12-31 23:59:59'),
+(4, 'token901234', '2024-12-31 23:59:59');
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `utilisateurs`
 --
 
@@ -267,18 +290,20 @@ CREATE TABLE `utilisateurs` (
   `nom` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `mot_de_passe` varchar(255) NOT NULL,
-  `est_admin` tinyint(1) DEFAULT 0
+  `est_admin` tinyint(1) DEFAULT 0,
+  `mail_verifie` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `utilisateurs`
 --
 
-INSERT INTO `utilisateurs` (`id`, `nom`, `email`, `mot_de_passe`, `est_admin`) VALUES
-(1, 'Emma Martin', 'emma@example.com', 'motdepasse1', 0),
-(2, 'Laura Dubois', 'laura@example.com', 'motdepasse2', 0),
-(3, 'Sophie Lefevre', 'sophie@example.com', 'motdepasse3', 0),
-(4, 'Admin Shop', 'admin@example.com', 'admin123', 1);
+INSERT INTO `utilisateurs` (`id`, `nom`, `email`, `mot_de_passe`, `est_admin`, `mail_verifie`) VALUES
+(1, 'Emma Martin', 'emma@example.com', 'motdepasse1', 0, 0),
+(2, 'Laura Dubois', 'laura@example.com', 'motdepasse2', 0, 0),
+(3, 'Sophie Lefevre', 'sophie@example.com', 'motdepasse3', 0, 0),
+(4, 'Admin Shop', 'admin@example.com', 'admin123', 1, 0),
+(9, 'Test', 'tsuyoki127@hotmail.com', 'test', 0, 1);
 
 --
 -- Index pour les tables déchargées
@@ -349,6 +374,12 @@ ALTER TABLE `produits_en_avant`
   ADD UNIQUE KEY `unique_produit` (`produit_id`);
 
 --
+-- Index pour la table `tokens_verification_mail`
+--
+ALTER TABLE `tokens_verification_mail`
+  ADD PRIMARY KEY (`utilisateur_id`);
+
+--
 -- Index pour la table `utilisateurs`
 --
 ALTER TABLE `utilisateurs`
@@ -393,7 +424,7 @@ ALTER TABLE `details_panier`
 -- AUTO_INCREMENT pour la table `infos_clients`
 --
 ALTER TABLE `infos_clients`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `paniers`
@@ -417,7 +448,7 @@ ALTER TABLE `produits_en_avant`
 -- AUTO_INCREMENT pour la table `utilisateurs`
 --
 ALTER TABLE `utilisateurs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Contraintes pour les tables déchargées
@@ -472,6 +503,12 @@ ALTER TABLE `produits`
 --
 ALTER TABLE `produits_en_avant`
   ADD CONSTRAINT `produits_en_avant_fk` FOREIGN KEY (`produit_id`) REFERENCES `produits` (`id`);
+
+--
+-- Contraintes pour la table `tokens_verification_mail`
+--
+ALTER TABLE `tokens_verification_mail`
+  ADD CONSTRAINT `tokens_verification_mail_ibfk_1` FOREIGN KEY (`utilisateur_id`) REFERENCES `utilisateurs` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -3,6 +3,11 @@ session_start();
 include("config.php");
 include("functions.php");
 
+if(isset($_SESSION['user_id'])){
+    header("Location: index.php");
+    die;
+}
+
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $email = $_POST['userEmail'];
     $password = $_POST['userPassword'];
@@ -67,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
 
             <div class="col-12 col-md-6 col-lg-4">
-                <form class="p-4 border rounded bg-light" method="post">
+                <form class="p-4 shadow rounded-1 bg-light" method="post">
                     <div class="form-group mb-3">
                         <label>Adresse email</label>
                         <input name="userEmail" type="email" class="form-control">
@@ -82,7 +87,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     </div>
                     <button type="submit" class="btn btn-dark mb-2">Se connecter</button>
                     <br />
-                    <a href="signup.php" class="text-xs link-opacity-50">Nouveau sur New Vet ? Creez ici votre
+                    <a href="resetpasswordform.php" class="link-opacity-50">Mot de passe oublié</a>
+                    <br />
+                    <a href="signup.php" class="link-opacity-50">Nouveau sur New Vet ? Creez ici votre
                         compte</a>
                 </form>
             </div>

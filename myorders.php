@@ -9,12 +9,13 @@ if (!isset($_SESSION['user_id'])) {
     die;
 }
 
-if(isset($_GET['orderNumber']) ){
+if (isset($_GET['orderNumber'])) {
     $searchOrderNumber = (int)$_GET['orderNumber'];
-}else{
+} else {
     $searchOrderNumber = '';
 }
 
+$orders = array();
 if ($searchOrderNumber > 0) {
     $orders = getOrdersByUserIdAndNumber($con, $_SESSION['user_id'], $searchOrderNumber);
 } else {
@@ -60,14 +61,14 @@ if ($searchOrderNumber > 0) {
             <div class="container">
                 <div class="justify-content-center row d-flex justify-content-around">
                     <span class="col-lg-5 row">
-                                <form method="GET" action="" class="d-flex align-items-center">
-                                    <div class="input-group">
-                                        <input name="orderNumber"
-                                            placeholder="Numéro de commande" type="search" class="form-control "
-                                            value="<?php if($searchOrderNumber != 0) echo $searchOrderNumber?>" />
-                                        <button type="submit" class="btn btn-dark ms-2">Rechercher</button>
-                                    </div>
-                                </form>
+                        <form method="GET" action="" class="d-flex align-items-center">
+                            <div class="input-group">
+                                <input name="orderNumber"
+                                    placeholder="Numéro de commande" type="search" class="form-control "
+                                    value="<?php if ($searchOrderNumber != 0) echo $searchOrderNumber ?>" />
+                                <button type="submit" class="btn btn-dark ms-2">Rechercher</button>
+                            </div>
+                        </form>
                     </span>
                     <div class="col-lg-4 mb-2">
                         <select class="form-select" id="ordersOrder" onchange="ordersSort()">
@@ -82,53 +83,58 @@ if ($searchOrderNumber > 0) {
                         <div id="ordersList">
 
                             <?php
-                            foreach ($orders as $order) {
-                                $orderDetails = getOrderDetails($con, $order['id']);
-                                $orderId = $order['id'];
-                                $orderDate = $order['date_creation'];
-                                $orderTotal = $order['prix_total'];
-                                $orderStatus = $order['statut'];
-                                $orderStatusTag = "<p class='badge rounded-pill bg-danger text-black'>Etat Inconnu</p>";
 
-                                switch ($orderStatus) {
-                                    case 1:
-                                        $orderStatusTag = "<p class='badge rounded-pill bg-danger text-black' style='--bs-bg-opacity: .5;'>En attente d'expedition</p>";
-                                        break;
-                                    case 2:
-                                        $orderStatusTag = "<p class='badge rounded-pill bg-warning text-black' style='--bs-bg-opacity: .5;'>Expediée</p>";
-                                        break;
-                                    case 3:
-                                        $orderStatusTag = "<p class='badge rounded-pill bg-success text-black' style='--bs-bg-opacity: .5;'>En cours de livraison</p>";
-                                        break;
-                                    case 4:
-                                        $orderStatusTag = "<p class='badge rounded-pill bg-primary text-black' style='--bs-bg-opacity: .5;'>Livrée</p>";
-                                        break;
-                                }
+                            if (is_array($orders)) {
+                                foreach ($orders as $order) {
+                                    $orderDetails = getOrderDetails($con, $order['id']);
+                                    $orderId = $order['id'];
+                                    $orderDate = $order['date_creation'];
+                                    $orderTotal = $order['prix_total'];
+                                    $orderStatus = $order['statut'];
+                                    $orderStatusTag = "<p class='badge rounded-pill bg-danger text-black'>Etat Inconnu</p>";
 
-                                echo "<div class='order-list-box card mt-4'>
-                                        <div class='p-4 card-body'>
-                                            <div class='align-items-center row'>
-                                                <div class='col-lg-5'>
-                                                    <div class='mt-3 mt-lg-0'>
-                                                        <h5 class='fs-19 mb-4'>
-                                                            <a class='primary-link' href='order.php?id=$orderId'>Commande n° $orderId</a>
-                                                        </h5>
-                                                        <h5>$orderTotal €</h5>
+                                    switch ($orderStatus) {
+                                        case 1:
+                                            $orderStatusTag = "<p class='badge rounded-pill bg-danger text-black' style='--bs-bg-opacity: .5;'>En attente d'expedition</p>";
+                                            break;
+                                        case 2:
+                                            $orderStatusTag = "<p class='badge rounded-pill bg-warning text-black' style='--bs-bg-opacity: .5;'>Expediée</p>";
+                                            break;
+                                        case 3:
+                                            $orderStatusTag = "<p class='badge rounded-pill bg-success text-black' style='--bs-bg-opacity: .5;'>En cours de livraison</p>";
+                                            break;
+                                        case 4:
+                                            $orderStatusTag = "<p class='badge rounded-pill bg-primary text-black' style='--bs-bg-opacity: .5;'>Livrée</p>";
+                                            break;
+                                    }
+
+                                    echo "<div class='order-list-box card mt-4'>
+                                            <div class='p-4 card-body'>
+                                                <div class='align-items-center row'>
+                                                    <div class='col-lg-5'>
+                                                        <div class='mt-3 mt-lg-0'>
+                                                            <h5 class='fs-19 mb-4'>
+                                                                <a class='primary-link' href='order.php?id=$orderId'>Commande n° $orderId</a>
+                                                            </h5>
+                                                            <h5>$orderTotal €</h5>
+                                                        </div>
+                                                    </div>
+                                                <div class='col-lg-4'>
+                                                    <div class='mt-2 mt-lg-0 d-flex flex-wrap align-items-start gap-1'>
+                                                        <span class='badge bg-soft-secondary fs-14 mt-1'>$orderDate</span>
                                                     </div>
                                                 </div>
-                                            <div class='col-lg-4'>
-                                                <div class='mt-2 mt-lg-0 d-flex flex-wrap align-items-start gap-1'>
-                                                    <span class='badge bg-soft-secondary fs-14 mt-1'>$orderDate</span>
-                                                </div>
+                                            </div>
+                                            <div class='shipping-state'>
+                                                $orderStatusTag
                                             </div>
                                         </div>
-                                        <div class='shipping-state'>
-                                            $orderStatusTag
-                                        </div>
-                                    </div>
-                                </div>
-                        ";
+                                    </div>";
+                                }
+                            }else{
+                                echo "<h2 class='mt-5 shadow p-5'>Aucune commande</h2>";
                             }
+
                             ?>
                         </div>
                     </div>

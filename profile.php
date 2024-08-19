@@ -3,6 +3,7 @@ session_start();
 
 include("config.php");
 include("functions.php");
+include("mail.php");
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
@@ -15,12 +16,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Si la requête est pour supprimer le compte
     $input = json_decode(file_get_contents('php://input'), true);
     if (isset($input['action']) && $input['action'] === 'deleteAccount') {
+
+        $userToDelete = checkLogin($con);
         if (deleteUser($con, $id)) {
+            sendAccountDeleteEmail($userToDelete['email'], $userToDelete['nom']);
             session_destroy();
-            echo "User deleted successfully";
+            echo "accountDeleted";
         } else {
-            echo "Error deleting user";
+            echo "errorDeletingAccount";
         }
+
         exit;
     }
 
@@ -78,16 +83,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 .then(response => response.text())
                 .then(data => {
                     console.log(data);
-                    if (data === "User deleted successfully") {
-                        alert("Account deleted successfully");
+                    if (data === "accountDeleted") {
+                        alert("Votre compte a bien été supprimé");
                         window.location.href = 'index.php'; // Redirection vers la page d'accueil
                     } else {
-                        alert("Error deleting account");
+                        alert("Erreur lors de la suppression du compte");
                     }
                 })
                 .catch(error => {
                     console.error(error);
-                    alert("Error deleting account");
+                    alert("Erreur lors de la suppression du compte");
                 });
         }
 
@@ -125,16 +130,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?php
         $userData = checkLogin($con);
         $id = $userData['id'];
+        $name = $userData['nom'];
+        $email = $userData['email'];
 
         $userInfo = getUserInfo($con, $id);
+        $phoneNumber = "";
+        $address = "";
+        $postalCode = "";
+        $country = "";
+        $city = "";
 
-        $name = $userData['nom'];
-        $phoneNumber = $userInfo['telephone'];
-        $address = $userInfo['adresse'];
-        $postalCode = $userInfo['code_postal'];
-        $country = $userInfo['pays'];
-        $city = $userInfo['ville'];
-        $email = $userData['email'];
+        if($userInfo){
+            if($userInfo['telephone'] != null){
+                $phoneNumber = $userInfo['telephone'];
+            }
+            if($userInfo['adresse'] != null){
+                $address = $userInfo['adresse'];
+            }
+            if($userInfo['code_postal'] != null){
+                $postalCode = $userInfo['code_postal'];
+            }
+            if($userInfo['pays'] != null){
+                $country = $userInfo['pays'];
+            }
+            if($userInfo['ville'] != null){
+                $city = $userInfo['ville'];
+            }
+        }
+
 
 
 

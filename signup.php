@@ -2,6 +2,12 @@
 session_start();
 include("config.php");
 include("functions.php");
+include("mail.php");
+
+if(isset($_SESSION['user_id'])){
+    header("Location: index.php");
+    die;
+}
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $name = $_POST['userName'];
@@ -10,17 +16,29 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     if (!empty($name) && !empty($email) && !empty($password)) {
 
-        $queryUtilisateurExistant = "SELECT * FROM utilisateurs WHERE email = '$email'";
-        $resultUtilisateurExistant = mysqli_query($con, $queryUtilisateurExistant);
-        if ($resultUtilisateurExistant) {
+        $userAlreadyExists = userAlreadyExists($con, $email);
+        
+        if ($userAlreadyExists) {
             echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
                     Cette adresse email est déjà utilisée.
                     <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
                   </div>";
         } else {
 
-            $queryAjouterUtilisateur = "INSERT INTO utilisateurs (nom,email,mot_de_passe) VALUES ('$name','$email','$password')";
-            $resultAjouterUtilisateur = mysqli_query($con, $queryAjouterUtilisateur);
+            $newUserId = addUser($con, $name, $email, $password);
+
+            if ($newUserId > 0) {
+                var_dump($resultAjouterUtilisateur);
+                sendAccountCreatedEmail($email, $name);
+                $_SESSION['user_id'] = $newUserId;
+                header("Location: index.php");
+                die;
+            } else {
+                echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
+                    Une erreur est survenue lors de la création de votre compte.
+                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                  </div>";
+            }
 
             header("Location: login.php");
             die;
@@ -59,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
         <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
             <div class="col-12 col-md-6 col-lg-4">
-                <form class="p-4 border rounded bg-light" method="post">
+                <form class="p-4 shadow rounded-1 bg-light" method="post">
                     <div class="form-group mb-3">
                         <label>Nom</label>
                         <input name="userName" type="text mb-3" class="form-control">

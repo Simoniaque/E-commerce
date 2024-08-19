@@ -53,8 +53,20 @@
                     echo "<a class='btn btn-outline-dark ms-3' href='login.php'>Se Connecter</a>
                           <a class='btn btn-outline-dark ms-3' href='signup.php'>S'inscrire</a>";
                 }
+
+                
                 ?>
             </div>
         </div>
     </nav>
+
+    <?php
+    $user = checkLogin($con);
+    if($user != null &&  $user['mail_verifie'] == 0){
+        $email = $user['email'];
+        //afficher un bandeau d'alerte
+        echo "<div class='alert alert-warning show mb-0 text-center' role='alert'>
+                Votre adresse mail n'a pas été vérifiée. Veuillez vérifier votre boîte mail. <a class='text-black' href='verifyaccount.php?email=$email'>Renvoyer le mail de vérification.</a>
+              </div>";
+    }?>
 </header>

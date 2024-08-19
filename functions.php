@@ -22,7 +22,7 @@ function checkLogin($con){
 }
 
 function getUserInfo($con, $userId){
-    $query = "SELECT * FROM infos_clients WHERE id = '$userId' limit 1";
+    $query = "SELECT * FROM infos_clients WHERE utilisateur_id = '$userId' limit 1";
 
     $result = mysqli_query($con,$query);
 
@@ -292,4 +292,62 @@ function getOrderById($con, $orderId){
         return $order;
     }
 }
+
+function userAlreadyExists($con, $email){
+    $query = "SELECT * FROM utilisateurs WHERE email = '$email'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        return true;
+    }
+    return false;
+}
+
+function addUser($con, $name, $email, $password){
+    $query = "INSERT INTO utilisateurs (nom, email, mot_de_passe) VALUES ('$name', '$email', '$password')";
+
+    $result = mysqli_query($con,$query);
+
+    if($result){
+        //retourner l'id de l'utilisateur ajouté 
+        return mysqli_insert_id($con);
+    }
+    return 0;
+}
+
+function getUserByEmail($con,$email){
+    $query = "SELECT * FROM utilisateurs WHERE email = '$email' limit 1";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $user = mysqli_fetch_assoc($result);
+        return $user;
+    }
+}
+
+function verifyAccount($con, $userID, $token){
+    $query = "SELECT * FROM tokens_verification_mail WHERE utilisateur_id = '$userID' AND token = '$token' AND date_max > NOW()";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $verifyAccountQuery = "UPDATE utilisateurs SET mail_verifie = 1 WHERE id = '$userID'";
+        $resultVerifyAccount = mysqli_query($con,$verifyAccountQuery);
+
+        if($resultVerifyAccount && mysqli_affected_rows($con) > 0){
+            //supprimer le token
+            $deleteTokenQuery = "DELETE FROM tokens_verification_mail WHERE utilisateur_id = '$userID' AND token = '$token'";
+            $resultDeleteToken = mysqli_query($con,$deleteTokenQuery);
+
+            if($resultDeleteToken && mysqli_affected_rows($con) > 0){
+                return true;
+            }
+        }
+    }
+    return false;
+
+}
+
 ?>
