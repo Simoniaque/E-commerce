@@ -196,6 +196,11 @@ if(isset($_GET['maxPrice'])){
                         $productName = $product["nom"];
                         $productPrice = $product["prix"];
                         $pathProductImg = PATH_PRODUCTS_IMAGES . $productID . ".webp";
+                        $addToCartTag = "<button class='btn btn-dark btn-sm' onclick=\"addToCart('$productID', 1)\">Ajouter au panier</button>";
+                        if($product['stock'] <= 0) {
+                            $addToCartTag = "<button class='btn btn-dark btn-sm' disabled>Stock épuisé</button>";
+
+                        }
                         echo "<div class='col-2 mb-5'>
                             <div class='card h-100 mx-2 border-0 shadow'>
                                 <div class='bg-image'>
@@ -206,7 +211,7 @@ if(isset($_GET['maxPrice'])){
                                         <h5 class='card-title mb-3'>$productName</h5>
                                     </a>
                                     <h6 class='mb-3'>$productPrice €</h6>
-                                    <button class='btn btn-dark btn-sm' onclick=\"addToCart('$productID', 1)\">Ajouter au panier</button>
+                                    $addToCartTag
                                 </div>
                             </div>
                         </div>";

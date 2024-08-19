@@ -34,7 +34,7 @@ function getUserByID($con, $id){
 }
 
 function getUserInfo($con, $userId){
-    $query = "SELECT * FROM infos_clients WHERE utilisateur_id = '$userId' limit 1";
+    $query = "SELECT * FROM details_utilisateurs WHERE utilisateur_id = '$userId' limit 1";
 
     $result = mysqli_query($con,$query);
 
@@ -97,7 +97,7 @@ function EditUserInfo($con, $id, $name, $phoneNumber, $address, $postalCode, $co
     $result = mysqli_query($con,$query);
 
     if($result){
-        $query = "UPDATE infos_clients SET telephone = '$phoneNumber', adresse = '$address', code_postal = '$postalCode', pays = '$country', ville = '$city' WHERE id = '$id'";
+        $query = "UPDATE details_utilisateurs SET telephone = '$phoneNumber', adresse = '$address', code_postal = '$postalCode', pays = '$country', ville = '$city' WHERE id = '$id'";
 
         $result = mysqli_query($con,$query);
 
@@ -466,7 +466,7 @@ function addToCart($con, $userId, $productId, $quantity){
     }
 
     // Check if the product is already in the cart
-    $query2 = "SELECT * FROM details_panier WHERE panier_id = '$cartID' AND produit_id = '$productId'";
+    $query2 = "SELECT * FROM details_paniers WHERE panier_id = '$cartID' AND produit_id = '$productId'";
 
     $result2 = mysqli_query($con,$query2);
 
@@ -475,7 +475,7 @@ function addToCart($con, $userId, $productId, $quantity){
         $cartDetail = mysqli_fetch_assoc($result2);
         $newQuantity = $cartDetail['quantite'] + $quantity;
 
-        $query3 = "UPDATE details_panier SET quantite = '$newQuantity' WHERE panier_id = '$cartID' AND produit_id = '$productId'";
+        $query3 = "UPDATE details_paniers SET quantite = '$newQuantity' WHERE panier_id = '$cartID' AND produit_id = '$productId'";
 
         $result3 = mysqli_query($con,$query3);
 
@@ -484,7 +484,7 @@ function addToCart($con, $userId, $productId, $quantity){
         }
     }else{
         // If the product is not in the cart, add it with the specified quantity
-        $query4 = "INSERT INTO details_panier (panier_id, produit_id, quantite) VALUES ('$cartID', '$productId', '$quantity')";
+        $query4 = "INSERT INTO details_paniers (panier_id, produit_id, quantite) VALUES ('$cartID', '$productId', '$quantity')";
 
         $result4 = mysqli_query($con,$query4);
 
@@ -508,7 +508,7 @@ function getCartID($con, $userID){
 }
 
 function getCartDetails($con, $cartID){
-    $query = "SELECT * FROM details_panier WHERE panier_id = '$cartID'";
+    $query = "SELECT * FROM details_paniers WHERE panier_id = '$cartID'";
 
     $result = mysqli_query($con,$query);
 
@@ -519,7 +519,7 @@ function getCartDetails($con, $cartID){
 }
 
 function getCartProducts($con, $cartID){
-    $query = "SELECT * FROM details_panier WHERE panier_id = '$cartID'";
+    $query = "SELECT * FROM details_paniers WHERE panier_id = '$cartID'";
 
     $result = mysqli_query($con,$query);
 
@@ -540,7 +540,7 @@ function updateCartQuantity($con, $userID, $productID, $quantity){
     
     $cartID = getCartID($con, $userID);
 
-    $queryCheckExist = "SELECT * FROM details_panier WHERE panier_id = '$cartID' AND produit_id = '$productID'";
+    $queryCheckExist = "SELECT * FROM details_paniers WHERE panier_id = '$cartID' AND produit_id = '$productID'";
     $resultCheckExist = mysqli_query($con,$queryCheckExist);
 
     if($resultCheckExist && mysqli_num_rows($resultCheckExist)> 0){
@@ -551,7 +551,7 @@ function updateCartQuantity($con, $userID, $productID, $quantity){
         return addToCart($con, $userID, $productID, $quantity);
     }
 
-    $query = "UPDATE details_panier SET quantite = '$quantity' WHERE panier_id = '$cartID' AND produit_id = '$productID'";
+    $query = "UPDATE details_paniers SET quantite = '$quantity' WHERE panier_id = '$cartID' AND produit_id = '$productID'";
 
     $result = mysqli_query($con,$query);
 
@@ -564,7 +564,7 @@ function updateCartQuantity($con, $userID, $productID, $quantity){
 function calculateTotalCartPrice($con, $userID){
     $cartID = getCartID($con, $userID);
 
-    $query = "SELECT SUM(prix * quantite) as total FROM details_panier JOIN produits ON details_panier.produit_id = produits.id WHERE panier_id = '$cartID'";
+    $query = "SELECT SUM(prix * quantite) as total FROM details_paniers JOIN produits ON details_paniers.produit_id = produits.id WHERE panier_id = '$cartID'";
 
     $result = mysqli_query($con,$query);
 
@@ -577,7 +577,7 @@ function calculateTotalCartPrice($con, $userID){
 function deleteProductFromCart($con, $userID, $productID){
     $cartID = getCartID($con, $userID);
 
-    $query = "DELETE FROM details_panier WHERE panier_id = '$cartID' AND produit_id = '$productID'";
+    $query = "DELETE FROM details_paniers WHERE panier_id = '$cartID' AND produit_id = '$productID'";
 
     $result = mysqli_query($con,$query);
 
