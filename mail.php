@@ -8,16 +8,16 @@ function sendAccountCreatedEmail($emailAddress, $name)
 {
     $url = 'localhost/E-Commerce/verifyaccount.php';
 
-    $subject = 'Bienvue chez New Vet !';
+    $subject = 'Bienvenue chez New Vet !';
     $textPart = 'Votre compte a bien été créé';
     $htmlPart = '<div style=\'font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; max-width: 600px; margin: 0 auto; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);\'>
                     <div style=\'background-color: #212529; color: #ffffff; padding: 10px; text-align: center; border-radius: 2px;\'>
-                        <h1 style=\'margin: 0;\'>Bienvenue sur Notre Site</h1>
+                        <h1 style=\'margin: 0;\'>Bienvenue chez New Vet</h1>
                     </div>
                     <div style=\'margin: 20px 0; background-color: #ffffff; padding: 20px; border-radius: 2px;\'>
                         <p>Bonjour '.$name.',</p>
-                        <p>Merci de vous être inscrit sur notre site web. Pour valider votre adresse mail, veuillez cliquer sur le lien suivant :</p>
-                            <p>Cliquez sur le lien suivant pour valider votre adresse mail : '.$url.'</p>
+                        <p>Merci de vous être inscrit sur notre site web. Pour valider votre adresse mail, veuillez cliquer sur le lien suivant : '.$url.'</p>
+                        <br/>
                         <p>Si vous avez des questions, n\'hésitez pas à nous contacter à l\'adresse mail suivante : contact.newvet@gmail.com.</p>
                         <p>Merci et à bientôt !</p>
                         <p>Cordialement,<br>L\'équipe de New Vet</p>
