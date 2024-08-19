@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : lun. 19 août 2024 à 04:00
+-- Généré le : lun. 19 août 2024 à 13:57
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -260,6 +260,18 @@ INSERT INTO `produits_en_avant` (`id`, `produit_id`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `tokens_reinitialisation_mdp`
+--
+
+CREATE TABLE `tokens_reinitialisation_mdp` (
+  `utilisateur_id` int(11) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `date_max` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `tokens_verification_mail`
 --
 
@@ -268,16 +280,6 @@ CREATE TABLE `tokens_verification_mail` (
   `token` varchar(255) NOT NULL,
   `date_max` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Déchargement des données de la table `tokens_verification_mail`
---
-
-INSERT INTO `tokens_verification_mail` (`utilisateur_id`, `token`, `date_max`) VALUES
-(1, 'token123456', '2024-12-31 23:59:59'),
-(2, 'token789012', '2024-12-31 23:59:59'),
-(3, 'token345678', '2024-12-31 23:59:59'),
-(4, 'token901234', '2024-12-31 23:59:59');
 
 -- --------------------------------------------------------
 
@@ -302,8 +304,7 @@ INSERT INTO `utilisateurs` (`id`, `nom`, `email`, `mot_de_passe`, `est_admin`, `
 (1, 'Emma Martin', 'emma@example.com', 'motdepasse1', 0, 0),
 (2, 'Laura Dubois', 'laura@example.com', 'motdepasse2', 0, 0),
 (3, 'Sophie Lefevre', 'sophie@example.com', 'motdepasse3', 0, 0),
-(4, 'Admin Shop', 'admin@example.com', 'admin123', 1, 0),
-(9, 'Test', 'tsuyoki127@hotmail.com', 'test', 0, 1);
+(13, 'mateus', 'mateus.fariasfreire@limayrac.fr', 'test123', 0, 1);
 
 --
 -- Index pour les tables déchargées
@@ -372,6 +373,12 @@ ALTER TABLE `produits`
 ALTER TABLE `produits_en_avant`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `unique_produit` (`produit_id`);
+
+--
+-- Index pour la table `tokens_reinitialisation_mdp`
+--
+ALTER TABLE `tokens_reinitialisation_mdp`
+  ADD PRIMARY KEY (`utilisateur_id`);
 
 --
 -- Index pour la table `tokens_verification_mail`
@@ -448,7 +455,7 @@ ALTER TABLE `produits_en_avant`
 -- AUTO_INCREMENT pour la table `utilisateurs`
 --
 ALTER TABLE `utilisateurs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Contraintes pour les tables déchargées
@@ -503,6 +510,12 @@ ALTER TABLE `produits`
 --
 ALTER TABLE `produits_en_avant`
   ADD CONSTRAINT `produits_en_avant_fk` FOREIGN KEY (`produit_id`) REFERENCES `produits` (`id`);
+
+--
+-- Contraintes pour la table `tokens_reinitialisation_mdp`
+--
+ALTER TABLE `tokens_reinitialisation_mdp`
+  ADD CONSTRAINT `tokens_reinitialisation_mdp_ibfk_1` FOREIGN KEY (`utilisateur_id`) REFERENCES `utilisateurs` (`id`) ON DELETE CASCADE;
 
 --
 -- Contraintes pour la table `tokens_verification_mail`
