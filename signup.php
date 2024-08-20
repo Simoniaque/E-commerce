@@ -4,7 +4,7 @@ include("config.php");
 include("functions.php");
 include("mail.php");
 
-if(isset($_SESSION['user_id'])){
+if (isset($_SESSION['user_id'])) {
     header("Location: index.php");
     die;
 }
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if (!empty($name) && !empty($email) && !empty($password)) {
 
         $userAlreadyExists = userAlreadyExists($con, $email);
-        
+
         if ($userAlreadyExists) {
             echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
                     Cette adresse email est déjà utilisée.
@@ -42,7 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             header("Location: login.php");
             die;
         }
-
     } else {
         echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
                     Veuillez remplir tous les champs
@@ -113,11 +112,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         });
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
 
     <?php include "footer.php"; ?>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 
 </html>

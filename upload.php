@@ -1,8 +1,8 @@
 <?php
 session_start();
 
-include ("config.php");
-include ("functions.php");
+include("config.php");
+include("functions.php");
 
 require 'vendor/autoload.php';
 
@@ -33,7 +33,6 @@ function uploadImgToBlob($connectionString, $containerName, $file, $blobName)
             $blobClient->createBlockBlob($containerName, $blobName, $content, $options);
             return "Le fichier '$blobName' a été téléchargé avec succès dans le container";
         }
-
     } catch (ServiceException $e) {
         $code = $e->getCode();
         $error_message = $e->getMessage();
@@ -59,7 +58,7 @@ function imgExistsOnContainer($blobClient, $containerName, $blobName)
     }
 }
 
-function addProduct($_productName, $_productCategory, $_productDescription,$_productPrice, $_productStock)
+function addProduct($_productName, $_productCategory, $_productDescription, $_productPrice, $_productStock)
 {
     global $con;
 
@@ -98,20 +97,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $productDescription = $_POST['productDescription'];
             $productPrice = $_POST['productPrice'];
             $productStock = $_POST['productStock'];
-    
+
             $productId = addProduct($productName, $productCategory, $productDescription, $productPrice, $productStock);
-    
+
             if (is_numeric($productId)) {
                 $file = $_FILES['productImg'];
                 $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
                 $newFilename = $productId . '.' . $extension;
                 $file['name'] = $newFilename;
-    
+
                 $connectionString = "DefaultEndpointsProtocol=https;AccountName=imgproduitnewvet;AccountKey=wn85f9ndBMq16Bis0lEq4ud2iRItnx+b24MI2HU6X1/w8HN1SLW1gZyDRTekph2nJtestcld5GtV+AStwPlIuw==;";
                 $containerName = "imagescontainer";
                 $blobName = $newFilename;
                 $message = uploadImgToBlob($connectionString, $containerName, $file, $blobName);
-    
+
 
                 echo "Le produit a été ajouté avec succès. ID: " . $productId;
             } else {

@@ -30,15 +30,15 @@ if (isset($_GET['order'])) {
 }
 
 
-$minPrice ="";
-if(isset($_GET['minPrice'])){
+$minPrice = "";
+if (isset($_GET['minPrice'])) {
     $minPrice = $_GET['minPrice'];
     $products = filterProductsByMinPrice($products, $minPrice);
 }
 
 
-$maxPrice ="";
-if(isset($_GET['maxPrice'])){
+$maxPrice = "";
+if (isset($_GET['maxPrice'])) {
     $maxPrice = $_GET['maxPrice'];
     $products = filterProductsByMaxPrice($products, $maxPrice);
 }
@@ -59,11 +59,10 @@ if(isset($_GET['maxPrice'])){
     <link rel="stylesheet" href="./assets/css/style.css">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    
+
     <script src="assets/js/addToCart.js"></script>
 
     <script>
@@ -76,7 +75,7 @@ if(isset($_GET['maxPrice'])){
                 .filter(checkbox => checkbox.checked);
 
             selectedCategories.forEach(element => {
-                url = url+ "id[]=" + element.getAttribute("categoryID") + "&";
+                url = url + "id[]=" + element.getAttribute("categoryID") + "&";
             });
 
             var selectedOrder = document.querySelector('input[name="sortingMethod"]:checked');
@@ -84,12 +83,12 @@ if(isset($_GET['maxPrice'])){
 
             var minPrice = document.getElementById("minPrice").value;
             var maxPrice = document.getElementById("maxPrice").value;
-            
-            if(minPrice != ""){
+
+            if (minPrice != "") {
                 url = url + "minPrice=" + minPrice + "&";
             }
 
-            if(maxPrice != ""){
+            if (maxPrice != "") {
                 url = url + "maxPrice=" + maxPrice;
             }
 
@@ -177,7 +176,7 @@ if(isset($_GET['maxPrice'])){
                                     </div>
                                     <div class='form-group text-right col-md-6'>
                                         <label>Max</label>
-                                        <input class='form-control' placeholder='€' type='number' id='maxPrice' value='$maxPrice'>";?>
+                                        <input class='form-control' placeholder='€' type='number' id='maxPrice' value='$maxPrice'>"; ?>
                                     </div>
                                 </div>
                                 <button class="btn btn-block btn-dark" onclick="AppliquerFiltres()">Appliquer</button>
@@ -197,9 +196,8 @@ if(isset($_GET['maxPrice'])){
                         $productPrice = $product["prix"];
                         $pathProductImg = PATH_PRODUCTS_IMAGES . $productID . ".webp";
                         $addToCartTag = "<button class='btn btn-dark btn-sm' onclick=\"addToCart('$productID', 1)\">Ajouter au panier</button>";
-                        if($product['stock'] <= 0) {
+                        if ($product['stock'] <= 0) {
                             $addToCartTag = "<button class='btn btn-dark btn-sm' disabled>Stock épuisé</button>";
-
                         }
                         echo "<div class='col-2 mb-5'>
                             <div class='card h-100 mx-2 border-0 shadow'>
@@ -225,6 +223,7 @@ if(isset($_GET['maxPrice'])){
 
         <div class="push"></div>
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     <?php include "footer.php"; ?>
 

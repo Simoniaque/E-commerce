@@ -23,8 +23,9 @@
 
                             while ($row = $result->fetch_assoc()) {
                                 $categoryName = $row['nom'];
+                                $categoryID = $row['id'];
 
-                                echo "<li><a class='dropdown-item' href=''>$categoryName</a></li>";
+                                echo "<li><a class='dropdown-item' href='category.php?id=$categoryID'>$categoryName</a></li>";
                             }
                             ?>
                         </ul>

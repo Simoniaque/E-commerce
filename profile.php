@@ -74,12 +74,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         function deleteAccount() {
             fetch('profile.php', {
-                method: 'POST',
-                body: JSON.stringify({ action: 'deleteAccount' }),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'deleteAccount'
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
                 .then(response => response.text())
                 .then(data => {
                     console.log(data);
@@ -107,9 +109,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             formData.append('email', document.getElementById("emailInput").value);
 
             fetch('profile.php', {
-                method: 'POST',
-                body: formData
-            })
+                    method: 'POST',
+                    body: formData
+                })
                 .then(response => response.text())
                 .then(data => {
                     console.log(data);
@@ -140,20 +142,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $country = "";
         $city = "";
 
-        if($userInfo){
-            if($userInfo['telephone'] != null){
+        if ($userInfo) {
+            if ($userInfo['telephone'] != null) {
                 $phoneNumber = $userInfo['telephone'];
             }
-            if($userInfo['adresse'] != null){
+            if ($userInfo['adresse'] != null) {
                 $address = $userInfo['adresse'];
             }
-            if($userInfo['code_postal'] != null){
+            if ($userInfo['code_postal'] != null) {
                 $postalCode = $userInfo['code_postal'];
             }
-            if($userInfo['pays'] != null){
+            if ($userInfo['pays'] != null) {
                 $country = $userInfo['pays'];
             }
-            if($userInfo['ville'] != null){
+            if ($userInfo['ville'] != null) {
                 $city = $userInfo['ville'];
             }
         }
@@ -223,10 +225,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
     </div>");
         ?>
-        
+
         <div class="push"></div>
     </main>
     <?php include "footer.php"; ?>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 
 </html>

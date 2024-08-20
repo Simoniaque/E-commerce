@@ -124,7 +124,7 @@ if (!isset($_GET['id'])) {
             return $product['id'] != $productID;
         });
 
-        if(!$products){
+        if (!$products) {
             echo "<div class='push'></div>
             </main>";
             include 'footer.php';
@@ -137,10 +137,10 @@ if (!isset($_GET['id'])) {
         }
 
         $randomProductKeys = array_rand($products, $nbRandomProducts);
-        
+
         $productsToDisplay;
         //Attribue à productsToDisplay les produits à afficher (les produits selon les clés aléatoires)
-        if(is_array($randomProductKeys)){
+        if (is_array($randomProductKeys)) {
             foreach ($randomProductKeys as $productKey) {
                 $productsToDisplay[] = $products[$productKey];
             }
@@ -152,8 +152,8 @@ if (!isset($_GET['id'])) {
         <section class="py-5">
             <?php
             if (is_null($randomProductKeys)) {
-                
-            echo "<div class='push'></div>
+
+                echo "<div class='push'></div>
             </main>
             <?php include 'footer.php'; ?>";
 
@@ -172,9 +172,8 @@ if (!isset($_GET['id'])) {
                         $pathProductImg = PATH_PRODUCTS_IMAGES . $productID . ".webp";
 
                         $addToCartTag = "<button class='btn btn-dark btn-sm' onclick=\"addToCart('$productID', 1)\">Ajouter au panier</button>";
-                        if($product['stock'] <= 0) {
+                        if ($product['stock'] <= 0) {
                             $addToCartTag = "<button class='btn btn-dark btn-sm' disabled>Stock épuisé</button>";
-
                         }
                         echo "<div class='col mb-5'>
                         <div class='card h-100 mx-2 border-0 shadow'>
@@ -201,6 +200,7 @@ if (!isset($_GET['id'])) {
 
     <?php include "footer.php"; ?>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 
 </html>

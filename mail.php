@@ -14,8 +14,8 @@ function sendAccountCreatedEmail($emailAddress, $name, $urlVerif)
                         <h1 style=\'margin: 0;\'>Bienvenue chez New Vet</h1>
                     </div>
                     <div style=\'margin: 20px 0; background-color: #ffffff; padding: 20px; border-radius: 2px;\'>
-                        <p>Bonjour '.$name.',</p>
-                        <p>Merci de vous être inscrit sur notre site web. Pour valider votre adresse mail, veuillez cliquer sur le lien suivant : '.$urlVerif.'</p>
+                        <p>Bonjour ' . $name . ',</p>
+                        <p>Merci de vous être inscrit sur notre site web. Pour valider votre adresse mail, veuillez cliquer sur le lien suivant : ' . $urlVerif . '</p>
                         <br/>
                         <p>Si vous avez des questions, n\'hésitez pas à nous contacter à l\'adresse mail suivante : contact.newvet@gmail.com.</p>
                         <p>Merci et à bientôt !</p>
@@ -38,9 +38,9 @@ function sendAccountDeleteEmail($emailAddress, $name)
                         <h1 style=\'margin: 0;\'>A bientôt</h1>
                     </div>
                     <div style=\'margin: 20px 0; background-color: #ffffff; padding: 20px; border-radius: 2px;\'>
-                        <p>Bonjour '.$name.',</p>
+                        <p>Bonjour ' . $name . ',</p>
                         <p>Nous sommes désolés de vous voir partir.</p>
-                        <p>Vous pouvez recréer un compte quand vous voudrez à l\'adresse suivante : '.WEBSITE_URL.'signup.php
+                        <p>Vous pouvez recréer un compte quand vous voudrez à l\'adresse suivante : ' . WEBSITE_URL . 'signup.php
                         <br/>
                         <p>Si vous avez des questions, n\'hésitez pas à nous contacter à l\'adresse mail suivante : contact.newvet@gmail.com.</p>
                         <p>Merci et à bientôt !</p>
@@ -92,7 +92,8 @@ function sendMail($emailAddress, $name, $subject, $textPart, $htmlPart)
     }
 }
 
-function sendMailResetPassword($emailAddress, $name, $urlResetPassword){
+function sendMailResetPassword($emailAddress, $name, $urlResetPassword)
+{
 
     $subject = 'Réinitialisation de votre mot de passe';
     $textPart = 'Mot de passe oublié';
@@ -101,9 +102,9 @@ function sendMailResetPassword($emailAddress, $name, $urlResetPassword){
                         <h1 style=\'margin: 0;\'>Réinitialisation mot de passe</h1>
                     </div>
                     <div style=\'margin: 20px 0; background-color: #ffffff; padding: 20px; border-radius: 2px;\'>
-                        <p>Bonjour '.$name.',</p>
+                        <p>Bonjour ' . $name . ',</p>
                         <p>Vous avez effectué une demande pour réinitialiser votre mot de passe.</p>
-                        <p>Cliquez sur le lien suivant pour réinitialiser votre mot de passe : '.$urlResetPassword.'</p>
+                        <p>Cliquez sur le lien suivant pour réinitialiser votre mot de passe : ' . $urlResetPassword . '</p>
                         <br/>
                         <p>Si vous avez des questions, n\'hésitez pas à nous contacter à l\'adresse mail suivante : contact.newvet@gmail.com.</p>
                         <p>Merci et à bientôt !</p>
@@ -116,18 +117,19 @@ function sendMailResetPassword($emailAddress, $name, $urlResetPassword){
     return sendMail($emailAddress, $name, $subject, $textPart, $htmlPart);
 }
 
-function sendMailVerifyAccount($emailAddress, $name, $urlVerif){
-    
-    
-        $subject = 'Vérification de votre adresse mail';
-        $textPart = 'Vérification de votre adresse mail';
-        $htmlPart = '<div style=\'font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; max-width: 600px; margin: 0 auto; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);\'>
+function sendMailVerifyAccount($emailAddress, $name, $urlVerif)
+{
+
+
+    $subject = 'Vérification de votre adresse mail';
+    $textPart = 'Vérification de votre adresse mail';
+    $htmlPart = '<div style=\'font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; max-width: 600px; margin: 0 auto; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);\'>
                         <div style=\'background-color: #212529; color: #ffffff; padding: 10px; text-align: center; border-radius: 2px;\'>
                             <h1 style=\'margin: 0;\'>Vérification de votre adresse mail</h1>
                         </div>
                         <div style=\'margin: 20px 0; background-color: #ffffff; padding: 20px; border-radius: 2px;\'>
-                            <p>Bonjour '.$name.',</p>
-                            <p>Merci de vous être inscrit sur notre site web. Pour valider votre adresse mail, veuillez cliquer sur le lien suivant : '.$urlVerif.'</p>
+                            <p>Bonjour ' . $name . ',</p>
+                            <p>Merci de vous être inscrit sur notre site web. Pour valider votre adresse mail, veuillez cliquer sur le lien suivant : ' . $urlVerif . '</p>
                             <br/>
                             <p>Si vous avez des questions, n\'hésitez pas à nous contacter à l\'adresse mail suivante : contact.newvet@gmail.com.</p>
                             <p>Merci et à bientôt !</p>
@@ -137,5 +139,5 @@ function sendMailVerifyAccount($emailAddress, $name, $urlVerif){
                             <p>&copy; 2024 New Vet. Tous droits réservés.</p>
                         </div>
                     </div>';
-        return sendMail($emailAddress, $name, $subject, $textPart, $htmlPart);
+    return sendMail($emailAddress, $name, $subject, $textPart, $htmlPart);
 }

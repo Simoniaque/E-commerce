@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     Les mots de passe ne correspondent pas
                     <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
                   </div>";
-            
+
             $allowPasswordReset = true;
         } else {
             // Récupération de l'utilisateur par email
@@ -48,8 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
-    
-// Traitement des requêtes GET
+
+    // Traitement des requêtes GET
 } else if (!empty($_GET)) {
     // Vérification de la présence de l'email
     if (!isset($_GET['email'])) {
@@ -76,7 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
-    
 } else {
     // Affichage du formulaire de réinitialisation par email
     $resetMailForm = true;
@@ -102,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <main>
         <?php include "header.php"; ?>
-        
+
         <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
             <div class="col-12 col-md-6 col-lg-4">
                 <?php
@@ -143,9 +142,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <?php include("footer.php"); ?>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 
 </html>

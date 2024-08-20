@@ -5,7 +5,7 @@ include("functions.php");
 include("mail.php");
 
 $user = checkLogin($con);
-if($user != null &&  $user['mail_verifie'] != 0){
+if ($user != null &&  $user['mail_verifie'] != 0) {
     header("Location: index.php");
     die;
 }
@@ -13,34 +13,32 @@ if($user != null &&  $user['mail_verifie'] != 0){
 $message = "";
 
 if (!empty($_GET)) {
-    if(isset($_GET['email'])){
+    if (isset($_GET['email'])) {
 
         $email = $_GET['email'];
         $user = getUserByEmail($con, $email);
-        if(!$user){
+        if (!$user) {
             header("Location: index.php");
             die;
         }
 
-        if(isset($_GET['token'])){
+        if (isset($_GET['token'])) {
             $token = $_GET['token'];
-            if(verifyAccount($con, $user['id'], $token)){
+            if (verifyAccount($con, $user['id'], $token)) {
                 $message = "Compte verifié avec succès !";
-            }else{
+            } else {
                 $message = "Lien de vérification invalide !";
             }
-        }else{
-            sendMailVerifyAccount($user['email'], $user['nom'],generateURLVerifyAccount($con, $user['id']));
-            
-            $message = "Un email de vérification vous a été envoyé à l'adresse : ".$user['email'] .".";
-        }
+        } else {
+            sendMailVerifyAccount($user['email'], $user['nom'], generateURLVerifyAccount($con, $user['id']));
 
-    }else{
+            $message = "Un email de vérification vous a été envoyé à l'adresse : " . $user['email'] . ".";
+        }
+    } else {
         header("Location: index.php");
         die;
     }
-
-}else{
+} else {
     header("Location: index.php");
     die;
 }
@@ -65,13 +63,13 @@ if (!empty($_GET)) {
 <body>
     <main>
         <?php include "header.php"; ?>
-        
+
 
         <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
 
             <div class="col-12 col-md-6 col-lg-4">
                 <form class="p-4 shadow rounded-1 bg-light" method="post">
-                    <?php 
+                    <?php
                     echo "<div class='text-center'> 
                             $message
                         </div>";
@@ -87,9 +85,7 @@ if (!empty($_GET)) {
     include("footer.php");
     ?>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 
 </html>
