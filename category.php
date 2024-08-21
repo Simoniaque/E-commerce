@@ -19,7 +19,34 @@ if (!$category) {
 }
 
 $categoryName = $category['nom'];
+$products = array();
 $products = getProductsByCategory($con, $categoryId);
+
+/*Les produits doivent d’abord être triés par priorité (donnée depuis le backoffice), puis
+les produits épuisés en dernier. Les produits qui n’ont pas été priorisés s’afficheront entre ceux qui
+le sont et les produits épuisés. */
+
+usort($products, function($a, $b) {
+    if ($a['en_priorite'] == 1 && $b['en_priorite'] != 1) {
+        return -1;
+    } elseif ($a['en_priorite'] != 1 && $b['en_priorite'] == 1) {
+        return 1;
+    } else {
+        return 0;
+    }
+});
+
+usort($products, function($a, $b) {
+    if ($a['stock'] <= 0 && $b['stock'] > 0) {
+        return 1;
+    } elseif ($a['stock'] > 0 && $b['stock'] <= 0) {
+        return -1;
+    } else {
+        return 0;
+    }
+});
+
+
 ?>
 
 <!DOCTYPE html>

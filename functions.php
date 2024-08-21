@@ -198,10 +198,6 @@ function getCart($con, $userId){
     }
 }
 
-function addItemToCart(){
-
-}
-
 function getHighlightCategories($con){
     $query = "SELECT * FROM categories_en_avant";
 
@@ -586,3 +582,195 @@ function deleteProductFromCart($con, $userID, $productID){
     }
     return false;
 }
+
+function getMaterialsByProduct($con, $product_id){
+    $query = "SELECT * FROM materiaux, produits_materiaux WHERE produits_materiaux.produit_id = '$product_id' AND produits_materiaux.materiau_id = materiaux.id";
+
+    $result = mysqli_query($con, $query);
+
+    if($result && mysqli_num_rows($result) > 0){
+        $materials = mysqli_fetch_all($result, MYSQLI_ASSOC);
+        return $materials;
+    }
+
+    return false;
+}
+
+function searchProducts($con, $searchText, $minPrice, $maxPrice, $inStock) {
+    
+    // Récupère tous les produits
+    $products = getProducts($con);
+
+    // Formate le texte de recherche
+    $searchText = formaterString($searchText);
+
+    // Si le texte de recherche est vide, filtre les produits selon les prix et stock
+    if ($searchText == "") {
+        foreach ($products as $product) {
+            if (($inStock && $product['stock'] <= 0) || $product['prix'] > $maxPrice || $product['prix'] < $minPrice) {
+                // Enlève le produit de la liste
+                $products = array_filter($products, function($p) use ($product) {
+                    return $p['id'] !== $product['id'];
+                });
+                continue;
+            }
+        }
+        return $products;
+    }
+
+    // Initialiser un tableau pour les produits à afficher
+    $productsToDisplay = array();
+
+    foreach ($products as $product) {
+        $productID = $product['id'];
+        $productName = formaterString($product['nom']);
+        $productPrice = $product['prix'];
+        $productStock = $product['stock'];
+        $productDescription = formaterString($product['description']);
+        $productCategoryName = formaterString(getCategoryById($con, $product['categorie_id'])['nom']);
+        $productMaterials = getMaterialsByProduct($con, $productID);
+
+        // Vérifie si le matériau du produit correspond au texte de recherche
+        foreach ($productMaterials as $material) {
+            $productMaterialName = formaterString($material['nom']);
+            if ($productMaterialName == $searchText) {
+                $productsToDisplay[] = $product;
+                continue 2; // Passe à l'itération suivante du produit
+            }
+        }
+
+        // Filtrage des produits par prix, stock et catégories
+        if (($inStock && $productStock <= 0) || $productPrice > $maxPrice || $productPrice < $minPrice) {
+            continue;
+        }
+
+        // Vérifie les correspondances exactes
+        if ($productName == $searchText || $productDescription == $searchText || $productCategoryName == $searchText) {
+            $productsToDisplay[] = $product;
+            continue;
+        }
+
+        // Vérifie les correspondances avec une lettre incorrecte ou manquante
+        $searchTextLength = strlen($searchText);
+        $productNameLength = strlen($productName);
+        $difference = $productNameLength - $searchTextLength;
+
+        if ($difference == 1) {
+            // Le nom du produit est plus long d'une lettre que le texte de recherche
+            for ($i = 0; $i < $productNameLength; $i++) {
+                if ($i >= $searchTextLength || $productName[$i] != $searchText[$i]) {
+                    // Enlève le caractère incorrect du nom du produit
+                    $modifiedProductName = substr_replace($productName, "", $i, 1);
+                    if ($modifiedProductName == $searchText) {
+                        $productsToDisplay[] = $product;
+                        break 2; // Passe à l'itération suivante du produit
+                    }
+                }
+            }
+        } else if ($difference == -1) {
+            // Le texte de recherche est plus long d'une lettre que le nom du produit
+            for ($i = 0; $i < $searchTextLength; $i++) {
+                if ($i >= $productNameLength || $productName[$i] != $searchText[$i]) {
+                    // Insère le caractère manquant dans le nom du produit
+                    $modifiedProductName = substr_replace($productName, $searchText[$i], $i, 0);
+                    if ($modifiedProductName == $searchText) {
+                        $productsToDisplay[] = $product;
+                        break 2; // Passe à l'itération suivante du produit
+                    }
+                }
+            }
+        }
+
+        // Vérifie si le texte de recherche est au début du nom du produit
+        if (strpos($productName, $searchText) === 0) {
+            $productsToDisplay[] = $product;
+            continue;
+        }
+        
+        // Vérifie si le texte de recherche est contenu dans le nom du produit, la description ou le nom de la catégorie
+        if (strpos($productName, $searchText) !== false || strpos($productDescription, $searchText) !== false || strpos($productCategoryName, $searchText) !== false) {
+            $productsToDisplay[] = $product;
+            continue;
+        }
+    }
+
+    return $productsToDisplay;
+}
+
+
+
+
+
+
+function getMaterials($con) {
+    $query = "SELECT * FROM materiaux";
+    
+    // Exécuter la requête
+    $result = $con->query($query);
+
+    // Vérifier l'existence des résultats
+    if ($result === false) {
+        die('Erreur lors de l\'exécution de la requête : ' . htmlspecialchars($con->error));
+    }
+
+    // Fetch les résultats
+    $materials = $result->fetch_all(MYSQLI_ASSOC);
+
+    return $materials;
+}
+
+
+function getCategories($con) {
+    $query = "SELECT * FROM categories";
+    
+    // Exécuter la requête
+    $result = $con->query($query);
+
+    // Vérifier l'existence des résultats
+    if ($result === false) {
+        die('Erreur lors de l\'exécution de la requête : ' . htmlspecialchars($con->error));
+    }
+
+    // Fetch les résultats
+    $categories = $result->fetch_all(MYSQLI_ASSOC);
+
+    return $categories;
+}
+
+function formaterString($str) {
+    // Tableau des caractères accentués et leurs équivalents non accentués
+    $accents = [
+        'à', 'â', 'ä', 'á', 'ã', 'å', 'À', 'Â', 'Ä', 'Á', 'Ã', 'Å',
+        'è', 'ê', 'ë', 'é', 'È', 'Ê', 'Ë', 'É',
+        'ì', 'î', 'ï', 'í', 'Ì', 'Î', 'Ï', 'Í',
+        'ò', 'ô', 'ö', 'ó', 'õ', 'Ò', 'Ô', 'Ö', 'Ó', 'Õ',
+        'ù', 'û', 'ü', 'ú', 'Ù', 'Û', 'Ü', 'Ú',
+        'ç', 'Ç',
+        'ñ', 'Ñ'
+    ];
+
+    $sans_accents = [
+        'a', 'a', 'a', 'a', 'a', 'a', 'A', 'A', 'A', 'A', 'A', 'A',
+        'e', 'e', 'e', 'e', 'E', 'E', 'E', 'E',
+        'i', 'i', 'i', 'i', 'I', 'I', 'I', 'I',
+        'o', 'o', 'o', 'o', 'o', 'O', 'O', 'O', 'O', 'O',
+        'u', 'u', 'u', 'u', 'U', 'U', 'U', 'U',
+        'c', 'C',
+        'n', 'N'
+    ];
+
+    // Remplacer les caractères accentués par leurs équivalents sans accents
+    $str = str_replace($accents, $sans_accents, $str);
+
+    // Transformer la chaîne en minuscules
+    $str = strtolower($str);
+
+    // Supprimer les doubles espaces
+    $str = preg_replace('/\s+/', ' ', $str);
+
+    // Supprimer les espaces au début et à la fin
+    $str = trim($str);
+
+    return $str;
+}
+?>

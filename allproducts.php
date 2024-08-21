@@ -46,7 +46,6 @@ if (isset($_GET['maxPrice'])) {
 
 ?>
 
-<!--Todo : Récuperer les infos depuis la bdd et créer la page dynamiquement-->
 <!DOCTYPE html>
 <html lang="fr">
 

@@ -60,60 +60,82 @@ if (!isset($_GET['id'])) {
         $name = $product['nom'];
         $price = $product['prix'];
         $description = $product['description'];
-        $materials = $product['materiaux'];
+        $materials = getMaterialsByProduct($con, $productID);
+        $materialsString = "";
+        if($materials){
+            $materialNames = array_column($materials, 'nom');
+            $materialsString = implode(" - ", $materialNames );
+        }
         $stock = $product['stock'];
 
-        $pathImage = PATH_PRODUCTS_IMAGES . $productID . '.webp';
+        $imagePaths = [
+            PATH_PRODUCTS_IMAGES . $productID . '.webp',
+            //TODO Ajouter des images avec un suffixe _2 et _3 dans le blob azure
+            PATH_PRODUCTS_IMAGES . '5.webp',
+            PATH_PRODUCTS_IMAGES . '10.webp',
+        ];
 
-        $addToCartButton = "<a href='#' class='btn btn-lg disabled'>Stock Epuisé</a>";
+        $addToCartButton = "<a href='#' class='btn btn-lg disabled'>Stock Épuisé</a>";
 
         if ($stock > 0) {
             $addToCartButton = "<a href='' class='btn btn-dark shadow-0' onclick=\"addProductToCart('$productID')\">Ajouter au panier</a>";
         }
 
-
-        echo "<div class='container pt-5'>
-            <div class='row gx-5 '>
-                <aside class='col-lg-6'>
-                    <div class='rounded-4 mb-3 d-flex justify-content-center'>
-                    <img style='max-width: 100%; max-height: 60vh; margin: auto;' class='rounded-4 fit' src='$pathImage' />
-                    </div>
-                </aside>
-                <div class='col-lg-6'>
-                    <div class='ps-lg-3'>
-                        <h3 class='title text-dark'>$name</h3>
-                        <h5>Catégorie</h5>
-
-                        <div class='mb-3'>
-                            <span class='h5'>$price €</span>
+        echo "
+<div class='container pt-5'>
+    <div class='row gx-5'>
+        <aside class='col-lg-6'>
+            <div id='productCarousel' class='carousel slide' data-bs-ride='carousel' style='height: 50vh;'>
+                <div class='carousel-inner' style='height: 100%;'>
+                ";
+                foreach ($imagePaths as $index => $imagePath) {
+                $activeClass = $index === 0 ? 'active' : '';
+                echo "
+                <div class='carousel-item $activeClass' style='height: 100%;'>
+                    <img src='$imagePath' class='d-block w-100 rounded-4' style='height: 100%; object-fit: contain;' alt='Product Image'>
+                </div>
+                ";
+                }
+                echo "      
+                </div>
+                <button class='carousel-control-prev' type='button' data-bs-target='#productCarousel' data-bs-slide='prev'>
+                    <span class='carousel-control-prev-icon' aria-hidden='true'></span>
+                    <span class='visually-hidden'>Previous</span>
+                </button>
+                <button class='carousel-control-next' type='button' data-bs-target='#productCarousel' data-bs-slide='next'>
+                    <span class='carousel-control-next-icon' aria-hidden='true'></span>
+                    <span class='visually-hidden'>Next</span>
+                </button>
+            </div>
+        </aside>
+        <div class='col-lg-6'>
+            <div class='ps-lg-3'>
+                <h3 class='title text-dark'>$name</h3>
+                <h5>Catégorie</h5>
+                <div class='mb-3'>
+                    <span class='h5'>$price €</span>
+                </div>
+                <p>$description</p>
+                <div class='row'>
+                    <dt class='col-3'>Matériaux</dt>
+                    <dd class='col-9'>$materialsString</dd>
+                </div>
+                <hr />
+                <div class='row mb-4'>
+                    <div class='col-md-4 col-6 mb-3'>
+                        <label class='mb-2 d-block'>Quantité</label>
+                        <div class='input-group mb-3' style='width: 170px;'>
+                            <input type='number' class='form-control text-center border border-secondary'
+                                id='mouse-only-number-input' value='1' min='1' max='$stock' />
                         </div>
-
-                        <p>
-                            $description
-                        </p>
-
-                        <div class='row'>
-                            <dt class='col-3'>Matériaux</dt>
-                            <dd class='col-9'>$materials</dd>
-                        </div>
-
-                        <hr />
-
-                        <div class='row mb-4'>
-                            <div class='col-md-4 col-6 mb-3'>
-                                <label class='mb-2 d-block'>Quantité</label>
-                                <div class='input-group mb-3' style='width: 170px;'>
-                                    <input type='number' class='form-control text-center border border-secondary'
-                                        id='mouse-only-number-input' value='1' min='1' max='$stock' />
-                                </div>
-                            </div>
-                        </div>
-                        
-                        $addToCartButton
                     </div>
                 </div>
+                $addToCartButton
             </div>
-        </div>";
+        </div>
+    </div>
+</div>";
+
 
         //Ajouter 6 produits aléatoire de la même catégorie
         $categoryID = $product['categorie_id'];
