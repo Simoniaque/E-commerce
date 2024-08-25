@@ -591,31 +591,31 @@ function getCartProducts($con, $cartID){
     }
 }
 
-function updateCartQuantity($con, $userID, $productID, $quantity){
-
-    
+function updateCartQuantity($con, $userID, $productID, $quantity) {
+    // Récupérer l'ID du panier de l'utilisateur
     $cartID = getCartID($con, $userID);
 
+    // Vérifier si le produit est déjà dans le panier
     $queryCheckExist = "SELECT * FROM details_paniers WHERE panier_id = '$cartID' AND produit_id = '$productID'";
-    $resultCheckExist = mysqli_query($con,$queryCheckExist);
+    $resultCheckExist = mysqli_query($con, $queryCheckExist);
 
-    if($resultCheckExist && mysqli_num_rows($resultCheckExist)> 0){
-        $cartDetail = mysqli_fetch_assoc($resultCheckExist);
-        $quantity += $cartDetail['quantite'];
-    }else{
-        //Ajouter le produit au panier
+    if ($resultCheckExist && mysqli_num_rows($resultCheckExist) > 0) {
+        // Le produit existe déjà dans le panier, donc on le met à jour
+        $query = "UPDATE details_paniers SET quantite = '$quantity' WHERE panier_id = '$cartID' AND produit_id = '$productID'";
+    } else {
+        // Le produit n'existe pas dans le panier, donc on l'ajoute
         return addToCart($con, $userID, $productID, $quantity);
     }
 
-    $query = "UPDATE details_paniers SET quantite = '$quantity' WHERE panier_id = '$cartID' AND produit_id = '$productID'";
+    // Exécuter la requête de mise à jour
+    $result = mysqli_query($con, $query);
 
-    $result = mysqli_query($con,$query);
-
-    if($result){
+    if ($result) {
         return true;
     }
     return false;
 }
+
 
 function calculateTotalCartPrice($con, $userID){
     $cartID = getCartID($con, $userID);
@@ -697,6 +697,42 @@ function getCategories($con) {
 
     return $categories;
 }
+
+
+function isCartEmpty($con, $userID) {
+    // Récupérer l'ID du panier de l'utilisateur
+    $cartID = getCartID($con, $userID);
+
+    if (!$cartID) {
+        return true; // Si aucun panier n'existe, il est considéré comme vide
+    }
+
+    // Vérifier le nombre de produits dans le panier
+    $query = "SELECT COUNT(*) as count FROM details_paniers WHERE panier_id = '$cartID'";
+    $result = mysqli_query($con, $query);
+
+    if ($result) {
+        $row = mysqli_fetch_assoc($result);
+        return $row['count'] == 0; // Retourne true si le panier est vide
+    }
+
+    return true; // Retourne true en cas d'erreur de requête
+}
+
+function convertCookieCartToDBCart($con, $userID) {
+    $cartCookieName = 'cart';
+    $cart = isset($_COOKIE[$cartCookieName]) ? json_decode($_COOKIE[$cartCookieName], true) : [];
+
+    foreach ($cart as $productID => $quantity) {
+        if ($quantity > 0) {
+            addToCart($con, $userID, $productID, $quantity);
+        }
+    }
+
+    // Effacer le cookie après conversion
+    setcookie($cartCookieName, '', time() - 3600, '/');
+}
+
 
 
 ?>

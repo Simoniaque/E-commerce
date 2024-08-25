@@ -6,7 +6,7 @@ include("config.php");
 include("functions.php");
 
 if (!isset($_GET['id'])) {
-    header("Location: allproducts.php");
+    header("Location: search.php");
     exit;
 }
 
@@ -14,7 +14,7 @@ $categoryId = $_GET['id'];
 $category = getCategoryById($con, $categoryId);
 
 if (!$category) {
-    header("Location: allproducts.php");
+    header("Location: search.php");
     exit;
 }
 
@@ -22,29 +22,30 @@ $categoryName = $category['nom'];
 $products = array();
 $products = getProductsByCategory($con, $categoryId);
 
-/*Les produits doivent d’abord être triés par priorité (donnée depuis le backoffice), puis
-les produits épuisés en dernier. Les produits qui n’ont pas été priorisés s’afficheront entre ceux qui
-le sont et les produits épuisés. */
+//check if $products is empty
+if ($products) {
 
-usort($products, function($a, $b) {
-    if ($a['en_priorite'] == 1 && $b['en_priorite'] != 1) {
-        return -1;
-    } elseif ($a['en_priorite'] != 1 && $b['en_priorite'] == 1) {
-        return 1;
-    } else {
-        return 0;
-    }
-});
+    usort($products, function ($a, $b) {
+        if ($a['en_priorite'] == 1 && $b['en_priorite'] != 1) {
+            return -1;
+        } elseif ($a['en_priorite'] != 1 && $b['en_priorite'] == 1) {
+            return 1;
+        } else {
+            return 0;
+        }
+    });
 
-usort($products, function($a, $b) {
-    if ($a['stock'] <= 0 && $b['stock'] > 0) {
-        return 1;
-    } elseif ($a['stock'] > 0 && $b['stock'] <= 0) {
-        return -1;
-    } else {
-        return 0;
-    }
-});
+    usort($products, function ($a, $b) {
+        if ($a['stock'] <= 0 && $b['stock'] > 0) {
+            return 1;
+        } elseif ($a['stock'] > 0 && $b['stock'] <= 0) {
+            return -1;
+        } else {
+            return 0;
+        }
+    });
+}
+
 
 
 ?>
@@ -86,30 +87,33 @@ usort($products, function($a, $b) {
             <div class="col-sm-12 col-md-8 col-lg-9 col-xl-10 row">
                 <div class="row gx-4 row-cols-2 row-cols-md-3 row-cols-lg-4 mt-5">
                     <?php
-
-                    foreach ($products as $product) {
-                        $productID = $product["id"];
-                        $productName = $product["nom"];
-                        $productPrice = $product["prix"];
-                        $pathProductImg = PATH_PRODUCTS_IMAGES . $productID . ".webp";
-                        $addToCartTag = "<button class='btn btn-dark btn-sm' onclick=\"addToCart('$productID', 1)\">Ajouter au panier</button>";
-                        if ($product['stock'] <= 0) {
-                            $addToCartTag = "<button class='btn btn-dark btn-sm' disabled>Stock épuisé</button>";
+                    if($products){
+                        foreach ($products as $product) {
+                            $productID = $product["id"];
+                            $productName = $product["nom"];
+                            $productPrice = $product["prix"];
+                            $pathProductImg = PATH_PRODUCTS_IMAGES . $productID . ".webp";
+                            $addToCartTag = "<button class='btn btn-dark btn-sm' onclick=\"addToCart('$productID', 1)\">Ajouter au panier</button>";
+                            if ($product['stock'] <= 0) {
+                                $addToCartTag = "<button class='btn btn-dark btn-sm' disabled>Stock épuisé</button>";
+                            }
+                            echo "<div class='col-2 mb-5'>
+                                <div class='card h-100 mx-2 border-0 shadow'>
+                                    <div class='bg-image'>
+                                        <a href='product.php?id=$productID'><img src='$pathProductImg' class='w-100' /></a>
+                                    </div>
+                                    <div class='card-body'>
+                                        <a href='product.php?id=$productID' class='text-reset'>
+                                            <h5 class='card-title mb-3'>$productName</h5>
+                                        </a>
+                                        <h6 class='mb-3'>$productPrice €</h6>
+                                        $addToCartTag
+                                    </div>
+                                </div>
+                            </div>";
                         }
-                        echo "<div class='col-2 mb-5'>
-                            <div class='card h-100 mx-2 border-0 shadow'>
-                                <div class='bg-image'>
-                                    <a href='product.php?id=$productID'><img src='$pathProductImg' class='w-100' /></a>
-                                </div>
-                                <div class='card-body'>
-                                    <a href='product.php?id=$productID' class='text-reset'>
-                                        <h5 class='card-title mb-3'>$productName</h5>
-                                    </a>
-                                    <h6 class='mb-3'>$productPrice €</h6>
-                                    $addToCartTag
-                                </div>
-                            </div>
-                        </div>";
+                    }else{
+                        debugToConsole("No products found in this category");
                     }
                     ?>
 

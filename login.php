@@ -8,6 +8,9 @@ if (isset($_SESSION['user_id'])) {
     die;
 }
 
+
+$redirectUrl = isset($_GET['redirect_to']) ? $_GET['redirect_to'] : 'index.php';
+
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $email = $_POST['userEmail'];
     $password = $_POST['userPassword'];
@@ -40,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
                 //Cas connexion réussie
                 $_SESSION['user_id'] = $userData['id'];
-                header("Location: index.php");
+                header("Location: " . $redirectUrl);
                 die;
             }
         }
@@ -55,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>Se Connecter</title>
-    <link rel="icon" type="image/x-icon" href="../assets/logo-dark.png" />
+    <link rel="icon" type="image/x-icon" href="assets/img/logo-black.png" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
