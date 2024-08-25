@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mar. 20 août 2024 à 12:38
+-- Généré le : dim. 25 août 2024 à 20:46
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -20,6 +20,32 @@ SET time_zone = "+00:00";
 --
 -- Base de données : `newvet`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `adresses_utilisateurs`
+--
+
+CREATE TABLE `adresses_utilisateurs` (
+  `id` int(11) NOT NULL,
+  `utilisateur_id` int(11) NOT NULL,
+  `adresse_complète` varchar(255) NOT NULL,
+  `ville` varchar(100) NOT NULL,
+  `code_postal` varchar(20) NOT NULL,
+  `pays` varchar(100) NOT NULL,
+  `type_adresse` enum('facturation','livraison','les_deux') DEFAULT 'les_deux',
+  `date_creation` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Déchargement des données de la table `adresses_utilisateurs`
+--
+
+INSERT INTO `adresses_utilisateurs` (`id`, `utilisateur_id`, `adresse_complète`, `ville`, `code_postal`, `pays`, `type_adresse`, `date_creation`) VALUES
+(1, 19, '11 rue pierre cot', 'toulouse', '31200', 'france', 'les_deux', '2024-08-25 15:38:29'),
+(2, 19, 'tttttt', 'tt', 'ttt', 'ttt', 'les_deux', '2024-08-25 16:03:47'),
+(3, 19, 'aa', 'a', 'aa', 'aa', 'les_deux', '2024-08-25 18:21:04');
 
 -- --------------------------------------------------------
 
@@ -152,7 +178,9 @@ CREATE TABLE `details_paniers` (
 
 INSERT INTO `details_paniers` (`id`, `panier_id`, `produit_id`, `quantite`) VALUES
 (24, 9, 3, 15),
-(25, 9, 4, 10);
+(25, 9, 4, 10),
+(26, 10, 10, 1),
+(27, 10, 2, 2);
 
 -- --------------------------------------------------------
 
@@ -204,6 +232,32 @@ INSERT INTO `materiaux` (`id`, `nom`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `moyens_paiement`
+--
+
+CREATE TABLE `moyens_paiement` (
+  `id` int(11) NOT NULL,
+  `utilisateur_id` int(11) NOT NULL,
+  `type` varchar(50) NOT NULL,
+  `numero_carte` varchar(20) DEFAULT NULL,
+  `nom_titulaire` varchar(100) DEFAULT NULL,
+  `date_expiration` date DEFAULT NULL,
+  `cvv` varchar(4) DEFAULT NULL,
+  `paypal_email` varchar(100) DEFAULT NULL,
+  `date_ajout` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Déchargement des données de la table `moyens_paiement`
+--
+
+INSERT INTO `moyens_paiement` (`id`, `utilisateur_id`, `type`, `numero_carte`, `nom_titulaire`, `date_expiration`, `cvv`, `paypal_email`, `date_ajout`) VALUES
+(1, 19, 'paypal', '', '', '0000-00-00', '', 'simon.auriac@limayrac.fr', '2024-08-25 18:25:07'),
+(2, 19, 'card', '00', 'auriac simon', '0000-00-00', '000', '', '2024-08-25 18:26:06');
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `paniers`
 --
 
@@ -217,7 +271,8 @@ CREATE TABLE `paniers` (
 --
 
 INSERT INTO `paniers` (`id`, `utilisateur_id`) VALUES
-(9, 15);
+(9, 15),
+(10, 19);
 
 -- --------------------------------------------------------
 
@@ -347,11 +402,19 @@ INSERT INTO `utilisateurs` (`id`, `nom`, `email`, `mot_de_passe`, `est_admin`, `
 (1, 'Emma Martin', 'emma@example.com', 'motdepasse1', 0, 1),
 (2, 'Laura Dubois', 'laura@example.com', 'motdepasse2', 0, 0),
 (3, 'Sophie Lefevre', 'sophie@example.com', 'motdepasse3', 0, 0),
-(15, 'Test', 'mateus.fariasfreire@limayrac.fr', 'test', 0, 1);
+(15, 'Test', 'mateus.fariasfreire@limayrac.fr', 'test', 0, 1),
+(19, 'Simoniaque', 'simon.auriac@limayrac.fr', 'azerty', 0, 1);
 
 --
 -- Index pour les tables déchargées
 --
+
+--
+-- Index pour la table `adresses_utilisateurs`
+--
+ALTER TABLE `adresses_utilisateurs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `utilisateur_id` (`utilisateur_id`);
 
 --
 -- Index pour la table `categories`
@@ -401,6 +464,13 @@ ALTER TABLE `details_utilisateurs`
 --
 ALTER TABLE `materiaux`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Index pour la table `moyens_paiement`
+--
+ALTER TABLE `moyens_paiement`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `utilisateur_id` (`utilisateur_id`);
 
 --
 -- Index pour la table `paniers`
@@ -455,6 +525,12 @@ ALTER TABLE `utilisateurs`
 --
 
 --
+-- AUTO_INCREMENT pour la table `adresses_utilisateurs`
+--
+ALTER TABLE `adresses_utilisateurs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT pour la table `categories`
 --
 ALTER TABLE `categories`
@@ -482,7 +558,7 @@ ALTER TABLE `details_commandes`
 -- AUTO_INCREMENT pour la table `details_paniers`
 --
 ALTER TABLE `details_paniers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT pour la table `details_utilisateurs`
@@ -497,10 +573,16 @@ ALTER TABLE `materiaux`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
+-- AUTO_INCREMENT pour la table `moyens_paiement`
+--
+ALTER TABLE `moyens_paiement`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT pour la table `paniers`
 --
 ALTER TABLE `paniers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT pour la table `produits`
@@ -524,11 +606,17 @@ ALTER TABLE `produits_materiaux`
 -- AUTO_INCREMENT pour la table `utilisateurs`
 --
 ALTER TABLE `utilisateurs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- Contraintes pour les tables déchargées
 --
+
+--
+-- Contraintes pour la table `adresses_utilisateurs`
+--
+ALTER TABLE `adresses_utilisateurs`
+  ADD CONSTRAINT `adresses_utilisateurs_ibfk_1` FOREIGN KEY (`utilisateur_id`) REFERENCES `utilisateurs` (`id`) ON DELETE CASCADE;
 
 --
 -- Contraintes pour la table `categories_en_avant`
@@ -561,6 +649,12 @@ ALTER TABLE `details_paniers`
 --
 ALTER TABLE `details_utilisateurs`
   ADD CONSTRAINT `details_utilisateurs_ibfk_1` FOREIGN KEY (`utilisateur_id`) REFERENCES `utilisateurs` (`id`) ON DELETE CASCADE;
+
+--
+-- Contraintes pour la table `moyens_paiement`
+--
+ALTER TABLE `moyens_paiement`
+  ADD CONSTRAINT `moyens_paiement_ibfk_1` FOREIGN KEY (`utilisateur_id`) REFERENCES `utilisateurs` (`id`);
 
 --
 -- Contraintes pour la table `paniers`
