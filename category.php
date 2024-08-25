@@ -6,7 +6,7 @@ include("config.php");
 include("functions.php");
 
 if (!isset($_GET['id'])) {
-    header("Location: allproducts.php");
+    header("Location: search.php");
     exit;
 }
 
@@ -14,7 +14,7 @@ $categoryId = $_GET['id'];
 $category = getCategoryById($con, $categoryId);
 
 if (!$category) {
-    header("Location: allproducts.php");
+    header("Location: search.php");
     exit;
 }
 
@@ -22,9 +22,6 @@ $categoryName = $category['nom'];
 $products = array();
 $products = getProductsByCategory($con, $categoryId);
 
-/*Les produits doivent d’abord être triés par priorité (donnée depuis le backoffice), puis
-les produits épuisés en dernier. Les produits qui n’ont pas été priorisés s’afficheront entre ceux qui
-le sont et les produits épuisés. */
 
 usort($products, function($a, $b) {
     if ($a['en_priorite'] == 1 && $b['en_priorite'] != 1) {

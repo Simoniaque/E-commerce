@@ -110,7 +110,7 @@ if ($sortingMethod !== 4) {
                                 <header class="card-header">
                                     <h6 class="title">Ordre de tri</h6>
                                 </header>
-                                <div class="filter-content collapse show" id="collapse_1">
+                                <div class="filter-content show">
                                     <div class="card-body">
                                         <div>
                                             <input type="radio" id="4" name="sortingMethod" value="4" <?= $sortingMethod == 4 ? 'checked' : '' ?> />
@@ -140,7 +140,7 @@ if ($sortingMethod !== 4) {
                                 <header class="card-header">
                                     <h6 class="title">Prix</h6>
                                 </header>
-                                <div class="filter-content collapse show" id="collapse_3">
+                                <div class="filter-content">
                                     <div class="card-body">
                                         <div class="form-row">
                                             <div class="form-group col-md-6">
