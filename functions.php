@@ -659,4 +659,20 @@ function isCartEmpty($con, $userID) {
     return true; // Retourne true en cas d'erreur de requête
 }
 
+function convertCookieCartToDBCart($con, $userID) {
+    $cartCookieName = 'cart';
+    $cart = isset($_COOKIE[$cartCookieName]) ? json_decode($_COOKIE[$cartCookieName], true) : [];
+
+    foreach ($cart as $productID => $quantity) {
+        if ($quantity > 0) {
+            addToCart($con, $userID, $productID, $quantity);
+        }
+    }
+
+    // Effacer le cookie après conversion
+    setcookie($cartCookieName, '', time() - 3600, '/');
+}
+
+
+
 ?>

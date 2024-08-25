@@ -9,6 +9,8 @@ if (isset($_SESSION['user_id'])) {
     die;
 }
 
+$redirectUrl = isset($_GET['redirect_to']) ? $_GET['redirect_to'] : 'index.php';
+
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $name = $_POST['userName'];
     $email = $_POST['userEmail'];
@@ -30,7 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             if ($newUserId > 0) {
                 sendAccountCreatedEmail($email, $name, generateURLVerifyAccount($con, $newUserId));
                 $_SESSION['user_id'] = $newUserId;
-                header("Location: index.php");
+
+                // Convertir le panier cookie en panier DB
+                convertCookieCartToDBCart($con, $newUserId);
+
+                header("Location: " . $redirectUrl);
                 die;
             } else {
                 echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
@@ -38,9 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
                   </div>";
             }
-
-            header("Location: login.php");
-            die;
         }
     } else {
         echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
@@ -49,7 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                   </div>";
     }
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -94,8 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     </div>
                     <button type="submit" class="btn btn-dark mb-2">S'inscrire</button>
                     <br />
-                    <a href="login.php" class="text-xs link-opacity-25">Vous avez déjà un compte ? Connectez-vous
-                        ici</a>
+                    <a href="login.php" class="text-xs link-opacity-25">Vous avez déjà un compte ? Connectez-vous ici</a>
                 </form>
             </div>
         </div>
@@ -106,15 +107,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         const togglePassword = document.querySelector('#togglePassword');
         const password = document.querySelector('#password');
         togglePassword.addEventListener('click', () => {
-
             const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
             password.setAttribute('type', type);
         });
     </script>
 
-
     <?php include "footer.php"; ?>
-
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>

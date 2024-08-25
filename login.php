@@ -8,6 +8,9 @@ if (isset($_SESSION['user_id'])) {
     die;
 }
 
+
+$redirectUrl = isset($_GET['redirect_to']) ? $_GET['redirect_to'] : 'index.php';
+
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $email = $_POST['userEmail'];
     $password = $_POST['userPassword'];
@@ -40,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
                 //Cas connexion réussie
                 $_SESSION['user_id'] = $userData['id'];
-                header("Location: index.php");
+                header("Location: " . $redirectUrl);
                 die;
             }
         }

@@ -30,15 +30,7 @@ if ($isLoggedIn) {
     }
 }
 
-if (!empty($cartProducts)) {
-    foreach ($cartProducts as $product) {
-        $productID = $product['id'];
-        $quantity = $product['quantite'];
-        $pricePerUnit = $product['prix'];
-        $totalPriceForProduct = $pricePerUnit * $quantity;
-        $totalPrice += $totalPriceForProduct;
-    }
-}
+
 ?>
 
 <!DOCTYPE html>
@@ -218,9 +210,17 @@ if (!empty($cartProducts)) {
                             </div>";
                         ?>
 
-                        <button type="button" id="checkoutButton" class="btn btn-dark btn-block btn-lg">
-                            Passer la commande
-                        </button>
+                        <!-- Remplacer le bouton actuel -->
+                        <?php if ($isLoggedIn) : ?>
+                            <a href="checkout.php" class="btn btn-dark btn-block btn-lg">
+                                Passer la commande
+                            </a>
+                        <?php else : ?>
+                            <a href="signup.php?redirect_to=<?php echo urlencode($_SERVER['REQUEST_URI']); ?>" class="btn btn-dark btn-block btn-lg">
+                                Créer un compte
+                            </a>
+                        <?php endif; ?>
+
                     </div>
                 <?php endif; ?>
             </div>

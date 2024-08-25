@@ -1,3 +1,5 @@
+<?php $currentPage = urlencode($_SERVER['REQUEST_URI']); ?>
+
 <header>
     <nav class="navbar navbar-light bg-light">
         <div class="container px-4 px-lg-5">
@@ -89,8 +91,8 @@
                                     <span class='visually-hidden'>New alerts</span>
                                 </span>" : "") . "
                               </a>
-                              <a class='btn btn-outline-dark ms-3' href='login.php'>Se Connecter</a>
-                              <a class='btn btn-outline-dark ms-3' href='signup.php'>S'inscrire</a>";
+                              <a class='btn btn-outline-dark ms-3' href='login.php?redirect_to=$currentPage'>Se Connecter</a>
+                              <a class='btn btn-outline-dark ms-3' href='signup.php?redirect_to=$currentPage'>S'inscrire</a>";
                     }
                     ?>
                 </div>
