@@ -44,6 +44,66 @@ function getUserInfo($con, $userId){
     }
 }
 
+function getUserAddresses($con, $userId) {
+    $query = "SELECT * FROM adresses_utilisateurs WHERE utilisateur_id = '$userId' ";
+    
+    $result = mysqli_query($con, $query);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        return mysqli_fetch_all($result, MYSQLI_ASSOC); // Retourne un tableau associatif
+    }
+    
+    return [];
+}
+
+function addUserAddress($con, $userId, $adresseComplete, $ville, $codePostal, $pays) {
+    $adresseComplete = mysqli_real_escape_string($con, $adresseComplete);
+    $ville = mysqli_real_escape_string($con, $ville);
+    $codePostal = mysqli_real_escape_string($con, $codePostal);
+    $pays = mysqli_real_escape_string($con, $pays);
+
+    $query = "INSERT INTO adresses_utilisateurs (utilisateur_id, adresse_complète, ville, code_postal, pays) 
+              VALUES ('$userId', '$adresseComplete', '$ville', '$codePostal', '$pays')";
+
+    if (mysqli_query($con, $query)) {
+        return true; // Succès
+    } else {
+        return false; // Échec
+    }
+}
+
+function getUserPaymentMethods($con, $userId) {
+    $query = "SELECT * FROM moyens_paiement WHERE utilisateur_id = '$userId' ";
+
+    $result = mysqli_query($con, $query);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        return mysqli_fetch_all($result, MYSQLI_ASSOC); // Retourne un tableau associatif
+    }
+    
+    return []; // Retourne un tableau vide si aucun résultat
+}
+
+function addUserPaymentMethod($con, $userId, $type, $cardNumber, $cardName, $expirationDate, $cvv, $paypalEmail) {
+    // Utilisation de mysqli_real_escape_string pour sécuriser les données
+    $cardNumber = mysqli_real_escape_string($con, $cardNumber);
+    $cardName = mysqli_real_escape_string($con, $cardName);
+    $expirationDate = mysqli_real_escape_string($con, $expirationDate);
+    $cvv = mysqli_real_escape_string($con, $cvv);
+    $paypalEmail = mysqli_real_escape_string($con, $paypalEmail);
+
+    $query = "INSERT INTO moyens_paiement (utilisateur_id, type, numero_carte, nom_titulaire, date_expiration, cvv, paypal_email) 
+              VALUES ('$userId', '$type', '$cardNumber', '$cardName', '$expirationDate', '$cvv', '$paypalEmail')";
+    
+    if (mysqli_query($con, $query)) {
+        return true; // Succès
+    } else {
+        // Affichage de l'erreur SQL
+        echo "Erreur SQL : " . mysqli_error($con);
+        return false; // Échec
+    }
+}
+
 function getProducts($con){
     $query = "SELECT * FROM produits";
 
