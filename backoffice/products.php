@@ -31,8 +31,9 @@ $result = $conn->query("SELECT p.id, p.nom, p.description, p.prix, p.stock, c.no
             <div class="col-md-10 p-0">
                 <?php include 'header.php'; ?>
 
-                <div class="container-fluid mt-4 ">
+                <div class="container-fluid mt-4">
                     <h1>Liste des Produits</h1>
+                    <a class="btn btn-dark mb-3" href="addproduct.php">Ajouter produit</a>
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">
                             <thead class="bg-dark text-light">
@@ -73,3 +74,4 @@ $result = $conn->query("SELECT p.id, p.nom, p.description, p.prix, p.stock, c.no
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
+

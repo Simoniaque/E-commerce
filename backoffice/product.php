@@ -1,31 +1,30 @@
 <?php
 session_start(); // Démarrer la session pour les messages flash
 
-include('config.php'); // Connexion à la base de données
+include('../config.php');
+
+include('../functions.php');
 
 $id = intval($_GET['id']); // ID du produit à modifier, assurez-vous que c'est un entier
 
 // Récupérer les informations du produit
-$result = $conn->query("SELECT * FROM produits WHERE id = $id");
-$product = $result->fetch_assoc();
+$product = getProductById($con, $id);
 
 // Traitement du formulaire
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nom = $conn->real_escape_string($_POST['nom']);
-    $description = $conn->real_escape_string($_POST['description']);
+    $nom = $_POST['nom'];
+    $description = $_POST['description'];
     $prix = floatval($_POST['prix']);
     $stock = intval($_POST['stock']);
     $categorie_id = intval($_POST['categorie_id']);
+    $materialsId = $_POST['material'];
 
-    $update_query = "UPDATE produits SET 
-                      nom = '$nom', 
-                      description = '$description', 
-                      prix = $prix, 
-                      stock = $stock, 
-                      categorie_id = $categorie_id 
-                    WHERE id = $id";
 
-    if ($conn->query($update_query) === TRUE) {
+    $result = updateProduct($con, $id, $nom, $description, $prix, $stock, $categorie_id, $materialsId);
+
+
+
+    if ($result) {
         $_SESSION['flash_message'] = [
             'type' => 'success',
             'message' => 'Produit mis à jour avec succès!'
@@ -61,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             display: inline-block;
             width: 30%;
         }
+
         .img-preview {
             max-height: 150px;
             width: 100%;
@@ -142,15 +142,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <label for="stock" class="form-label">Stock:</label>
                             <input type="number" id="stock" name="stock" class="form-control" value="<?php echo htmlspecialchars($product['stock']); ?>">
                         </div>
+                        <div class="mb-3">
+                            <?php
+                            $materials = getMaterials($con);
+                            $associatedMaterialIds = getMaterialsIDByProduct($con, $product['id']);
+
+                            foreach ($materials as $material) {
+                                $idMat = $material['id'];
+                                $nomMat = $material['nom'];
+
+                                // Vérifiez si l'ID est dans le tableau des IDs associés
+                                $checked = in_array($idMat, $associatedMaterialIds) ? 'checked' : '';
+                                echo "<input type='checkbox' class='mx-2' id='material$idMat' name='material[]' value='$idMat' $checked>$nomMat</input>";
+                            }
+                            ?>
+                        </div>
 
                         <div class="mb-3">
                             <label for="categorie_id" class="form-label">Catégorie:</label>
                             <select id="categorie_id" name="categorie_id" class="form-select">
                                 <?php
-                                $categories = $conn->query("SELECT id, nom FROM categories");
-                                while ($cat = $categories->fetch_assoc()) {
-                                    $selected = ($cat['id'] == $product['categorie_id']) ? 'selected' : '';
-                                    echo "<option value='{$cat['id']}' $selected>{$cat['nom']}</option>";
+                                $categories = getCategories($con);
+                                foreach ($categories as $cat) {
+                                    // Ajouter au select les catégories du produit
+                                    echo "<option value='{$cat['id']}'" . ($cat['id'] == $product['categorie_id'] ? ' selected' : '') . ">{$cat['nom']}</option>";
                                 }
                                 ?>
                             </select>
@@ -167,18 +182,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="upload.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('productForm');
+            form.addEventListener('submit', submitProductForm);
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
             const fileInputs = document.querySelectorAll('input[type="file"]');
 
             fileInputs.forEach(input => {
-                input.addEventListener('change', function () {
+                input.addEventListener('change', function() {
                     const id = this.id;
                     const preview = document.getElementById(`preview${id.charAt(0).toUpperCase() + id.slice(1)}`);
                     const file = this.files[0];
 
                     if (file) {
                         const reader = new FileReader();
-                        reader.onload = function (e) {
+                        reader.onload = function(e) {
                             preview.src = e.target.result;
                         };
                         reader.readAsDataURL(file);
@@ -194,4 +214,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </body>
 
 </html>
-

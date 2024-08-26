@@ -656,6 +656,51 @@ function getMaterialsByProduct($con, $product_id){
     return false;
 }
 
+function getMaterialsIDByProduct($con, $product){
+    $query = "SELECT materiau_id FROM produits_materiaux WHERE produit_id = '$product'";
+
+    $result = mysqli_query($con, $query);
+
+    if($result && mysqli_num_rows($result) > 0){
+        $materials = mysqli_fetch_all($result, MYSQLI_ASSOC);
+        $materialsID = array();
+        foreach ($materials as $material) {
+            $materialsID[] = $material['materiau_id'];
+        }
+        return $materialsID;
+    }
+
+    return false;
+}
+
+
+function updateProduct($con, $id, $nom, $description, $prix, $stock, $categorie_id, $materials){
+
+    $query = "UPDATE produits SET nom = '$nom', description = '$description', prix = '$prix', stock = '$stock', categorie_id = '$categorie_id' WHERE id = '$id'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result){
+        //supprimer les matériaux du produit
+        $queryDeleteMaterials = "DELETE FROM produits_materiaux WHERE produit_id = '$id'";
+        $resultDeleteMaterials = mysqli_query($con,$queryDeleteMaterials);
+
+        if($resultDeleteMaterials){
+            //ajouter les nouveaux matériaux
+            foreach ($materials as $material) {
+                $queryAddMaterial = "INSERT INTO produits_materiaux (produit_id, materiau_id) VALUES ('$id', '$material')";
+                $resultAddMaterial = mysqli_query($con,$queryAddMaterial);
+
+                if(!$resultAddMaterial){
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+    return false;
+
+}
 
 
 
