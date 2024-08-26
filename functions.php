@@ -33,6 +33,54 @@ function getUserByID($con, $id){
     }
 }
 
+function addOrder($con, $userID) {
+    // Étape 1: Créer une nouvelle commande
+    $orderDate = date("Y-m-d H:i:s"); // Date actuelle
+    $queryCreateOrder = "INSERT INTO commandes (utilisateur_id, date_creation) VALUES ('$userID', '$orderDate')";
+    
+    if (mysqli_query($con, $queryCreateOrder)) {
+        // Récupérer l'ID de la commande nouvellement créée
+        $orderID = mysqli_insert_id($con);
+
+        // Étape 2: Récupérer les produits dans le panier de l'utilisateur
+        $cartID = getCartID($con, $userID);
+        $queryGetCartItems = "SELECT * FROM details_paniers WHERE panier_id = '$cartID'";
+        $resultCartItems = mysqli_query($con, $queryGetCartItems);
+
+        if ($resultCartItems && mysqli_num_rows($resultCartItems) > 0) {
+            // Parcourir chaque produit dans le panier et l'ajouter à la commande
+            while ($row = mysqli_fetch_assoc($resultCartItems)) {
+                $productID = $row['produit_id'];
+                $quantity = $row['quantite'];
+
+                // Ajouter chaque produit à la commande
+                $queryAddOrderDetail = "INSERT INTO details_commandes (commande_id, produit_id, quantite) 
+                                        VALUES ('$orderID', '$productID', '$quantity')";
+                
+                if (!mysqli_query($con, $queryAddOrderDetail)) {
+                    echo "Erreur lors de l'ajout du produit à la commande: " . mysqli_error($con);
+                    return false;
+                }
+            }
+
+            // Étape 3: Vider le panier après la commande
+            $queryClearCart = "DELETE FROM details_paniers WHERE panier_id = '$cartID'";
+            if (mysqli_query($con, $queryClearCart)) {
+                return $orderID; // Succès, retourner l'ID de la commande créée
+            } else {
+                echo "Erreur lors du vidage du panier: " . mysqli_error($con);
+                return false;
+            }
+        } else {
+            echo "Le panier est vide ou une erreur est survenue lors de la récupération des produits.";
+            return false;
+        }
+    } else {
+        echo "Erreur lors de la création de la commande: " . mysqli_error($con);
+        return false;
+    }
+}
+
 function getUserInfo($con, $userId){
     $query = "SELECT * FROM details_utilisateurs WHERE utilisateur_id = '$userId' limit 1";
 

@@ -26,6 +26,32 @@ $userData = checkLogin($con);
 </head>
 
 <body>
+<div class="overlay"></div>
+    <div class="popup">
+        <p>
+            <?php 
+            if (isset($_SESSION['order_message'])) {
+                echo $_SESSION['order_message']; 
+                unset($_SESSION['order_message']);
+            } 
+            ?>
+        </p>
+        <button onclick="closePopup()">OK</button>
+    </div>
+
+    <script>
+        // Fonction pour fermer la pop-up
+        function closePopup() {
+            document.querySelector('.popup').style.display = 'none';
+            document.querySelector('.overlay').style.display = 'none';
+        }
+
+        // Afficher la pop-up si un message de commande existe
+        <?php if (isset($_SESSION['order_message'])): ?>
+            document.querySelector('.popup').style.display = 'block';
+            document.querySelector('.overlay').style.display = 'block';
+        <?php endif; ?>
+    </script>
     <main>
         <?php include "header.php"; ?>
 
