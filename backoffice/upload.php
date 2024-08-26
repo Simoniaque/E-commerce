@@ -14,7 +14,6 @@ if (isset($_FILES['file']) && isset($_POST['blobName']) && isset($_POST['contain
 
     if ($file['error'] == UPLOAD_ERR_OK) {
         try {
-            // Lire le fichier temporaire en tant que chaîne de caractères
             $content = file_get_contents($file['tmp_name']);
 
             if ($content === false) {
@@ -22,7 +21,6 @@ if (isset($_FILES['file']) && isset($_POST['blobName']) && isset($_POST['contain
                 exit;
             }
 
-            // Uploader le fichier
             $blobClient->createBlockBlob($container, $blobName, $content);
 
             echo "Upload réussi pour $blobName dans le container $container";

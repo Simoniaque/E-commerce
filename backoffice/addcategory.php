@@ -1,28 +1,24 @@
 <?php
-//addProduct.php
+// addcategory.php
 session_start();
 include('../config.php');
 include('../functions.php');
 
 $response = array('success' => false, 'message' => '');
 
+// Traitement du formulaire lors de l'envoi
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nom = $_POST['nom'];
     $description = $_POST['description'];
-    $prix = floatval($_POST['prix']);
-    $stock = intval($_POST['stock']);
-    $categorie_id = intval($_POST['categorie_id']);
-    $materialsId = isset($_POST['material']) ? $_POST['material'] : array();
 
-    // Ajouter le produit à la base de données
-    $newProductId = addProduct($con, $nom, $description, $prix, $stock, $categorie_id, $materialsId);
+    $result = addCategory($con, $nom, $description);
 
-    if ($newProductId) {
+    if ($result) {
         $response['success'] = true;
-        $response['message'] = 'Produit ajouté avec succès!';
-        $response['product_id'] = $newProductId;
+        $response['message'] = 'Catégorie ajoutée avec succès!';
+        $response['category_id'] = $result; // On suppose que `addCategory` retourne l'ID de la nouvelle catégorie
     } else {
-        $response['message'] = 'Erreur lors de l\'ajout du produit: ' . $con->error;
+        $response['message'] = 'Erreur lors de l\'ajout de la catégorie: ' . $con->error;
     }
 
     header('Content-Type: application/json');
@@ -33,10 +29,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajouter Produit</title>
+    <title>Ajouter une Catégorie</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -47,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             display: inline-block;
             width: 30%;
         }
+
         .img-preview {
             max-height: 150px;
             width: 100%;
@@ -54,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     </style>
 </head>
+
 <body>
     <div class="container-fluid p-0">
         <div class="row g-0">
@@ -66,28 +65,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="container mt-4">
                     <div id="alertContainer"></div>
 
-                    <h1 class="mb-4">Ajouter un Produit</h1>
-                    <form id="productForm" method="POST" enctype="multipart/form-data">
+                    <h1 class="mb-4">Ajouter une Catégorie</h1>
+                    <form id="categoryForm" method="POST" enctype="multipart/form-data">
                         <div class="row mb-3">
                             <div class="col">
                                 <label for="image1" class="form-label">Image 1:</label>
                                 <input type="file" id="image1" name="image1" class="form-control" accept="image/*">
                                 <div class="img-container">
                                     <img id="previewImage1" src="" alt="" class="img-preview mt-2">
-                                </div>
-                            </div>
-                            <div class="col">
-                                <label for="image2" class="form-label">Image 2:</label>
-                                <input type="file" id="image2" name="image2" class="form-control" accept="image/*">
-                                <div class="img-container">
-                                    <img id="previewImage2" src="" alt="" class="img-preview mt-2">
-                                </div>
-                            </div>
-                            <div class="col">
-                                <label for="image3" class="form-label">Image 3:</label>
-                                <input type="file" id="image3" name="image3" class="form-control" accept="image/*">
-                                <div class="img-container">
-                                    <img id="previewImage3" src="" alt="" class="img-preview mt-2">
                                 </div>
                             </div>
                         </div>
@@ -102,41 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <textarea id="description" name="description" class="form-control" rows="3" required></textarea>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="prix" class="form-label">Prix:</label>
-                            <input type="number" id="prix" name="prix" class="form-control" step="0.01" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="stock" class="form-label">Stock:</label>
-                            <input type="number" id="stock" name="stock" class="form-control" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for='material' class='form-label'>Matériaux:</label><br/>
-                            <?php
-                            $materials = getMaterials($con);
-                            foreach ($materials as $material) {
-                                $idMat = $material['id'];
-                                $nomMat = $material['nom'];
-                                echo "<input type='checkbox' class='mx-2' id='material$idMat' name='material[]' value='$idMat'>$nomMat</input>";
-                            }
-                            ?>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="categorie_id" class="form-label">Catégorie:</label>
-                            <select id="categorie_id" name="categorie_id" class="form-select">
-                                <?php
-                                $categories = getCategories($con);
-                                foreach ($categories as $cat) {
-                                    echo "<option value='{$cat['id']}'>{$cat['nom']}</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Ajouter le Produit</button>
+                        <button type="submit" class="btn btn-primary">Ajouter la Catégorie</button>
                     </form>
                 </div>
             </div>
@@ -158,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             `;
         };
 
-        const convertToWebP = (file) => {
+        const convertToPNG = (file) => {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = () => {
@@ -173,9 +124,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             if (blob) {
                                 resolve(blob);
                             } else {
-                                reject(new Error('Erreur lors de la conversion en WebP.'));
+                                reject(new Error('Erreur lors de la conversion en PNG.'));
                             }
-                        }, 'image/webp');
+                        }, 'image/png');
                     };
                     img.src = reader.result;
                 };
@@ -197,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             try {
-                const convertedFile = await convertToWebP(file);
+                const convertedFile = await convertToPNG(file);
 
                 const formData = new FormData();
                 formData.append('file', convertedFile);
@@ -216,45 +167,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         };
 
-        const handleUploads = async (idProduit, fileInputs, container) => {
-            let filesSelected = false;
-            const files = fileInputs.map(id => document.getElementById(id).files[0]);
-            const blobNames = [
-                `${idProduit}.webp`,
-                `${idProduit}_2.webp`,
-                `${idProduit}_3.webp`
-            ];
-
-            for (let i = 0; i < files.length; i++) {
-                if (files[i]) {
-                    filesSelected = true;
-                    console.log(`Uploading ${blobNames[i]}...`);
-                    await uploadImage(files[i], container, blobNames[i]);
-                }
-            }
-
-            if (!filesSelected) {
-                console.log('Aucun fichier sélectionné pour l\'upload.');
-            }
-        };
-
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('productForm');
+            const form = document.getElementById('categoryForm');
 
             form.addEventListener('submit', async function(event) {
                 event.preventDefault(); // Empêcher la soumission normale du formulaire
-                
+
                 const formData = new FormData(form);
-                
+
                 try {
-                    const response = await fetch('addproduct.php', {
+                    const response = await fetch('addcategory.php', { // Notez le changement ici pour soumettre à `addcategory.php`
                         method: 'POST',
                         body: formData
                     });
 
+                    if (!response.ok) {
+                        throw new Error('Erreur lors de la soumission du formulaire');
+                    }
+
                     const data = await response.json();
+
                     if (data.success) {
-                        await handleUploads(data.product_id, ['image1', 'image2', 'image3'], 'imagescontainer');
+                        // Assurez-vous de spécifier l'ID de la catégorie pour le traitement des images
+                        await uploadImage(formData.get('image1'), 'imagescategories', `${data.category_id}.png`);
                         showAlert(data.message, 'success');
                         form.reset(); // Réinitialiser le formulaire si nécessaire
                     } else {
@@ -286,4 +221,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         });
     </script>
 </body>
+
 </html>

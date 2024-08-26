@@ -322,6 +322,24 @@ function getAllProducts($con){
     }
 }
 
+function updateCategory($con, $categoryID, $nom, $description) {
+    $stmt = $con->prepare("UPDATE categories SET nom = ?, description = ? WHERE id = ?");
+    if ($stmt === false) {
+        return false;
+    }
+
+    $stmt->bind_param('ssi', $nom, $description, $categoryID);
+    $result = $stmt->execute();
+
+    if ($result === false) {
+        return false;
+    }
+
+    $stmt->close();
+    return $result;
+}
+
+
 function orderProductsByPrice($products){
     usort($products, function($a, $b) {
         return $a['prix'] <=> $b['prix'];
