@@ -1,7 +1,19 @@
 <?php
-// categories.php
 include('../config.php'); // Connexion à la base de données
 include('../functions.php'); // Assurez-vous que cette fonction est définie
+
+// Traitement de la suppression de catégorie
+if (isset($_GET['delete_id'])) {
+    $idcategory = intval($_GET['delete_id']); // Assurez-vous que l'ID est un entier
+    
+    if (deleteCategory($con, $idcategory)) {
+        $message = "Catégorie supprimée avec succès.";
+        $alert_type = "success";
+    } else {
+        $message = "Une erreur est survenue lors de la suppression de la catégorie.";
+        $alert_type = "danger";
+    }
+}
 
 // Récupérer toutes les catégories
 $categories = getCategories($con);
@@ -33,6 +45,14 @@ $categories = getCategories($con);
                 <div class="container-fluid mt-4">
                     <h1>Liste des Catégories</h1>
                     <a class="btn btn-dark mb-3" href="addcategory.php">Ajouter catégorie</a>
+
+                    <!-- Afficher le message de succès ou d'erreur -->
+                    <?php if (isset($message)): ?>
+                        <div class="alert alert-<?php echo $alert_type; ?>" role="alert">
+                            <?php echo $message; ?>
+                        </div>
+                    <?php endif; ?>
+
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">
                             <thead class="bg-dark text-light">
@@ -55,7 +75,7 @@ $categories = getCategories($con);
                                     </td>
                                     <td>
                                         <a class="btn btn-warning btn-sm" href="category.php?id=<?php echo $category['id']; ?>">Modifier</a>
-                                        <a class="btn btn-danger btn-sm" href="delete_category.php?id=<?php echo $category['id']; ?>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?');">Supprimer</a>
+                                        <a class="btn btn-danger btn-sm" href="?delete_id=<?php echo $category['id']; ?>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?');">Supprimer</a>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
