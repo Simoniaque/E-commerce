@@ -674,7 +674,7 @@ function getMaterialsIDByProduct($con, $product){
 }
 
 
-function updateProduct($con, $id, $nom, $description, $prix, $stock, $categorie_id, $materials){
+function updateProduct($con, $id, $nom, $description, $prix, $stock, $categorie_id, $materialsIDs){
 
     $query = "UPDATE produits SET nom = '$nom', description = '$description', prix = '$prix', stock = '$stock', categorie_id = '$categorie_id' WHERE id = '$id'";
 
@@ -687,7 +687,7 @@ function updateProduct($con, $id, $nom, $description, $prix, $stock, $categorie_
 
         if($resultDeleteMaterials){
             //ajouter les nouveaux matériaux
-            foreach ($materials as $material) {
+            foreach ($materialsIDs as $material) {
                 $queryAddMaterial = "INSERT INTO produits_materiaux (produit_id, materiau_id) VALUES ('$id', '$material')";
                 $resultAddMaterial = mysqli_query($con,$queryAddMaterial);
 
@@ -798,6 +798,28 @@ function convertCookieCartToDBCart($con, $userID) {
 
     // Effacer le cookie après conversion
     setcookie($cartCookieName, '', time() - 3600, '/');
+}
+
+function addCategory($con, $categoryName, $categoryDescription){
+    $query = "INSERT INTO categories (nom, description) VALUES ('$categoryName', '$categoryDescription')";
+
+    $result = mysqli_query($con,$query);
+
+    if($result){
+        return mysqli_insert_id($con);
+    }
+    return false;
+}
+
+function deleteCategory($con, $categoryID){
+    $query = "DELETE FROM categories WHERE id = '$categoryID'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result){
+        return true;
+    }
+    return false;
 }
 
 
