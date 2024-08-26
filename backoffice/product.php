@@ -1,5 +1,5 @@
 <?php
-//Product.php
+// Product.php
 session_start();
 include('../config.php');
 include('../functions.php');
@@ -14,12 +14,12 @@ if (!$product) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nom = $_POST['nom'];
-    $description = $_POST['description'];
+    $nom = htmlspecialchars(trim($_POST['nom']));
+    $description = htmlspecialchars(trim($_POST['description']));
     $prix = floatval($_POST['prix']);
     $stock = intval($_POST['stock']);
     $categorie_id = intval($_POST['categorie_id']);
-    $materialsId = isset($_POST['material']) ? $_POST['material'] : array();
+    $materialsId = isset($_POST['material']) ? array_map('intval', $_POST['material']) : array();
 
     // Mise à jour du produit dans la base de données
     $result = updateProduct($con, $productID, $nom, $description, $prix, $stock, $categorie_id, $materialsId);
@@ -80,21 +80,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <label for="image1" class="form-label">Image 1:</label>
                                 <input type="file" id="image1" name="image1" class="form-control" accept="image/*">
                                 <div class="img-container">
-                                    <img id="previewImage1" src="https://imgproduitnewvet.blob.core.windows.net/imagescontainer/<?php echo $productID; ?>.webp" alt="" class="img-preview mt-2">
+                                    <img id="previewImage1" src="https://imgproduitnewvet.blob.core.windows.net/imagescontainer/<?php echo htmlspecialchars($productID); ?>.webp" alt="" class="img-preview mt-2">
                                 </div>
                             </div>
                             <div class="col">
                                 <label for="image2" class="form-label">Image 2:</label>
                                 <input type="file" id="image2" name="image2" class="form-control" accept="image/*">
                                 <div class="img-container">
-                                    <img id="previewImage2" src="https://imgproduitnewvet.blob.core.windows.net/imagescontainer/<?php echo $productID; ?>_2.webp" alt="" class="img-preview mt-2">
+                                    <img id="previewImage2" src="https://imgproduitnewvet.blob.core.windows.net/imagescontainer/<?php echo htmlspecialchars($productID); ?>_2.webp" alt="" class="img-preview mt-2">
                                 </div>
                             </div>
                             <div class="col">
                                 <label for="image3" class="form-label">Image 3:</label>
                                 <input type="file" id="image3" name="image3" class="form-control" accept="image/*">
                                 <div class="img-container">
-                                    <img id="previewImage3" src="https://imgproduitnewvet.blob.core.windows.net/imagescontainer/<?php echo $productID; ?>_3.webp" alt="" class="img-preview mt-2">
+                                    <img id="previewImage3" src="https://imgproduitnewvet.blob.core.windows.net/imagescontainer/<?php echo htmlspecialchars($productID); ?>_3.webp" alt="" class="img-preview mt-2">
                                 </div>
                             </div>
                         </div>
@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                             foreach ($materials as $material) {
                                 $idMat = $material['id'];
-                                $nomMat = $material['nom'];
+                                $nomMat = htmlspecialchars($material['nom']);
                                 $checked = in_array($idMat, $associatedMaterialIds) ? 'checked' : '';
                                 echo "<input type='checkbox' class='mx-2' id='material$idMat' name='material[]' value='$idMat' $checked>$nomMat</input>";
                             }
@@ -140,7 +140,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <?php
                                 $categories = getCategories($con);
                                 foreach ($categories as $cat) {
-                                    echo "<option value='{$cat['id']}'" . ($cat['id'] == $product['categorie_id'] ? ' selected' : '') . ">{$cat['nom']}</option>";
+                                    $selected = ($cat['id'] == $product['categorie_id']) ? ' selected' : '';
+                                    echo "<option value='{$cat['id']}'$selected>{$cat['nom']}</option>";
                                 }
                                 ?>
                             </select>
@@ -226,78 +227,57 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         };
 
-        const handleUploads = async (idProduit, fileInputs, container) => {
-    let filesSelected = false;
-    const files = fileInputs.map(id => document.getElementById(id).files[0]);
-    const blobNames = [
-        `${idProduit}.webp`,
-        `${idProduit}_2.webp`,
-        `${idProduit}_3.webp`
-    ];
+        document.getElementById('productForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
 
-    for (let i = 0; i < files.length; i++) {
-        if (files[i]) {
-            filesSelected = true;
-            console.log(`Uploading ${blobNames[i]}...`);
-            await uploadImage(files[i], container, blobNames[i]);
-        }
-    }
+            const productID = '<?php echo $productID; ?>';
+            const files = [document.getElementById('image1').files[0], document.getElementById('image2').files[0], document.getElementById('image3').files[0]];
+            const blobNames = [`${productID}.webp`, `${productID}_2.webp`, `${productID}_3.webp`];
+            const container = 'imagescontainer';
 
-    if (!filesSelected) {
-        console.log('Aucun fichier sélectionné pour l\'upload.');
-    }
+            for (let i = 0; i < files.length; i++) {
+                await uploadImage(files[i], container, blobNames[i]);
+            }
 
-    // Recharger la page après les uploads
-    window.location.reload();
-};
-
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('productForm');
-
-            form.addEventListener('submit', async function(event) {
-                event.preventDefault(); // Empêcher la soumission normale du formulaire
-                
-                const formData = new FormData(form);
-                
-                try {
-                    const response = await fetch('product.php?id=<?php echo $productID; ?>', {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    const data = await response.json();
-                    if (data.success) {
-                        await handleUploads(data.product_id, ['image1', 'image2', 'image3'], 'imagescontainer');
-                        showAlert(data.message, 'success');
-                        form.reset(); // Réinitialiser le formulaire si nécessaire
-                    } else {
-                        showAlert(data.message, 'danger');
-                    }
-                } catch (error) {
-                    showAlert(`Erreur lors de la soumission du formulaire: ${error.message}`, 'danger');
-                }
-            });
-
-            const fileInputs = document.querySelectorAll('input[type="file"]');
-            fileInputs.forEach(input => {
-                input.addEventListener('change', function() {
-                    const id = this.id;
-                    const preview = document.getElementById(`preview${id.charAt(0).toUpperCase() + id.slice(1)}`);
-                    const file = this.files[0];
-
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            preview.src = e.target.result;
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        preview.src = '';
-                    }
+            try {
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData
                 });
-            });
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                    setTimeout(() => {
+                        window.location.href = 'products.php';
+                    }, 2000);
+                } else {
+                    showAlert(result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('Erreur lors de la modification du produit: ' + error.message, 'danger');
+            }
         });
+
+        const previewImage = (event, previewId) => {
+            const preview = document.getElementById(previewId);
+            const file = event.target.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '';
+            }
+        };
+
+        document.getElementById('image1').addEventListener('change', (e) => previewImage(e, 'previewImage1'));
+        document.getElementById('image2').addEventListener('change', (e) => previewImage(e, 'previewImage2'));
+        document.getElementById('image3').addEventListener('change', (e) => previewImage(e, 'previewImage3'));
     </script>
 </body>
 </html>

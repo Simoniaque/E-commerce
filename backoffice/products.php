@@ -1,9 +1,9 @@
 <?php
 // products.php
-include('config.php'); // Connexion à la base de données
+include('../config.php'); // Connexion à la base de données
 
 // Récupérer tous les produits
-$result = $conn->query("SELECT p.id, p.nom, p.description, p.prix, p.stock, c.nom as categorie 
+$result = $con->query("SELECT p.id, p.nom, p.description, p.prix, p.stock, c.nom as categorie 
                         FROM produits p 
                         LEFT JOIN categories c ON p.categorie_id = c.id");
 ?>

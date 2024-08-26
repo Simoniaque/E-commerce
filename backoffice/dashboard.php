@@ -1,13 +1,13 @@
 <?php
 // dashboard.php
-include('config.php');
+include('../config.php');
 
 // Exemple : Afficher le nombre total de commandes
-$result = $conn->query("SELECT COUNT(*) as total_orders FROM commandes");
+$result = $con->query("SELECT COUNT(*) as total_orders FROM commandes");
 $total_orders = $result->fetch_assoc()['total_orders'];
 
 // Exemple : Afficher le chiffre d'affaires total
-$result = $conn->query("SELECT SUM(prix_total) as total_revenue FROM commandes");
+$result = $con->query("SELECT SUM(prix_total) as total_revenue FROM commandes");
 $total_revenue = $result->fetch_assoc()['total_revenue'];
 ?>
 

@@ -1,5 +1,5 @@
 <?php
-//addProduct.php
+// addProduct.php
 session_start();
 include('../config.php');
 include('../functions.php');
@@ -7,20 +7,24 @@ include('../functions.php');
 $response = array('success' => false, 'message' => '');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nom = $_POST['nom'];
-    $description = $_POST['description'];
+    $nom = htmlspecialchars(trim($_POST['nom']));
+    $description = htmlspecialchars(trim($_POST['description']));
     $prix = floatval($_POST['prix']);
     $stock = intval($_POST['stock']);
     $categorie_id = intval($_POST['categorie_id']);
-    $materialsId = isset($_POST['material']) ? $_POST['material'] : array();
+    $materialsId = isset($_POST['material']) ? array_map('intval', $_POST['material']) : array();
 
     // Ajouter le produit à la base de données
     $newProductId = addProduct($con, $nom, $description, $prix, $stock, $categorie_id, $materialsId);
 
     if ($newProductId) {
+        // Les informations de réponse
         $response['success'] = true;
         $response['message'] = 'Produit ajouté avec succès!';
         $response['product_id'] = $newProductId;
+
+        // Traiter les images après l'ajout du produit
+        // Note: Les images doivent être traitées en JavaScript car elles sont envoyées dans la même requête.
     } else {
         $response['message'] = 'Erreur lors de l\'ajout du produit: ' . $con->error;
     }
@@ -118,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $materials = getMaterials($con);
                             foreach ($materials as $material) {
                                 $idMat = $material['id'];
-                                $nomMat = $material['nom'];
+                                $nomMat = htmlspecialchars($material['nom']);
                                 echo "<input type='checkbox' class='mx-2' id='material$idMat' name='material[]' value='$idMat'>$nomMat</input>";
                             }
                             ?>

@@ -358,7 +358,8 @@ function userAlreadyExists($con, $email){
 }
 
 function addUser($con, $name, $email, $password){
-    $query = "INSERT INTO utilisateurs (nom, email, mot_de_passe) VALUES ('$name', '$email', '$password')";
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+    $query = "INSERT INTO utilisateurs (nom, email, mot_de_passe) VALUES ('$name', '$email', '$hashedPassword')";
 
     $result = mysqli_query($con,$query);
 

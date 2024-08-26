@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         } else {
             $userData = mysqli_fetch_assoc($result);
             //Cas mot de pass incorrect
-            if ($userData["mot_de_passe"] != $password) {
+            if (password_verify($password, $user['mot_de_passe'])) {
                 echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
                             Mot de passe incorrect
                             <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
