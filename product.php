@@ -70,9 +70,8 @@ if (!isset($_GET['id'])) {
 
         $imagePaths = [
             PATH_PRODUCTS_IMAGES . $productID . '.webp',
-            //TODO Ajouter des images avec un suffixe _2 et _3 dans le blob azure
-            PATH_PRODUCTS_IMAGES . '5.webp',
-            PATH_PRODUCTS_IMAGES . '10.webp',
+            PATH_PRODUCTS_IMAGES . $productID . '_2.webp',
+            PATH_PRODUCTS_IMAGES . $productID . '_3.webp',
         ];
 
         $addToCartButton = "<a href='#' class='btn btn-lg disabled'>Stock Épuisé</a>";
