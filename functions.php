@@ -702,6 +702,28 @@ function updateProduct($con, $id, $nom, $description, $prix, $stock, $categorie_
 
 }
 
+function addProduct($con, $nom, $description, $prix, $stock, $categorie_id, $materials){
+    $query = "INSERT INTO produits (nom, description, prix, stock, categorie_id) VALUES ('$nom', '$description', '$prix', '$stock', '$categorie_id')";
+
+    $result = mysqli_query($con,$query);
+
+    if($result){
+        $productID = mysqli_insert_id($con);
+
+        foreach ($materials as $material) {
+            $queryAddMaterial = "INSERT INTO produits_materiaux (produit_id, materiau_id) VALUES ('$productID', '$material')";
+            $resultAddMaterial = mysqli_query($con,$queryAddMaterial);
+
+            if(!$resultAddMaterial){
+                return 0;
+            }
+        }
+        return $productID;
+    }
+
+    return 0;
+}
+
 
 
 
