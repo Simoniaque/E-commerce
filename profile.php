@@ -31,14 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Sinon, c'est une mise à jour des informations de l'utilisateur
     $name = $_POST['name'];
-    $phoneNumber = $_POST['phoneNumber'];
-    $address = $_POST['address'];
-    $postalCode = $_POST['postalCode'];
-    $country = $_POST['country'];
-    $city = $_POST['city'];
     $email = $_POST['email'];
 
-    if (EditUserInfo($con, $id, $name, $phoneNumber, $address, $postalCode, $country, $city, $email)) {
+    if (EditUserInfo($con, $id, $name, $email)) {
         echo "User info updated successfully";
     } else {
         echo "Error updating user info";
@@ -87,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     console.log(data);
                     if (data === "accountDeleted") {
                         alert("Votre compte a bien été supprimé");
-                        window.location.href = 'index.php'; // Redirection vers la page d'accueil
+                        window.location.href = 'index.php';
                     } else {
                         alert("Erreur lors de la suppression du compte");
                     }
@@ -101,11 +96,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         function EditUserInfo() {
             const formData = new FormData();
             formData.append('name', document.getElementById("nameInput").value);
-            formData.append('phoneNumber', document.getElementById("phoneNumberInput").value);
-            formData.append('address', document.getElementById("addressInput").value);
-            formData.append('postalCode', document.getElementById("postalCodeInput").value);
-            formData.append('country', document.getElementById("countryInput").value);
-            formData.append('city', document.getElementById("cityInput").value);
             formData.append('email', document.getElementById("emailInput").value);
 
             fetch('profile.php', {
@@ -135,31 +125,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $name = $userData['nom'];
         $email = $userData['email'];
 
-        $userInfo = getUserInfo($con, $id);
-        $phoneNumber = "";
-        $address = "";
-        $postalCode = "";
-        $country = "";
-        $city = "";
-
-        if ($userInfo) {
-            if ($userInfo['telephone'] != null) {
-                $phoneNumber = $userInfo['telephone'];
-            }
-            if ($userInfo['adresse'] != null) {
-                $address = $userInfo['adresse'];
-            }
-            if ($userInfo['code_postal'] != null) {
-                $postalCode = $userInfo['code_postal'];
-            }
-            if ($userInfo['pays'] != null) {
-                $country = $userInfo['pays'];
-            }
-            if ($userInfo['ville'] != null) {
-                $city = $userInfo['ville'];
-            }
-        }
-
 
 
 
@@ -177,31 +142,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </div>
                         <hr />
                         <div class='col-md-12 mb-3'>
-                            <label class='labels'>Numéro de téléphone</label>
-                            <input type='text' id='phoneNumberInput' class='form-control' placeholder='$phoneNumber' value=''>
-                        </div>
-                        <hr />
-                        <div class='col-md-12 mb-3'>
-                            <label class='labels'>Adresse postale</label>
-                            <input type='text' id='addressInput' class='form-control' placeholder='$address' value=''>
-                        </div>
-                        <hr />
-                        <div class='col-md-12 mb-3'>
-                            <label class='labels'>Code postal</label>
-                            <input type='text' id='postalCodeInput' class='form-control' placeholder='$postalCode' value=''>
-                        </div>
-                        <hr />
-                        <div class='col-md-12 mb-3'>
-                            <label class='labels'>Pays</label>
-                            <input type='text' id='countryInput' class='form-control' placeholder='$country' value=''>
-                        </div>
-                        <hr />
-                        <div class='col-md-12 mb-3'>
-                            <label class='labels'>Ville</label>
-                            <input type='text' id='cityInput' class='form-control' placeholder='$city' value=''>
-                        </div>
-                        <hr />
-                        <div class='col-md-12 mb-3'>
                             <label class='labels'>Adresse Mail</label>
                             <input type='text' id='emailInput' class='form-control' placeholder='$email' value=''>
                         </div>
@@ -214,6 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class='col-md-6'>
                 <div class='p-3 py-5'>
                     <a href='myorders.php'><button  class='btn btn-dark col-12 mb-3'>Mes Commandes</button></a>
+                    <a href='resetpassword.php?email=$email'><button  class='btn btn-dark col-12 mb-3'>Réinitialiser mon mot de passe</button></a>
                     <button class='btn btn-danger col-12 mb-3' onclick='showDeleteAccountVerification()'>Supprimer mon compte</button>
                     <span id='verifyDeleteAccount' class='m-2' style='display: none;'>
                         <h5 class='mb-3'>Êtes-vous sûr de vouloir supprimer votre compte ?</h5>

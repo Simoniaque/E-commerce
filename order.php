@@ -21,12 +21,12 @@ $orderDetails = getOrderDetails($con, $orderId);
 $user = checkLogin($con);
 $userName = $user['nom'];
 
-$userInfo = getUserInfo($con, $order['utilisateur_id']);
-$userAddress = $userInfo['adresse'];
-$userPostalCode = $userInfo['code_postal'];
-$userCity = $userInfo['ville'];
-$userCountry = $userInfo['pays'];
-$userPhone = $userInfo['telephone'];
+//Recup les infos de l'utilisateur
+$userAddress = "10 Rue de la paix";
+$userPostalCode = "75013";
+$userCity = "Paris";
+$userCountry = "France";
+$userPhone = "01 01 01 01 01";
 
 
 ?>

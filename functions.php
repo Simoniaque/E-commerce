@@ -33,17 +33,6 @@ function getUserByID($con, $id){
     }
 }
 
-function getUserInfo($con, $userId){
-    $query = "SELECT * FROM details_utilisateurs WHERE utilisateur_id = '$userId' limit 1";
-
-    $result = mysqli_query($con,$query);
-
-    if($result && mysqli_num_rows($result)> 0){
-        $userInfo = mysqli_fetch_assoc($result);
-        return $userInfo;
-    }
-}
-
 function getUserAddresses($con, $userId) {
     $query = "SELECT * FROM adresses_utilisateurs WHERE utilisateur_id = '$userId' ";
     
@@ -125,28 +114,12 @@ function getCategoriesList($con){
     }
 }
 
-function EditUserInfo($con, $id, $name, $phoneNumber, $address, $postalCode, $country, $city, $email){
+function EditUserInfo($con, $id, $name, $email){
 
     $userData = checkLogin($con);
-    $userInfo = getUserInfo($con, $id);
 
     if($name == ""){
         $name = $userData['nom'];
-    }
-    if($phoneNumber == ""){
-        $phoneNumber = $userInfo['telephone'];
-    }
-    if($address == ""){
-        $address = $userInfo['adresse'];
-    }
-    if($postalCode == ""){
-        $postalCode = $userInfo['code_postal'];
-    }
-    if($country == ""){
-        $country = $userInfo['pays'];
-    }
-    if($city == ""){
-        $city = $userInfo['ville'];
     }
     if($email == ""){
         $email = $userData['email'];
@@ -157,13 +130,7 @@ function EditUserInfo($con, $id, $name, $phoneNumber, $address, $postalCode, $co
     $result = mysqli_query($con,$query);
 
     if($result){
-        $query = "UPDATE details_utilisateurs SET telephone = '$phoneNumber', adresse = '$address', code_postal = '$postalCode', pays = '$country', ville = '$city' WHERE id = '$id'";
-
-        $result = mysqli_query($con,$query);
-
-        if($result){
-            return true;
-        }
+        return true;
     }
     return false;
 }
