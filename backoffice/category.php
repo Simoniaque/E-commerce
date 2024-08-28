@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div class="row mb-3">
                             <div class="col">
                                 <label for="image1" class="form-label">Image 1:</label>
-                                <input type="file" id="image1" name="image1" class="form-control" accept="image/*">
+                                <input type="file" id="image1" name="image1" class="form-control" accept="image/jpeg">
                                 <div class="img-container">
                                     <img id="previewImage1" src="https://imgproduitnewvet.blob.core.windows.net/imagescategories/<?php echo $categoryID; ?>.png" alt="" class="img-preview mt-2">
                                 </div>
@@ -85,12 +85,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                         <div class="mb-3">
                             <label for="nom" class="form-label">Nom:</label>
-                            <input type="text" id="nom" name="nom" class="form-control" value="<?php echo htmlspecialchars($category['nom']); ?>" required>
+                            <input type="text" id="nom" name="nom" class="form-control" value="<?php echo $category['nom']; ?>" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="description" class="form-label">Description:</label>
-                            <textarea id="description" name="description" class="form-control" rows="3" required><?php echo htmlspecialchars($category['description']); ?></textarea>
+                            <textarea id="description" name="description" class="form-control" rows="3" required><?php echo $category['description']; ?></textarea>
                         </div>
 
                         <button type="submit" class="btn btn-primary">Modifier le Catégorie</button>
@@ -115,30 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             `;
         };
 
-        const convertToPNG = (file) => {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        ctx.drawImage(img, 0, 0);
-                        canvas.toBlob((blob) => {
-                            if (blob) {
-                                resolve(blob);
-                            } else {
-                                reject(new Error('Erreur lors de la conversion en PNG.'));
-                            }
-                        }, 'image/png');
-                    };
-                    img.src = reader.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        };
+        
 
         const uploadImage = async (file, container, blobName) => {
             if (!file) {
@@ -154,10 +131,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             try {
-                const convertedFile = await convertToPNG(file);
-
                 const formData = new FormData();
-                formData.append('file', convertedFile);
+                formData.append('file', file);
                 formData.append('blobName', blobName);
                 formData.append('container', container);
 
@@ -190,8 +165,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 console.log('Aucun fichier sélectionné pour l\'upload.');
             }
 
-            // Recharger la page après l'upload
-            window.location.reload();
         };
 
 

@@ -9,6 +9,11 @@
             <a class="nav-link text-white active" href="dashboard.php">
                 Dashboard
             </a>
+        </li> 
+        <li class="nav-item">
+            <a class="nav-link text-white" href="highlanders.php">
+                Highlanders
+            </a>
         </li>
         <li class="nav-item">
             <a class="nav-link text-white" href="products.php">

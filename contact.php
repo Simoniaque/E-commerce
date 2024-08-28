@@ -10,12 +10,12 @@ $contactSuccess = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Récupérer les données du formulaire
-    $name = htmlspecialchars(trim($_POST['fullname']));
-    $email = filter_var(trim($_POST['email']), FILTER_VALIDATE_EMAIL);
-    $phone = htmlspecialchars(trim($_POST['phone']));
+    $name = $_POST['fullname'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
     $object = "Formulaire de contact";
-    $subject = htmlspecialchars(trim($_POST['subject']));
-    $message = htmlspecialchars(trim($_POST['message']));
+    $subject = $_POST['subject'];
+    $message = $_POST['message'];
 
     // Vérifier que les champs requis sont remplis
     if ($name && $email && $subject && $message) {
@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <li><strong>Email :</strong> ' . $email . '</li>
                             <li><strong>Téléphone :</strong> ' . $phone . '</li>
                             <li><strong>Sujet :</strong> ' . $subject . '</li>
-                            <li><strong>Message :</strong><br>' . nl2br(htmlspecialchars($message)) . '</li>
+                            <li><strong>Message :</strong><br>' . nl2br($message) . '</li>
                         </ul>
                         <br/>
                         <p>Notre équipe examinera votre message et vous répondra dans les plus brefs délais.</p>

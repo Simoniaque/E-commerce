@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div class="row mb-3">
                             <div class="col">
                                 <label for="image1" class="form-label">Image 1:</label>
-                                <input type="file" id="image1" name="image1" class="form-control" accept="image/*">
+                                <input type="file" id="image1" name="image1" class="form-control" accept="image/jpeg">
                                 <div class="img-container">
                                     <img id="previewImage1" src="" alt="" class="img-preview mt-2">
                                 </div>

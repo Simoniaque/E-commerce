@@ -102,7 +102,7 @@ if ($sortingMethod !== 4) {
                                     <h6 class="title">Recherche</h6>
                                 </header>
                                 <div class="card-body">
-                                    <input type="text" class="form-control" id="search" name="search" value="<?= htmlspecialchars($searchText) ?>">
+                                    <input type="text" class="form-control" id="search" name="search" value="<?= $searchText?>">
                                 </div>
                             </article>
 
@@ -145,11 +145,11 @@ if ($sortingMethod !== 4) {
                                         <div class="form-row">
                                             <div class="form-group col-md-6">
                                                 <label for="min_price">Prix min</label>
-                                                <input type="number" class="form-control" id="min_price" name="min_price" step="0.01" value="<?= htmlspecialchars($minPrice) ?>"><br>
+                                                <input type="number" class="form-control" id="min_price" name="min_price" step="0.01" value="<?= $minPrice?>"><br>
                                             </div>
                                             <div class='form-group text-right col-md-6'>
                                                 <label for="max_price">Prix max</label>
-                                                <input type="number" class='form-control' id="max_price" name="max_price" step="0.01" value="<?= htmlspecialchars($maxPrice) ?>"><br>
+                                                <input type="number" class='form-control' id="max_price" name="max_price" step="0.01" value="<?= $maxPrice?>"><br>
                                             </div>
                                         </div>
                                         <label>

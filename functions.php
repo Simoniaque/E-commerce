@@ -320,6 +320,20 @@ function getCategoryById($con, $category_id){
         return $category;
     }
 }
+
+function getProductCategory($con, $productID){
+    $query = "SELECT * FROM produits WHERE id = '$productID'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $product = mysqli_fetch_assoc($result);
+        $categoryID = $product['categorie_id'];
+        $category = getCategoryById($con, $categoryID);
+        return $category;
+    }
+}
+
 function show_404() {
     header("HTTP/1.1 404 Not Found");
     exit();
@@ -366,6 +380,52 @@ function getHighlightCategories($con){
 
         return $categories;
     }
+}
+
+function setHighlightCategories($con, $category1, $category2, $category3, $category4){
+    $query = "DELETE FROM categories_en_avant";
+
+    $result = mysqli_query($con,$query);
+
+    if($result){
+        $query1 = "INSERT INTO categories_en_avant (categorie_id) VALUES ('$category1')";
+        $query2 = "INSERT INTO categories_en_avant (categorie_id) VALUES ('$category2')";
+        $query3 = "INSERT INTO categories_en_avant (categorie_id) VALUES ('$category3')";
+        $query4 = "INSERT INTO categories_en_avant (categorie_id) VALUES ('$category4')";
+
+        $result1 = mysqli_query($con,$query1);
+        $result2 = mysqli_query($con,$query2);
+        $result3 = mysqli_query($con,$query3);
+        $result4 = mysqli_query($con,$query4);
+
+        if($result1 && $result2 && $result3 && $result4){
+            return true;
+        }
+    }
+    return false;
+}
+
+function setHighlightProducts($con, $product1, $product2, $product3, $product4){
+    $query = "DELETE FROM produits_en_avant";
+
+    $result = mysqli_query($con,$query);
+
+    if($result){
+        $query1 = "INSERT INTO produits_en_avant (produit_id) VALUES ('$product1')";
+        $query2 = "INSERT INTO produits_en_avant (produit_id) VALUES ('$product2')";
+        $query3 = "INSERT INTO produits_en_avant (produit_id) VALUES ('$product3')";
+        $query4 = "INSERT INTO produits_en_avant (produit_id) VALUES ('$product4')";
+
+        $result1 = mysqli_query($con,$query1);
+        $result2 = mysqli_query($con,$query2);
+        $result3 = mysqli_query($con,$query3);
+        $result4 = mysqli_query($con,$query4);
+
+        if($result1 && $result2 && $result3 && $result4){
+            return true;
+        }
+    }
+    return false;
 }
 
 function getHighlightProducts($con){
@@ -861,7 +921,16 @@ function addProduct($con, $nom, $description, $prix, $stock, $categorie_id, $mat
 
 
 
+function deleteProduct($con, $idproduct){
+    $query = "DELETE FROM produits WHERE id = '$idproduct'";
 
+    $result = mysqli_query($con,$query);
+
+    if($result){
+        return true;
+    }
+    return false;
+}
 
 function getMaterials($con) {
     $query = "SELECT * FROM materiaux";
@@ -871,7 +940,7 @@ function getMaterials($con) {
 
     // Vérifier l'existence des résultats
     if ($result === false) {
-        die('Erreur lors de l\'exécution de la requête : ' . htmlspecialchars($con->error));
+        die('Erreur lors de l\'exécution de la requête : ' . $con->error);
     }
 
     // Fetch les résultats
@@ -889,7 +958,7 @@ function getCategories($con) {
 
     // Vérifier l'existence des résultats
     if ($result === false) {
-        die('Erreur lors de l\'exécution de la requête : ' . htmlspecialchars($con->error));
+        die('Erreur lors de l\'exécution de la requête : ' . $con->error);
     }
 
     // Fetch les résultats
