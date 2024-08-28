@@ -7,10 +7,10 @@
             <div class="col-md-4 my-3 my-md-0">
                 <ul class="list-inline text-center">
                     <li class="list-inline-item">
-                        <a href="/cgu" class="text-white">CGU</a>
+                        <a href="cgu.php" class="text-white">CGU</a>
                     </li>
                     <li class="list-inline-item">
-                        <a href="/mentions-legales" class="text-white">Mentions légales</a>
+                        <a href="mention.php" class="text-white">Mentions légales</a>
                     </li>
                     <li class="list-inline-item">
                         <a href="contact.php" class="text-white">Contact</a>

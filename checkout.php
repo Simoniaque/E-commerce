@@ -209,6 +209,9 @@ Le montant total est de €$totalAmount. Votre commande sera livrée $deliveryDa
                                 </tr>
                             </tfoot>
                         </table>
+                        <form method="post" action="checkout.php">
+                            <button type="submit" name="place_order">Valider la commande</button>
+                        </form>
                     </div>
                 </div>
 
@@ -235,29 +238,21 @@ Le montant total est de €$totalAmount. Votre commande sera livrée $deliveryDa
                             <?php endforeach; ?>
                         </ol>
                         <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#newAddressModal">+ Ajouter une nouvelle adresse</button>
-                        <form method="post" action="checkout.php">
-                            <button type="submit" name="place_order">Valider la commande</button>
-                        </form>
+                        <!-- Gestion des moyens de paiement -->
+                        <h4>Moyens de Paiement</h4>
+                        <ul>
+                            <?php foreach ($paymentMethods as $paymentMethod): ?>
+                                <li>
+                                    <input type="radio" name="payment_method" value="<?php echo $paymentMethod['id']; ?>" id="payment_<?php echo $paymentMethod['id']; ?>" required>
+                                    <label for="payment_<?php echo $paymentMethod['id']; ?>">
+                                        <?php echo $paymentMethod['type'] === 'card' ? 'Carte bancaire' : 'PayPal'; ?> -
+                                        <?php echo $paymentMethod['type'] === 'card' ? '**** **** **** ' . substr($paymentMethod['numero_carte'], -4) : $paymentMethod['paypal_email']; ?>
+                                    </label>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#newPaymentModal">+ Ajouter un nouveau moyen de paiement</button>
                     </form>
-                </div>
-            </div>
-
-            <!-- Gestion des moyens de paiement -->
-            <div class="row mt-5">
-                <div class="col-lg-12">
-                    <h4>Moyens de Paiement</h4>
-                    <ul>
-                        <?php foreach ($paymentMethods as $paymentMethod): ?>
-                            <li>
-                                <input type="radio" name="payment_method" value="<?php echo $paymentMethod['id']; ?>" id="payment_<?php echo $paymentMethod['id']; ?>" required>
-                                <label for="payment_<?php echo $paymentMethod['id']; ?>">
-                                    <?php echo $paymentMethod['type'] === 'card' ? 'Carte bancaire' : 'PayPal'; ?> -
-                                    <?php echo $paymentMethod['type'] === 'card' ? '**** **** **** ' . substr($paymentMethod['numero_carte'], -4) : $paymentMethod['paypal_email']; ?>
-                                </label>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#newPaymentModal">+ Ajouter un nouveau moyen de paiement</button>
                 </div>
             </div>
         </div>
