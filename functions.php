@@ -36,7 +36,7 @@ function getUserByID($con, $id){
 function addOrder($con, $userID) {
     // Étape 1: Créer une nouvelle commande
     $orderDate = date("Y-m-d H:i:s"); // Date actuelle
-    $queryCreateOrder = "INSERT INTO commandes (utilisateur_id, date_creation) VALUES ('$userID', '$orderDate')";
+    $queryCreateOrder = "INSERT INTO commandes (utilisateur_id, date_creation, prix_total) VALUES ('$userID', '$orderDate', 0)";
     
     if (mysqli_query($con, $queryCreateOrder)) {
         // Récupérer l'ID de la commande nouvellement créée
@@ -48,10 +48,16 @@ function addOrder($con, $userID) {
         $resultCartItems = mysqli_query($con, $queryGetCartItems);
 
         if ($resultCartItems && mysqli_num_rows($resultCartItems) > 0) {
+            $totalAmount = 0;
+
             // Parcourir chaque produit dans le panier et l'ajouter à la commande
             while ($row = mysqli_fetch_assoc($resultCartItems)) {
                 $productID = $row['produit_id'];
                 $quantity = $row['quantite'];
+                $productPrice = getProductPrice($con, $productID); // Fonction pour récupérer le prix du produit
+
+                // Calculer le total pour ce produit
+                $totalAmount += $productPrice * $quantity;
 
                 // Ajouter chaque produit à la commande
                 $queryAddOrderDetail = "INSERT INTO details_commandes (commande_id, produit_id, quantite) 
@@ -61,6 +67,13 @@ function addOrder($con, $userID) {
                     echo "Erreur lors de l'ajout du produit à la commande: " . mysqli_error($con);
                     return false;
                 }
+            }
+
+            // Mettre à jour la commande avec le montant total
+            $queryUpdateOrder = "UPDATE commandes SET prix_total = '$totalAmount' WHERE id = '$orderID'";
+            if (!mysqli_query($con, $queryUpdateOrder)) {
+                echo "Erreur lors de la mise à jour du montant total de la commande: " . mysqli_error($con);
+                return false;
             }
 
             // Étape 3: Vider le panier après la commande
@@ -80,6 +93,33 @@ function addOrder($con, $userID) {
         return false;
     }
 }
+
+// Fonction pour récupérer le prix du produit
+function getProductPrice($con, $productID) {
+    $queryGetPrice = "SELECT prix FROM produits WHERE id = '$productID'";
+    $result = mysqli_query($con, $queryGetPrice);
+    if ($result) {
+        $row = mysqli_fetch_assoc($result);
+        return $row['prix'];
+    }
+    return 0; // Retourne 0 si le prix n'est pas trouvé
+}
+
+function deleteUserAddress($con, $userId, $addressId) {
+    $stmt = $con->prepare("DELETE FROM adresses_utilisateurs WHERE id = ? AND utilisateur_id = ?");
+    $stmt->bind_param("ii", $addressId, $userId);
+    $stmt->execute();
+    return $stmt->affected_rows > 0; // Retourne vrai si une ligne a été supprimée
+}
+
+
+function deleteUserPaymentMethod($con, $userId, $paymentId) {
+    $stmt = $con->prepare("DELETE FROM moyens_paiement WHERE id = ? AND utilisateur_id = ?");
+    $stmt->bind_param("ii", $paymentId, $userId);
+    $stmt->execute();
+    return $stmt->affected_rows > 0; // Retourne vrai si une ligne a été supprimée
+}
+
 
 function getUserInfo($con, $userId){
     $query = "SELECT * FROM details_utilisateurs WHERE utilisateur_id = '$userId' limit 1";
