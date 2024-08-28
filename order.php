@@ -37,7 +37,7 @@ $userPhone = "01 01 01 01 01";
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>New Vet</title>
+    <title>Commande</title>
     <link rel="icon" type="image/x-icon" href="assets/img/logo-black.png" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

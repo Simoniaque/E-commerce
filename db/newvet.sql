@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mer. 28 août 2024 à 19:24
+-- Généré le : jeu. 29 août 2024 à 01:23
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -103,24 +103,23 @@ CREATE TABLE `commandes` (
   `utilisateur_id` int(11) NOT NULL,
   `date_creation` date NOT NULL DEFAULT current_timestamp(),
   `prix_total` decimal(10,2) NOT NULL DEFAULT 0.00,
-  `statut` int(1) NOT NULL DEFAULT 1,
-  `chiffres_cb` int(4) NOT NULL
+  `statut` int(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `commandes`
 --
 
-INSERT INTO `commandes` (`id`, `utilisateur_id`, `date_creation`, `prix_total`, `statut`, `chiffres_cb`) VALUES
-(1, 1, '2024-06-21', 119.98, 4, 1234),
-(2, 2, '2024-06-21', 89.97, 2, 5678),
-(3, 1, '2024-08-22', 219.96, 3, 9123),
-(4, 2, '2024-08-23', 299.97, 2, 4567),
-(5, 3, '2024-08-24', 79.98, 4, 8912),
-(6, 1, '2024-08-25', 159.98, 1, 3456),
-(7, 2, '2024-08-26', 49.99, 4, 7891),
-(8, 3, '2024-08-27', 249.95, 3, 2345),
-(9, 1, '2024-08-28', 399.95, 2, 6789);
+INSERT INTO `commandes` (`id`, `utilisateur_id`, `date_creation`, `prix_total`, `statut`) VALUES
+(1, 1, '2024-06-21', 119.98, 4),
+(2, 2, '2024-06-21', 89.97, 2),
+(3, 1, '2024-08-22', 219.96, 3),
+(4, 2, '2024-08-23', 299.97, 2),
+(5, 3, '2024-08-24', 79.98, 4),
+(6, 1, '2024-08-25', 159.98, 1),
+(7, 2, '2024-08-26', 49.99, 4),
+(8, 3, '2024-08-27', 249.95, 3),
+(9, 1, '2024-08-28', 399.95, 2);
 
 -- --------------------------------------------------------
 
@@ -201,6 +200,22 @@ INSERT INTO `materiaux` (`id`, `nom`) VALUES
 (3, 'Cuir'),
 (4, 'Laine'),
 (5, 'Soie');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `messages_contact`
+--
+
+CREATE TABLE `messages_contact` (
+  `id` int(11) NOT NULL,
+  `nom` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `telephone` varchar(20) DEFAULT NULL,
+  `sujet` varchar(255) DEFAULT NULL,
+  `message` text NOT NULL,
+  `date_message` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -440,6 +455,13 @@ ALTER TABLE `materiaux`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Index pour la table `messages_contact`
+--
+ALTER TABLE `messages_contact`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
 -- Index pour la table `moyens_paiement`
 --
 ALTER TABLE `moyens_paiement`
@@ -539,6 +561,12 @@ ALTER TABLE `details_paniers`
 --
 ALTER TABLE `materiaux`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT pour la table `messages_contact`
+--
+ALTER TABLE `messages_contact`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT pour la table `moyens_paiement`

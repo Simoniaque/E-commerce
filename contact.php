@@ -67,6 +67,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
         $emailSent = sendMail($email, $name, $subjectClient, $textPartClient, $htmlPartClient);
 
+        addMessage($con, $name, $email, $phone, $subject, $message);
+
         } else {
             $contactMessage = 'Une erreur est survenue lors de l\'envoi de votre message. Veuillez réessayer.';
         }
@@ -82,7 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>New Vet - Contact</title>
+    <title>Contact</title>
     <link rel="icon" type="image/x-icon" href="assets/img/logo-black.png" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

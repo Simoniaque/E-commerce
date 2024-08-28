@@ -6,7 +6,7 @@
     <div class="container-fluid px-0">
         <div class="d-flex align-items-center">
             <!-- Logo aligné à gauche -->
-            <img src="../assets/img/logo-white.png" alt="New Vet" class="img-fluid" style="max-width: 100px; height: auto;">
+            <a href="../index.php"><img src="../assets/img/logo-white.png" alt="New Vet" class="img-fluid" style="max-width: 100px; height: auto;"></a>
 
             <!-- Conteneur pour le texte centré -->
             <div class="mx-auto text-center flex-grow-1">

@@ -984,6 +984,39 @@ function deleteCategory($con, $categoryID){
     return false;
 }
 
+function addMessage($con, $name, $email, $phone, $subject, $message){
+    $query = "INSERT INTO messages_contact (nom, email, telephone, sujet, message) VALUES ('$name', '$email', '$phone', '$subject', '$message')";
+
+    $result = mysqli_query($con,$query);
+
+    if($result){
+        return true;
+    }
+    return false;
+}
+
+function getAllMessages($con){
+    $query = "SELECT * FROM messages_contact";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $messages = mysqli_fetch_all($result, MYSQLI_ASSOC);
+        return $messages;
+    }
+    return array();
+}
+
+function deleteMessage($con, $id){
+    $query = "DELETE FROM messages_contact WHERE id = '$id'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result){
+        return true;
+    }
+    return false;
+}
 
 
 ?>
