@@ -7,24 +7,20 @@ include('../functions.php');
 $response = array('success' => false, 'message' => '');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nom = htmlspecialchars(trim($_POST['nom']));
-    $description = htmlspecialchars(trim($_POST['description']));
+    $nom = $_POST['nom'];
+    $description = $_POST['description'];
     $prix = floatval($_POST['prix']);
     $stock = intval($_POST['stock']);
     $categorie_id = intval($_POST['categorie_id']);
     $materialsId = isset($_POST['material']) ? array_map('intval', $_POST['material']) : array();
 
-    // Ajouter le produit à la base de données
     $newProductId = addProduct($con, $nom, $description, $prix, $stock, $categorie_id, $materialsId);
 
     if ($newProductId) {
-        // Les informations de réponse
         $response['success'] = true;
         $response['message'] = 'Produit ajouté avec succès!';
         $response['product_id'] = $newProductId;
 
-        // Traiter les images après l'ajout du produit
-        // Note: Les images doivent être traitées en JavaScript car elles sont envoyées dans la même requête.
     } else {
         $response['message'] = 'Erreur lors de l\'ajout du produit: ' . $con->error;
     }
@@ -75,21 +71,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div class="row mb-3">
                             <div class="col">
                                 <label for="image1" class="form-label">Image 1:</label>
-                                <input type="file" id="image1" name="image1" class="form-control" accept="image/*">
+                                <input type="file" id="image1" name="image1" class="form-control" accept="image/webp" required>
                                 <div class="img-container">
                                     <img id="previewImage1" src="" alt="" class="img-preview mt-2">
                                 </div>
                             </div>
                             <div class="col">
                                 <label for="image2" class="form-label">Image 2:</label>
-                                <input type="file" id="image2" name="image2" class="form-control" accept="image/*">
+                                <input type="file" id="image2" name="image2" class="form-control" accept="image/webp" required>
                                 <div class="img-container">
                                     <img id="previewImage2" src="" alt="" class="img-preview mt-2">
                                 </div>
                             </div>
                             <div class="col">
                                 <label for="image3" class="form-label">Image 3:</label>
-                                <input type="file" id="image3" name="image3" class="form-control" accept="image/*">
+                                <input type="file" id="image3" name="image3" class="form-control" accept="image/webp" required>
                                 <div class="img-container">
                                     <img id="previewImage3" src="" alt="" class="img-preview mt-2">
                                 </div>
@@ -122,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $materials = getMaterials($con);
                             foreach ($materials as $material) {
                                 $idMat = $material['id'];
-                                $nomMat = htmlspecialchars($material['nom']);
+                                $nomMat = $material['nom'];
                                 echo "<input type='checkbox' class='mx-2' id='material$idMat' name='material[]' value='$idMat'>$nomMat</input>";
                             }
                             ?>
@@ -162,31 +158,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             `;
         };
 
-        const convertToWebP = (file) => {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        ctx.drawImage(img, 0, 0);
-                        canvas.toBlob((blob) => {
-                            if (blob) {
-                                resolve(blob);
-                            } else {
-                                reject(new Error('Erreur lors de la conversion en WebP.'));
-                            }
-                        }, 'image/webp');
-                    };
-                    img.src = reader.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        };
-
         const uploadImage = async (file, container, blobName) => {
             if (!file) {
                 console.log(`Aucun fichier pour ${blobName}`);
@@ -201,10 +172,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             try {
-                const convertedFile = await convertToWebP(file);
 
                 const formData = new FormData();
-                formData.append('file', convertedFile);
+                formData.append('file', file);
                 formData.append('blobName', blobName);
                 formData.append('container', container);
 

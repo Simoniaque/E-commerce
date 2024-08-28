@@ -68,8 +68,8 @@ $categories = getCategories($con);
                                 <?php foreach($categories as $category): ?>
                                 <tr>
                                     <td><?php echo $category['id']; ?></td>
-                                    <td><?php echo htmlspecialchars($category['nom']); ?></td>
-                                    <td><?php echo htmlspecialchars($category['description']); ?></td>
+                                    <td><?php echo $category['nom']; ?></td>
+                                    <td><?php echo $category['description']; ?></td>
                                     <td>
                                         <img src="<?php echo 'https://imgproduitnewvet.blob.core.windows.net/imagescategories/' . $category['id'] . '.png'; ?>" alt="Image de la catégorie" style="width: 100px; height: auto;">
                                     </td>

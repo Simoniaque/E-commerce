@@ -13,7 +13,7 @@
                         <a href="/mentions-legales" class="text-white">Mentions légales</a>
                     </li>
                     <li class="list-inline-item">
-                        <a href="/contact" class="text-white">Contact</a>
+                        <a href="contact.php" class="text-white">Contact</a>
                     </li>
                 </ul>
             </div>
