@@ -194,6 +194,29 @@ function EditUserInfo($con, $id, $name, $email){
     return false;
 }
 
+function EditUser($con, $id, $name, $email, string $password, $isAdmin, $isVerified){
+
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
+    if($password == ""){
+        $query = "UPDATE utilisateurs SET nom = '$name', email = '$email', est_admin = '$isAdmin', mail_verifie = '$isVerified' WHERE id = '$id'";
+
+    }else{
+        $password = password_hash($password, PASSWORD_BCRYPT);
+        $query = "UPDATE utilisateurs SET nom = '$name', email = '$email', mot_de_passe = '$hashedPassword', est_admin = '$isAdmin', mail_verifie = '$isVerified' WHERE id = '$id'";
+    }
+
+
+    $result = mysqli_query($con,$query);
+
+    if($result){
+        return true;
+    }
+    return false;
+
+
+}
+
 function deleteUser($con, $id) {
     //Suppression de l'utilisateur
     $query = "DELETE FROM utilisateurs WHERE id = '$id'";
@@ -365,6 +388,20 @@ function updateCategory($con, $categoryID, $nom, $description) {
     return $result;
 }
 
+function getAllUsers($con){
+    $query = "SELECT * FROM utilisateurs";
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
+        return $users;
+    }
+
+    return false;
+
+
+}
+
 
 function orderProductsByPrice($products){
     usort($products, function($a, $b) {
@@ -427,6 +464,17 @@ function addUser($con, $name, $email, $password){
         return mysqli_insert_id($con);
     }
     return 0;
+}
+
+function addNewUser($con,$name, $email, $password, $isAdmin, $emailVerified){
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+    $query = "INSERT INTO utilisateurs (nom, email, mot_de_passe, est_admin, mail_verifie) VALUES ('$name', '$email', '$hashedPassword', '$isAdmin', '$emailVerified')";
+
+
+    if(@mysqli_query($con, $query)){
+        return true;
+    }
+    return false;
 }
 
 function getUserByEmail($con,$email){

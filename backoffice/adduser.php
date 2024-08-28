@@ -4,14 +4,6 @@ session_start();
 include('../config.php');
 include('../functions.php');
 
-
-if (!isset($_GET['id'])) {
-    die('Utilisateur non trouvé.');
-}
-$userID = $_GET['id'];
-
-$userToModify = getUserByID($con, $userID);
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['name'];
     $email = $_POST['email'];
@@ -19,13 +11,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $isAdmin = isset($_POST['admin']) ? 1 : 0;
     $emailVerified = isset($_POST['emailVerified']) ? 1 : 0;
 
-    if(EditUser($con, $userID ,$name, $email, $password, $isAdmin, $emailVerified)) {
-        echo '<div class="alert alert-success" role="alert">Utilisateur modifié avec succès.</div>';
-    } else {
-        echo '<div class="alert alert-danger" role="alert">Erreur lors de la modification de l\'utilisateur.</div>';
+    if(userAlreadyExists($con, $email)){
+        echo '<div class="alert alert-danger" role="alert">Cette adresse mail est déjà utilisée</div>';
+    }else{
+        if(addNewUser($con,$name, $email, $password, $isAdmin, $emailVerified)) {
+            echo '<div class="alert alert-success" role="alert">Utilisateur ajouté avec succès.</div>';
+        } else {
+            echo '<div class="alert alert-danger" role="alert">Erreur lors de l\'ajout de l\'utilisateur.</div>';
+        }
     }
-
-    $userToModify = getUserByID($con, $userID);
 }
 ?>
 
@@ -34,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modifier Utilisateur</title>
+    <title>Ajouter Utilisateur</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="icon" href="../assets/img/logo-black.png" type="image/x-icon">
@@ -51,39 +45,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="container mt-4">
                     <div id="alertContainer"></div>
 
-                    <h1 class="mb-4">Modifier l'utilisateur</h1>
+                    <h1 class="mb-4">Ajouter l'utilisateur</h1>
                     <form id="productForm" method="POST" enctype="multipart/form-data">
                         
 
                         <div class="mb-3">
                             <label for="name" class="form-label">Nom:</label>
-                            <input type="text" id="name" name="name" class="form-control" value="<?php echo $userToModify['nom'];?>" required>
+                            <input type="text" id="name" name="name" class="form-control" value="" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="email" class="form-label">Email:</label>
-                            <input type="email" id="email" name="email" class="form-control" step="0.01" required value="<?php echo $userToModify['email']; ?>">
+                            <input type="email" id="email" name="email" class="form-control" step="0.01" required value="">
                         </div>
 
                         <div class="mb-3">
                             <label for="password" class="form-label">Mot de passe:</label>
-                            <input type="text" id="password" name="password" class="form-control" value="">
+                            <input type="text" id="password" name="password" class="form-control" value="" required>
                         </div>
                         
                         <div class="mb-3">
-                            <?php $isAdmin = $userToModify['est_admin'] == 1 ? 'checked' : ''; ?>
-                            <input type="checkbox" id="admin" name="admin" class="" <?php echo $isAdmin?>>
+                            <input type="checkbox" id="admin" name="admin" class="">
                             <label for="admin" class="form-label">Est admin</label>
                         </div>
 
                         <div class="mb-3">
-                            <?php $checkedMail = $userToModify['mail_verifie'] == 1 ? 'checked' : ''; ?>
-                            <input type="checkbox" id="emailVerified" name="emailVerified" class="" <?php echo $checkedMail?>>
+                            <input type="checkbox" id="emailVerified" name="emailVerified" class="">
                             <label for="emailVerified" class="form-label">A vérifié son adresse mail</label>
                         </div>
                         
 
-                        <button type="submit" class="btn btn-primary">Modifier l'utilisateur</button>
+                        <button type="submit" class="btn btn-primary">Ajouter l'utilisateur</button>
                     </form>
                 </div>
             </div>

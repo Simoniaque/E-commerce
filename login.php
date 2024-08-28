@@ -4,8 +4,14 @@ include("config.php");
 include("functions.php");
 
 if (isset($_SESSION['user_id'])) {
-    header("Location: index.php");
-    die;
+    if(getUserByID($con, $_SESSION['user_id'])){
+        header("Location: index.php");
+        die;
+    }
+    else
+    {
+        unset($_SESSION['user_id']);
+    }
 }
 
 

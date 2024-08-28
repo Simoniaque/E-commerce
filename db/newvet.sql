@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : dim. 25 août 2024 à 20:46
+-- Généré le : mer. 28 août 2024 à 14:52
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -45,7 +45,8 @@ CREATE TABLE `adresses_utilisateurs` (
 INSERT INTO `adresses_utilisateurs` (`id`, `utilisateur_id`, `adresse_complète`, `ville`, `code_postal`, `pays`, `type_adresse`, `date_creation`) VALUES
 (1, 19, '11 rue pierre cot', 'toulouse', '31200', 'france', 'les_deux', '2024-08-25 15:38:29'),
 (2, 19, 'tttttt', 'tt', 'ttt', 'ttt', 'les_deux', '2024-08-25 16:03:47'),
-(3, 19, 'aa', 'a', 'aa', 'aa', 'les_deux', '2024-08-25 18:21:04');
+(3, 19, 'aa', 'a', 'aa', 'aa', 'les_deux', '2024-08-25 18:21:04'),
+(4, 1, '57 rue du swag', 'Toulouse', '31400', 'France', 'les_deux', '2024-08-25 18:50:22');
 
 -- --------------------------------------------------------
 
@@ -64,11 +65,13 @@ CREATE TABLE `categories` (
 --
 
 INSERT INTO `categories` (`id`, `nom`, `description`) VALUES
-(1, 'Robes', 'Découvrez notre collection de robes qui combine élégance, confort et tendance. Que vous cherchiez une robe fluide pour l\'été, une robe de soirée chic ou une robe décontractée pour le quotidien, nous avons le modèle parfait pour chaque occasion. Faites-vou'),
+(1, 'Robes', 'Découvrez notre collection de robes qui combine élégance, confort et tendance. Que vous cherchiez une robe fluide pour l\'été, une robe de soirée chic ou une robe décontractée pour le quotidien, nous avons le modèle parfait pour chaque occasion'),
 (2, 'Hauts', 'Explorez notre sélection de hauts, conçus pour s\'adapter à toutes vos envies et à chaque moment de la journée. Du t-shirt basique au chemisier raffiné, en passant par les blouses et les débardeurs, chaque pièce est pensée pour offrir confort et élégance. '),
 (3, 'Pantalons', 'Nos pantalons allient style et fonctionnalité pour vous offrir une allure impeccable. Que vous préfériez les coupes ajustées, les pantalons larges ou les modèles plus casual, notre collection répondra à toutes vos attentes. Fabriqués avec des matériaux de'),
 (4, 'Chaussures', 'Complétez votre tenue avec notre gamme de chaussures, alliant confort et style pour chaque pas. Des baskets tendances aux escarpins élégants, en passant par les sandales d\'été et les bottines hivernales, trouvez la paire qui correspond à votre style et à '),
-(5, 'Accessoires', 'Les accessoires sont la touche finale qui sublime votre look. Explorez notre collection de sacs, bijoux, ceintures, et autres petits trésors pour personnaliser vos tenues avec style. Que vous cherchiez une pièce discrète ou un accessoire statement, notre ');
+(5, 'Accessoires', 'Les accessoires sont la touche finale qui sublime votre look. Explorez notre collection de sacs, bijoux, ceintures, et autres petits trésors pour personnaliser vos tenues avec style. Que vous cherchiez une pièce discrète ou un accessoire statement, notre '),
+(9, 'Pulls', 'Découvrez notre collection de pulls, conçus pour vous offrir chaleur et style. Des classiques intemporels aux modèles tendance, nos pulls ajoutent une touche de confort à vos tenues tout au long de l’année. Trouvez votre pièce idéale pour allier douceur e'),
+(10, 'Vestes', 'Alliant élégance et praticité, nos modèles vous assurent un look impeccable et un confort optimal. Trouvez la veste parfaite pour compléter votre tenue et affronter chaque journée avec style.');
 
 -- --------------------------------------------------------
 
@@ -177,35 +180,7 @@ CREATE TABLE `details_paniers` (
 --
 
 INSERT INTO `details_paniers` (`id`, `panier_id`, `produit_id`, `quantite`) VALUES
-(24, 9, 3, 15),
-(25, 9, 4, 10),
-(26, 10, 10, 1),
-(27, 10, 2, 2);
-
--- --------------------------------------------------------
-
---
--- Structure de la table `details_utilisateurs`
---
-
-CREATE TABLE `details_utilisateurs` (
-  `id` int(11) NOT NULL,
-  `utilisateur_id` int(11) NOT NULL,
-  `adresse` varchar(255) DEFAULT NULL,
-  `ville` varchar(100) DEFAULT NULL,
-  `code_postal` varchar(20) DEFAULT NULL,
-  `pays` varchar(100) DEFAULT NULL,
-  `telephone` varchar(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Déchargement des données de la table `details_utilisateurs`
---
-
-INSERT INTO `details_utilisateurs` (`id`, `utilisateur_id`, `adresse`, `ville`, `code_postal`, `pays`, `telephone`) VALUES
-(1, 1, '10 Rue de la Mode', 'Paris', '75001', 'France', '0123456789'),
-(2, 2, '25 Avenue des Roses', 'Lyon', '69002', 'France', '0987654321'),
-(3, 3, '5 Boulevard Chic', 'Marseille', '13003', 'France', '0147258369');
+(28, 11, 2, 1);
 
 -- --------------------------------------------------------
 
@@ -253,7 +228,8 @@ CREATE TABLE `moyens_paiement` (
 
 INSERT INTO `moyens_paiement` (`id`, `utilisateur_id`, `type`, `numero_carte`, `nom_titulaire`, `date_expiration`, `cvv`, `paypal_email`, `date_ajout`) VALUES
 (1, 19, 'paypal', '', '', '0000-00-00', '', 'simon.auriac@limayrac.fr', '2024-08-25 18:25:07'),
-(2, 19, 'card', '00', 'auriac simon', '0000-00-00', '000', '', '2024-08-25 18:26:06');
+(2, 19, 'card', '00', 'auriac simon', '0000-00-00', '000', '', '2024-08-25 18:26:06'),
+(3, 1, 'card', '1234 5678 9123 4567', 'Swagito', '0000-00-00', '255', '', '2024-08-25 18:51:39');
 
 -- --------------------------------------------------------
 
@@ -271,8 +247,7 @@ CREATE TABLE `paniers` (
 --
 
 INSERT INTO `paniers` (`id`, `utilisateur_id`) VALUES
-(9, 15),
-(10, 19);
+(11, 1);
 
 -- --------------------------------------------------------
 
@@ -296,15 +271,19 @@ CREATE TABLE `produits` (
 --
 
 INSERT INTO `produits` (`id`, `categorie_id`, `nom`, `description`, `prix`, `stock`, `date_ajout`, `en_priorite`) VALUES
-(1, 1, 'Robe Midi Élégante', 'Robe midi élégante pour toutes les occasions.', 59.99, 50, '2024-08-13', 0),
-(2, 1, 'Robe Maxi Florale', 'Robe longue avec motif floral, parfaite pour l\'été.', 79.99, 30, '2024-08-09', 0),
+(1, 1, 'Robe Zébrée', 'Robe zébrée élégante pour toutes les occasion', 40.00, 30, '2024-08-13', 0),
+(2, 1, 'Robe Maxi Florale', 'Robe longue avec motif floral, parfaite pour l&amp;amp;#039;été.', 79.99, 30, '2024-08-09', 0),
 (3, 2, 'Chemisier à Manches Longues', 'Chemisier féminin à manches longues.', 29.99, 80, '2024-04-24', 0),
 (4, 2, 'Débardeur Basique', 'Débardeur confortable pour une tenue décontractée.', 14.99, 100, '2024-02-16', 0),
 (5, 3, 'Jean Skinny Stretch', 'Jean stretch et ajusté pour un look moderne.', 49.99, 0, '2024-08-21', 0),
-(6, 4, 'Bottes Hautes', 'Bottes élégantes pour l\'hiver.', 89.99, 0, '2024-08-28', 1),
+(6, 4, 'Bottes Hautes', 'Bottes élégantes pour l&#039;hiver.', 89.99, 0, '2024-08-28', 1),
 (7, 4, 'Sandales à Talons', 'Sandales à talons pour les soirées.', 69.99, 20, '2024-01-10', 1),
 (10, 4, 'Chaussure à talon', 'Chaussure à talon en cuir', 49.00, 20, '2018-08-15', 0),
-(11, 3, 'Pantalon Onlraffy-Yo Life', 'Ce produit est fabriqué à partir de polyester recyclé. Le polyester recyclé préserve les ressources naturelles et réduit la quantité de déchets.', 39.99, 50, '2024-08-20', 0);
+(11, 3, 'Pantalon Onlraffy-Yo Life', 'Ce produit est fabriqué à partir de polyester recyclé. Le polyester recyclé préserve les ressources naturelles et réduit la quantité de déchets.', 39.99, 50, '2024-08-20', 0),
+(13, 5, 'Sac paille', 'Sac rond en paille avec anses dorées', 25.00, 50, '2024-08-26', 0),
+(22, 3, 'Pantallon Habillé', 'Pantalon fluide à jambes larges, taille réglable avec liens ton sur ton et poches sur les côtés', 35.00, 50, '2024-08-26', 0),
+(28, 5, ' Lunette de Soleil Polarisées', 'Protection UV400 Surdimensionnées Lunettes Classique Grand Cadre Lunettes de Soleil Femmes B2289', 19.99, 100, '2024-08-26', 0),
+(29, 9, 'Pull court en maille fine', 'Pull court en maille fine et douce de viscose mélangée. Modèle avec bande côtelée autour de l&#039;encolure ronde, emmanchures descendues et manches longues. Finition côtelée aux poignets et à la base.', 18.99, 30, '2024-08-26', 0);
 
 -- --------------------------------------------------------
 
@@ -344,16 +323,22 @@ CREATE TABLE `produits_materiaux` (
 --
 
 INSERT INTO `produits_materiaux` (`id`, `produit_id`, `materiau_id`) VALUES
-(1, 1, 1),
-(2, 2, 2),
-(3, 3, 1),
-(12, 4, 1),
-(8, 5, 1),
-(4, 5, 3),
-(5, 6, 3),
-(10, 7, 2),
-(7, 10, 3),
-(11, 11, 2);
+(86, 1, 1),
+(87, 1, 2),
+(90, 2, 2),
+(93, 3, 2),
+(94, 4, 1),
+(95, 5, 1),
+(96, 5, 3),
+(98, 6, 3),
+(97, 7, 2),
+(99, 10, 3),
+(100, 11, 2),
+(35, 13, 2),
+(53, 22, 1),
+(54, 22, 2),
+(77, 28, 2),
+(91, 29, 1);
 
 -- --------------------------------------------------------
 
@@ -399,10 +384,9 @@ CREATE TABLE `utilisateurs` (
 --
 
 INSERT INTO `utilisateurs` (`id`, `nom`, `email`, `mot_de_passe`, `est_admin`, `mail_verifie`) VALUES
-(1, 'Emma Martin', 'emma@example.com', 'motdepasse1', 0, 1),
+(1, 'Emma martin', 'emma@example.com', '$2y$10$MNayNfh78UrmFgvGR2noreUtwYUQ3kOh7QUh3AoG1MEhQvue/pcUi', 0, 1),
 (2, 'Laura Dubois', 'laura@example.com', 'motdepasse2', 0, 0),
 (3, 'Sophie Lefevre', 'sophie@example.com', 'motdepasse3', 0, 0),
-(15, 'Test', 'mateus.fariasfreire@limayrac.fr', 'test', 0, 1),
 (19, 'Simoniaque', 'simon.auriac@limayrac.fr', 'azerty', 0, 1);
 
 --
@@ -451,13 +435,6 @@ ALTER TABLE `details_paniers`
   ADD PRIMARY KEY (`id`),
   ADD KEY `panier_id` (`panier_id`),
   ADD KEY `produit_id` (`produit_id`);
-
---
--- Index pour la table `details_utilisateurs`
---
-ALTER TABLE `details_utilisateurs`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `utilisateur_id` (`utilisateur_id`);
 
 --
 -- Index pour la table `materiaux`
@@ -528,13 +505,13 @@ ALTER TABLE `utilisateurs`
 -- AUTO_INCREMENT pour la table `adresses_utilisateurs`
 --
 ALTER TABLE `adresses_utilisateurs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT pour la table `categories_en_avant`
@@ -546,25 +523,19 @@ ALTER TABLE `categories_en_avant`
 -- AUTO_INCREMENT pour la table `commandes`
 --
 ALTER TABLE `commandes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT pour la table `details_commandes`
 --
 ALTER TABLE `details_commandes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT pour la table `details_paniers`
 --
 ALTER TABLE `details_paniers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
-
---
--- AUTO_INCREMENT pour la table `details_utilisateurs`
---
-ALTER TABLE `details_utilisateurs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT pour la table `materiaux`
@@ -576,19 +547,19 @@ ALTER TABLE `materiaux`
 -- AUTO_INCREMENT pour la table `moyens_paiement`
 --
 ALTER TABLE `moyens_paiement`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT pour la table `paniers`
 --
 ALTER TABLE `paniers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT pour la table `produits`
 --
 ALTER TABLE `produits`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT pour la table `produits_en_avant`
@@ -600,13 +571,13 @@ ALTER TABLE `produits_en_avant`
 -- AUTO_INCREMENT pour la table `produits_materiaux`
 --
 ALTER TABLE `produits_materiaux`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
 
 --
 -- AUTO_INCREMENT pour la table `utilisateurs`
 --
 ALTER TABLE `utilisateurs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- Contraintes pour les tables déchargées
@@ -643,12 +614,6 @@ ALTER TABLE `details_commandes`
 ALTER TABLE `details_paniers`
   ADD CONSTRAINT `details_paniers_ibfk_1` FOREIGN KEY (`panier_id`) REFERENCES `paniers` (`id`),
   ADD CONSTRAINT `details_paniers_ibfk_2` FOREIGN KEY (`produit_id`) REFERENCES `produits` (`id`);
-
---
--- Contraintes pour la table `details_utilisateurs`
---
-ALTER TABLE `details_utilisateurs`
-  ADD CONSTRAINT `details_utilisateurs_ibfk_1` FOREIGN KEY (`utilisateur_id`) REFERENCES `utilisateurs` (`id`) ON DELETE CASCADE;
 
 --
 -- Contraintes pour la table `moyens_paiement`

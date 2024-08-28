@@ -5,8 +5,14 @@ include("functions.php");
 include("mail.php");
 
 if (isset($_SESSION['user_id'])) {
-    header("Location: index.php");
-    die;
+    if(getUserByID($con, $_SESSION['user_id'])){
+        header("Location: index.php");
+        die;
+    }
+    else
+    {
+        unset($_SESSION['user_id']);
+    }
 }
 
 $redirectUrl = isset($_GET['redirect_to']) ? $_GET['redirect_to'] : 'index.php';
