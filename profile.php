@@ -378,7 +378,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     <?php foreach ($addresses as $address): ?>
                                         <li>
                                             <?php echo htmlspecialchars($address['adresse_complète']); ?>
-                                            <button class="btn btn-link text-danger" onclick="deleteAddress(<?php echo $address['id']; ?>)">Supprimer</button>
+
                                         </li>
                                     <?php endforeach; ?>
                                 </ul>
@@ -392,7 +392,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                         <li>
                                             <?php echo $paymentMethod['type'] === 'card' ? 'Carte bancaire' : 'PayPal'; ?> :
                                             <?php echo $paymentMethod['type'] === 'card' ? '**** **** **** ' . substr($paymentMethod['numero_carte'], -4) : htmlspecialchars($paymentMethod['paypal_email']); ?>
-                                            <button class="btn btn-link text-danger" onclick="deletePayment(<?php echo $paymentMethod['id']; ?>)">Supprimer</button>
+
                                         </li>
                                     <?php endforeach; ?>
                                 </ul>
@@ -499,6 +499,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <button class='btn btn-danger col-4 mb-3 me-3' onclick='deleteAccount()'>Oui</button>
                             <button class='btn btn-dark col-4 mb-3' onclick='hideDeleteAccountVerification()'>Non</button>
                         </span>
+                        <?php
+
+                        if ($userData['est_admin'] == 1) {
+                            echo "<a href='backoffice/dashboard.php'><button class='btn btn-dark col-12 mb-3'>Panneau d'administration</button></a>";
+                        }
+                        ?>
                     </div>
                 </div>
             </div>
