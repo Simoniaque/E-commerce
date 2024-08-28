@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mer. 28 août 2024 à 14:52
+-- Généré le : mer. 28 août 2024 à 19:24
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -34,7 +34,6 @@ CREATE TABLE `adresses_utilisateurs` (
   `ville` varchar(100) NOT NULL,
   `code_postal` varchar(20) NOT NULL,
   `pays` varchar(100) NOT NULL,
-  `type_adresse` enum('facturation','livraison','les_deux') DEFAULT 'les_deux',
   `date_creation` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
@@ -42,11 +41,10 @@ CREATE TABLE `adresses_utilisateurs` (
 -- Déchargement des données de la table `adresses_utilisateurs`
 --
 
-INSERT INTO `adresses_utilisateurs` (`id`, `utilisateur_id`, `adresse_complète`, `ville`, `code_postal`, `pays`, `type_adresse`, `date_creation`) VALUES
-(1, 19, '11 rue pierre cot', 'toulouse', '31200', 'france', 'les_deux', '2024-08-25 15:38:29'),
-(2, 19, 'tttttt', 'tt', 'ttt', 'ttt', 'les_deux', '2024-08-25 16:03:47'),
-(3, 19, 'aa', 'a', 'aa', 'aa', 'les_deux', '2024-08-25 18:21:04'),
-(4, 1, '57 rue du swag', 'Toulouse', '31400', 'France', 'les_deux', '2024-08-25 18:50:22');
+INSERT INTO `adresses_utilisateurs` (`id`, `utilisateur_id`, `adresse_complète`, `ville`, `code_postal`, `pays`, `date_creation`) VALUES
+(1, 19, '11 rue pierre cot', 'toulouse', '31200', 'france', '2024-08-25 15:38:29'),
+(2, 19, 'tttttt', 'tt', 'ttt', 'ttt', '2024-08-25 16:03:47'),
+(3, 19, 'aa', 'a', 'aa', 'aa', '2024-08-25 18:21:04');
 
 -- --------------------------------------------------------
 
@@ -89,10 +87,10 @@ CREATE TABLE `categories_en_avant` (
 --
 
 INSERT INTO `categories_en_avant` (`id`, `categorie_id`) VALUES
-(3, 1),
-(2, 2),
-(4, 3),
-(1, 4);
+(183, 2),
+(184, 4),
+(185, 5),
+(186, 10);
 
 -- --------------------------------------------------------
 
@@ -228,8 +226,7 @@ CREATE TABLE `moyens_paiement` (
 
 INSERT INTO `moyens_paiement` (`id`, `utilisateur_id`, `type`, `numero_carte`, `nom_titulaire`, `date_expiration`, `cvv`, `paypal_email`, `date_ajout`) VALUES
 (1, 19, 'paypal', '', '', '0000-00-00', '', 'simon.auriac@limayrac.fr', '2024-08-25 18:25:07'),
-(2, 19, 'card', '00', 'auriac simon', '0000-00-00', '000', '', '2024-08-25 18:26:06'),
-(3, 1, 'card', '1234 5678 9123 4567', 'Swagito', '0000-00-00', '255', '', '2024-08-25 18:51:39');
+(2, 19, 'card', '00', 'auriac simon', '0000-00-00', '000', '', '2024-08-25 18:26:06');
 
 -- --------------------------------------------------------
 
@@ -272,7 +269,7 @@ CREATE TABLE `produits` (
 
 INSERT INTO `produits` (`id`, `categorie_id`, `nom`, `description`, `prix`, `stock`, `date_ajout`, `en_priorite`) VALUES
 (1, 1, 'Robe Zébrée', 'Robe zébrée élégante pour toutes les occasion', 40.00, 30, '2024-08-13', 0),
-(2, 1, 'Robe Maxi Florale', 'Robe longue avec motif floral, parfaite pour l&amp;amp;#039;été.', 79.99, 30, '2024-08-09', 0),
+(2, 1, 'Robe Maxi Florale', 'Robe longue avec motif floral, parfaite pour l&#039;été.', 79.99, 30, '2024-08-09', 0),
 (3, 2, 'Chemisier à Manches Longues', 'Chemisier féminin à manches longues.', 29.99, 80, '2024-04-24', 0),
 (4, 2, 'Débardeur Basique', 'Débardeur confortable pour une tenue décontractée.', 14.99, 100, '2024-02-16', 0),
 (5, 3, 'Jean Skinny Stretch', 'Jean stretch et ajusté pour un look moderne.', 49.99, 0, '2024-08-21', 0),
@@ -283,7 +280,7 @@ INSERT INTO `produits` (`id`, `categorie_id`, `nom`, `description`, `prix`, `sto
 (13, 5, 'Sac paille', 'Sac rond en paille avec anses dorées', 25.00, 50, '2024-08-26', 0),
 (22, 3, 'Pantallon Habillé', 'Pantalon fluide à jambes larges, taille réglable avec liens ton sur ton et poches sur les côtés', 35.00, 50, '2024-08-26', 0),
 (28, 5, ' Lunette de Soleil Polarisées', 'Protection UV400 Surdimensionnées Lunettes Classique Grand Cadre Lunettes de Soleil Femmes B2289', 19.99, 100, '2024-08-26', 0),
-(29, 9, 'Pull court en maille fine', 'Pull court en maille fine et douce de viscose mélangée. Modèle avec bande côtelée autour de l&#039;encolure ronde, emmanchures descendues et manches longues. Finition côtelée aux poignets et à la base.', 18.99, 30, '2024-08-26', 0);
+(32, 1, 'Pull noir en coton', 'Pull noir confortable et chaud', 35.00, 50, '2024-08-28', 0);
 
 -- --------------------------------------------------------
 
@@ -301,10 +298,10 @@ CREATE TABLE `produits_en_avant` (
 --
 
 INSERT INTO `produits_en_avant` (`id`, `produit_id`) VALUES
-(4, 1),
-(2, 5),
-(1, 6),
-(3, 10);
+(130, 3),
+(131, 5),
+(132, 6),
+(129, 22);
 
 -- --------------------------------------------------------
 
@@ -323,9 +320,9 @@ CREATE TABLE `produits_materiaux` (
 --
 
 INSERT INTO `produits_materiaux` (`id`, `produit_id`, `materiau_id`) VALUES
-(86, 1, 1),
-(87, 1, 2),
-(90, 2, 2),
+(202, 1, 1),
+(203, 1, 2),
+(103, 2, 2),
 (93, 3, 2),
 (94, 4, 1),
 (95, 5, 1),
@@ -337,8 +334,8 @@ INSERT INTO `produits_materiaux` (`id`, `produit_id`, `materiau_id`) VALUES
 (35, 13, 2),
 (53, 22, 1),
 (54, 22, 2),
-(77, 28, 2),
-(91, 29, 1);
+(110, 28, 2),
+(208, 32, 1);
 
 -- --------------------------------------------------------
 
@@ -511,13 +508,13 @@ ALTER TABLE `adresses_utilisateurs`
 -- AUTO_INCREMENT pour la table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT pour la table `categories_en_avant`
 --
 ALTER TABLE `categories_en_avant`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=187;
 
 --
 -- AUTO_INCREMENT pour la table `commandes`
@@ -559,19 +556,19 @@ ALTER TABLE `paniers`
 -- AUTO_INCREMENT pour la table `produits`
 --
 ALTER TABLE `produits`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT pour la table `produits_en_avant`
 --
 ALTER TABLE `produits_en_avant`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=133;
 
 --
 -- AUTO_INCREMENT pour la table `produits_materiaux`
 --
 ALTER TABLE `produits_materiaux`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=209;
 
 --
 -- AUTO_INCREMENT pour la table `utilisateurs`
