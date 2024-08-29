@@ -33,10 +33,10 @@ function getUserByID($con, $id){
     }
 }
 
-function addOrder($con, $userID) {
+function addOrder($con, $userID, $idAdresseFacturation, $idAdresseLivraison, $payementMethodID){
     // Étape 1: Créer une nouvelle commande
     $orderDate = date("Y-m-d H:i:s"); // Date actuelle
-    $queryCreateOrder = "INSERT INTO commandes (utilisateur_id, date_creation, prix_total) VALUES ('$userID', '$orderDate', 0)";
+    $queryCreateOrder = "INSERT INTO commandes (utilisateur_id, date_creation, prix_total, adresse_de_facturation, adresse_de_livraison, moyen_de_paiement) VALUES ('$userID', '$orderDate', 0, '$idAdresseFacturation', '$idAdresseLivraison', '$payementMethodID')";
     
     if (mysqli_query($con, $queryCreateOrder)) {
         // Récupérer l'ID de la commande nouvellement créée
@@ -1058,5 +1058,31 @@ function deleteMessage($con, $id){
     return false;
 }
 
+
+function getAddressById($con, $billingAdresssID){
+    
+    $query = "SELECT * FROM adresses_utilisateurs WHERE id = '$billingAdresssID'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $address = mysqli_fetch_assoc($result);
+        return $address;
+    }
+    return false;
+}
+
+function getPayementMethod($con, $paymentMethodID){
+    
+    $query = "SELECT * FROM moyens_paiement WHERE id = '$paymentMethodID'";
+
+    $result = mysqli_query($con,$query);
+
+    if($result && mysqli_num_rows($result)> 0){
+        $paymentMethod = mysqli_fetch_assoc($result);
+        return $paymentMethod;
+    }
+    return false;
+}
 
 ?>

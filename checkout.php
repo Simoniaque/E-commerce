@@ -78,17 +78,12 @@ $paymentMethods = getUserPaymentMethods($con, $userData['id']);
 $userID = $_SESSION['user_id'];
 
 // Vérifier si le formulaire a été soumis
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
-
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order']) && isset($_POST['billing_address']) && isset($_POST['shipping_address']) && isset($_POST['payment_method'])) {
     // Appeler la fonction addOrder pour créer une commande
-    $orderID = addOrder($con, $userID);
-
-    $_SESSION['order_message'] = "Merci pour votre commande ! Votre numéro de commande est $orderID. 
-Le montant total est de €$totalAmount. Votre commande sera livrée $deliveryDate.";
+    $orderID = addOrder($con, $userID, $_POST['billing_address'], $_POST['shipping_address'], $_POST['payment_method']);
 
     if ($orderID) {
-        // Rediriger vers une page de confirmation de commande
-        header("Location: index.php");
+        header("Location: order.php?id=$orderID");
         exit();
     } else {
         // Afficher un message d'erreur ou rediriger vers une page d'erreur
@@ -209,8 +204,44 @@ Le montant total est de €$totalAmount. Votre commande sera livrée $deliveryDa
                                 </tr>
                             </tfoot>
                         </table>
+
                         <form method="post" action="checkout.php">
-                            <button type="submit" name="place_order">Valider la commande</button>
+                            <h4>Adresse de Facturation</h4>
+                            <ol>
+                                <?php foreach ($addresses as $address): ?>
+                                    <li>
+                                        <input type="radio" name="billing_address" value="<?php echo $address['id']; ?>" id="billing_<?php echo $address['id']; ?>" required>
+                                        <label for="billing_<?php echo $address['id']; ?>"><?php echo $address['adresse_complète']; ?></label>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ol>
+
+                            <h4>Adresse de Livraison</h4>
+                            <ol>
+                                <?php foreach ($addresses as $address): ?>
+                                    <li>
+                                        <input type="radio" name="shipping_address" value="<?php echo $address['id']; ?>" id="shipping_<?php echo $address['id']; ?>" required>
+                                        <label for="shipping_<?php echo $address['id']; ?>"><?php echo $address['adresse_complète']; ?></label>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ol>
+
+                            <h4>Moyens de Paiement</h4>
+
+                            <ul>
+                                <?php foreach ($paymentMethods as $paymentMethod): ?>
+                                    <li>
+                                        <input type="radio" name="payment_method" value="<?php echo $paymentMethod['id']; ?>" id="payment_<?php echo $paymentMethod['id']; ?>" required>
+                                        <label for="payment_<?php echo $paymentMethod['id']; ?>">
+                                            <?php echo $paymentMethod['type'] === 'card' ? 'Carte bancaire' : 'PayPal'; ?> -
+                                            <?php echo $paymentMethod['type'] === 'card' ? '**** **** **** ' . substr($paymentMethod['numero_carte'], -4) : $paymentMethod['paypal_email']; ?>
+                                        </label>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+
+                            <!-- Submit button to place order -->
+                            <button type="submit" class="btn btn-dark" name="place_order">Valider la commande</button>
                         </form>
                     </div>
                 </div>
@@ -218,39 +249,11 @@ Le montant total est de €$totalAmount. Votre commande sera livrée $deliveryDa
                 <!-- Sélection des adresses -->
                 <div class="col-lg-4">
                     <form action="checkout.php" method="POST">
-                        <h4>Adresse de Facturation</h4>
-                        <ol>
-                            <?php foreach ($addresses as $address): ?>
-                                <li>
-                                    <input type="radio" name="billing_address" value="<?php echo $address['id']; ?>" id="billing_<?php echo $address['id']; ?>" required>
-                                    <label for="billing_<?php echo $address['id']; ?>"><?php echo $address['adresse_complète']; ?></label>
-                                </li>
-                            <?php endforeach; ?>
-                        </ol>
-
-                        <h4>Adresse de Livraison</h4>
-                        <ol>
-                            <?php foreach ($addresses as $address): ?>
-                                <li>
-                                    <input type="radio" name="shipping_address" value="<?php echo $address['id']; ?>" id="shipping_<?php echo $address['id']; ?>" required>
-                                    <label for="shipping_<?php echo $address['id']; ?>"><?php echo $address['adresse_complète']; ?></label>
-                                </li>
-                            <?php endforeach; ?>
-                        </ol>
+                        <h4>Adresse de Facturation / Livraison</h4>
                         <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#newAddressModal">+ Ajouter une nouvelle adresse</button>
                         <!-- Gestion des moyens de paiement -->
                         <h4>Moyens de Paiement</h4>
-                        <ul>
-                            <?php foreach ($paymentMethods as $paymentMethod): ?>
-                                <li>
-                                    <input type="radio" name="payment_method" value="<?php echo $paymentMethod['id']; ?>" id="payment_<?php echo $paymentMethod['id']; ?>" required>
-                                    <label for="payment_<?php echo $paymentMethod['id']; ?>">
-                                        <?php echo $paymentMethod['type'] === 'card' ? 'Carte bancaire' : 'PayPal'; ?> -
-                                        <?php echo $paymentMethod['type'] === 'card' ? '**** **** **** ' . substr($paymentMethod['numero_carte'], -4) : $paymentMethod['paypal_email']; ?>
-                                    </label>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
+
                         <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#newPaymentModal">+ Ajouter un nouveau moyen de paiement</button>
                     </form>
                 </div>

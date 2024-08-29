@@ -14,7 +14,6 @@ $order = getOrderById($con, $orderId);
 $total = $order['prix_total'];
 $date = $order['date_creation'];
 $status = $order['statut'];
-$lastCardDigits = $order['chiffres_cb'];
 
 $orderDetails = getOrderDetails($con, $orderId);
 
@@ -22,11 +21,21 @@ $user = checkLogin($con);
 $userName = $user['nom'];
 
 //Recup les infos de l'utilisateur
-$userAddress = "10 Rue de la paix";
-$userPostalCode = "75013";
-$userCity = "Paris";
-$userCountry = "France";
-$userPhone = "01 01 01 01 01";
+$billingAdresssID = $order["adresse_de_facturation"];
+$billingAdresssInfo = getAddressById($con, $billingAdresssID);
+
+$billingAddress = $billingAdresssInfo['adresse_complète'];
+$billingCity = $billingAdresssInfo['ville'];
+$billingCountry = $billingAdresssInfo['pays'];
+$billingPostalCode = $billingAdresssInfo['code_postal'];
+
+$shippingAdresssID = $order["adresse_de_livraison"];
+$shippingAdresssInfo = getAddressById($con, $shippingAdresssID);
+
+$shippingAddress = $shippingAdresssInfo['adresse_complète'];
+$shippingCity = $shippingAdresssInfo['ville'];
+$shippingCountry = $shippingAdresssInfo['pays'];
+$shippingPostalCode = $shippingAdresssInfo['code_postal'];
 
 
 ?>
@@ -143,20 +152,30 @@ $userPhone = "01 01 01 01 01";
                                 <div class="row">
 
                                     <?php
+                                    $stringPayementMethod = "";
+                                    $payementMethod = getPayementMethod($con,$order['moyen_de_paiement']);
+
+                                    if($payementMethod['type'] == "paypal"){
+                                        $paypalEmail = $payementMethod['paypal_email'];
+                                        $stringPayementMethod = "<div><p>Paypal $paypalEmail</p></div>";
+                                    }else{
+                                        $cardNumberLast4Digits = substr($payementMethod['numero_carte'], -4);;
+                                        $stringPayementMethod = "<div><p>Visa **** **** **** $cardNumberLast4Digits</p></div>";
+                                    }
+
                                     echo "<div class='col-lg-6'>
                                         <h3 class='h6'>Adresse de facturation</h3>
                                         <hr>
                                         <address>
                                             <strong>$userName</strong><br>
-                                            $userAddress<br>
-                                            $userCity, $userPostalCode<br>
-                                            N° de téléphone : $userPhone
+                                            $billingAddress<br>
+                                            $billingCity, $billingCountry<br>
                                         </address>
                                         </div>
                                         <div class='col-lg-6'>
                                             <h3 class='h6'>Methode de paiement</h3>
                                             <hr>
-                                            <p>Visa **** **** **** $lastCardDigits</p>
+                                            $stringPayementMethod
                                         </div>
                                     </div>";
 
@@ -175,9 +194,8 @@ $userPhone = "01 01 01 01 01";
                                             <hr>
                                             <address>
                                                 <strong>$userName</strong><br>
-                                                $userAddress<br>
-                                                $userCity, $userPostalCode<br>
-                                                N° de téléphone : $userPhone
+                                                $shippingAddress<br>
+                                                $shippingCity, $shippingPostalCode<br>
                                             </address>"; ?>
                                 </div>
                             </div>

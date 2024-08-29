@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : jeu. 29 août 2024 à 01:23
+-- Généré le : jeu. 29 août 2024 à 03:10
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -42,9 +42,10 @@ CREATE TABLE `adresses_utilisateurs` (
 --
 
 INSERT INTO `adresses_utilisateurs` (`id`, `utilisateur_id`, `adresse_complète`, `ville`, `code_postal`, `pays`, `date_creation`) VALUES
-(1, 19, '11 rue pierre cot', 'toulouse', '31200', 'france', '2024-08-25 15:38:29'),
-(2, 19, 'tttttt', 'tt', 'ttt', 'ttt', '2024-08-25 16:03:47'),
-(3, 19, 'aa', 'a', 'aa', 'aa', '2024-08-25 18:21:04');
+(0, 1, 'test', 'test', 'test', 'test', '2024-08-28 23:39:06'),
+(7, 1, 'test2', 'azdlazkjgdia', 'zadazmouihdj', 'azdoazuihid', '2024-08-28 23:57:43'),
+(9, 1, 'Avenue de la paix', 'Toulouse', '31400', 'France', '2024-08-29 00:47:05'),
+(10, 1, 'Rue des champs Elysées ', 'Paris', '75000', 'France', '2024-08-29 00:47:28');
 
 -- --------------------------------------------------------
 
@@ -103,23 +104,35 @@ CREATE TABLE `commandes` (
   `utilisateur_id` int(11) NOT NULL,
   `date_creation` date NOT NULL DEFAULT current_timestamp(),
   `prix_total` decimal(10,2) NOT NULL DEFAULT 0.00,
-  `statut` int(1) NOT NULL DEFAULT 1
+  `statut` int(1) NOT NULL DEFAULT 1,
+  `adresse_de_facturation` int(11) NOT NULL,
+  `adresse_de_livraison` int(11) NOT NULL,
+  `moyen_de_paiement` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `commandes`
 --
 
-INSERT INTO `commandes` (`id`, `utilisateur_id`, `date_creation`, `prix_total`, `statut`) VALUES
-(1, 1, '2024-06-21', 119.98, 4),
-(2, 2, '2024-06-21', 89.97, 2),
-(3, 1, '2024-08-22', 219.96, 3),
-(4, 2, '2024-08-23', 299.97, 2),
-(5, 3, '2024-08-24', 79.98, 4),
-(6, 1, '2024-08-25', 159.98, 1),
-(7, 2, '2024-08-26', 49.99, 4),
-(8, 3, '2024-08-27', 249.95, 3),
-(9, 1, '2024-08-28', 399.95, 2);
+INSERT INTO `commandes` (`id`, `utilisateur_id`, `date_creation`, `prix_total`, `statut`, `adresse_de_facturation`, `adresse_de_livraison`, `moyen_de_paiement`) VALUES
+(1, 1, '2024-06-21', 119.98, 4, 0, 0, 0),
+(2, 2, '2024-06-21', 89.97, 2, 0, 0, 0),
+(3, 1, '2024-08-22', 219.96, 3, 0, 0, 0),
+(4, 2, '2024-08-23', 299.97, 2, 0, 0, 0),
+(5, 3, '2024-08-24', 79.98, 4, 0, 0, 0),
+(6, 1, '2024-08-25', 159.98, 1, 0, 0, 0),
+(7, 2, '2024-08-26', 49.99, 4, 0, 0, 0),
+(8, 3, '2024-08-27', 249.95, 3, 0, 0, 0),
+(9, 1, '2024-08-28', 399.95, 2, 0, 0, 0),
+(12, 1, '2024-08-29', 79.99, 1, 7, 7, 0),
+(13, 1, '2024-08-29', 79.99, 1, 0, 0, 0),
+(14, 1, '2024-08-29', 79.99, 1, 0, 7, 0),
+(15, 1, '2024-08-29', 79.99, 1, 9, 10, 5),
+(16, 1, '2024-08-29', 40.00, 1, 9, 10, 5),
+(17, 1, '2024-08-29', 109.98, 1, 0, 0, 0),
+(18, 1, '2024-08-29', 49.00, 1, 0, 0, 0),
+(30, 1, '2024-08-29', 29.99, 1, 10, 10, 5),
+(31, 1, '2024-08-29', 14.99, 1, 10, 10, 5);
 
 -- --------------------------------------------------------
 
@@ -157,7 +170,17 @@ INSERT INTO `details_commandes` (`id`, `commande_id`, `produit_id`, `quantite`) 
 (18, 8, 6, 1),
 (19, 8, 10, 1),
 (20, 9, 5, 2),
-(21, 9, 7, 1);
+(21, 9, 7, 1),
+(28, 12, 2, 1),
+(29, 13, 2, 1),
+(30, 14, 2, 1),
+(31, 15, 2, 1),
+(32, 16, 1, 1),
+(33, 17, 2, 1),
+(34, 17, 3, 1),
+(35, 18, 10, 1),
+(44, 30, 3, 1),
+(45, 31, 4, 1);
 
 -- --------------------------------------------------------
 
@@ -171,13 +194,6 @@ CREATE TABLE `details_paniers` (
   `produit_id` int(11) NOT NULL,
   `quantite` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Déchargement des données de la table `details_paniers`
---
-
-INSERT INTO `details_paniers` (`id`, `panier_id`, `produit_id`, `quantite`) VALUES
-(28, 11, 2, 1);
 
 -- --------------------------------------------------------
 
@@ -240,8 +256,10 @@ CREATE TABLE `moyens_paiement` (
 --
 
 INSERT INTO `moyens_paiement` (`id`, `utilisateur_id`, `type`, `numero_carte`, `nom_titulaire`, `date_expiration`, `cvv`, `paypal_email`, `date_ajout`) VALUES
-(1, 19, 'paypal', '', '', '0000-00-00', '', 'simon.auriac@limayrac.fr', '2024-08-25 18:25:07'),
-(2, 19, 'card', '00', 'auriac simon', '0000-00-00', '000', '', '2024-08-25 18:26:06');
+(0, 19, 'paypal', '', '', '0000-00-00', '', 'simon.auriac@limayrac.fr', '2024-08-25 18:25:07'),
+(2, 19, 'card', '00', 'auriac simon', '0000-00-00', '000', '', '2024-08-25 18:26:06'),
+(4, 1, 'card', 'azdazkbdim', 'zjahdmoiazjd', '0000-00-00', '477', '', '2024-08-29 00:05:59'),
+(5, 1, 'card', '1234 5678 9123 4567', 'Emma Martin', '0000-00-00', '200', '', '2024-08-29 00:48:06');
 
 -- --------------------------------------------------------
 
@@ -430,7 +448,10 @@ ALTER TABLE `categories_en_avant`
 --
 ALTER TABLE `commandes`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `utilisateur_id` (`utilisateur_id`);
+  ADD KEY `utilisateur_id` (`utilisateur_id`),
+  ADD KEY `fk_commandes_adresse_facturation` (`adresse_de_facturation`),
+  ADD KEY `fk_commandes_adresse_livraison` (`adresse_de_livraison`),
+  ADD KEY `fk_commandes_moyen_paiement` (`moyen_de_paiement`);
 
 --
 -- Index pour la table `details_commandes`
@@ -524,7 +545,7 @@ ALTER TABLE `utilisateurs`
 -- AUTO_INCREMENT pour la table `adresses_utilisateurs`
 --
 ALTER TABLE `adresses_utilisateurs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT pour la table `categories`
@@ -542,19 +563,19 @@ ALTER TABLE `categories_en_avant`
 -- AUTO_INCREMENT pour la table `commandes`
 --
 ALTER TABLE `commandes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT pour la table `details_commandes`
 --
 ALTER TABLE `details_commandes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT pour la table `details_paniers`
 --
 ALTER TABLE `details_paniers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT pour la table `materiaux`
@@ -572,7 +593,7 @@ ALTER TABLE `messages_contact`
 -- AUTO_INCREMENT pour la table `moyens_paiement`
 --
 ALTER TABLE `moyens_paiement`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT pour la table `paniers`
@@ -624,7 +645,10 @@ ALTER TABLE `categories_en_avant`
 -- Contraintes pour la table `commandes`
 --
 ALTER TABLE `commandes`
-  ADD CONSTRAINT `commandes_ibfk_1` FOREIGN KEY (`utilisateur_id`) REFERENCES `utilisateurs` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `commandes_ibfk_1` FOREIGN KEY (`utilisateur_id`) REFERENCES `utilisateurs` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_commandes_adresse_facturation` FOREIGN KEY (`adresse_de_facturation`) REFERENCES `adresses_utilisateurs` (`id`),
+  ADD CONSTRAINT `fk_commandes_adresse_livraison` FOREIGN KEY (`adresse_de_livraison`) REFERENCES `adresses_utilisateurs` (`id`),
+  ADD CONSTRAINT `fk_commandes_moyen_paiement` FOREIGN KEY (`moyen_de_paiement`) REFERENCES `moyens_paiement` (`id`);
 
 --
 -- Contraintes pour la table `details_commandes`

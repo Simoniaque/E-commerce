@@ -97,16 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     exit(); // Terminer le script après traitement POST
 }
 
-$getCart = getCart($con, $userData['id']);
-$cartProducts = [];
-$totalPrice = 0;
 
-if ($getCart) {
-    $cartProducts = getCartProducts($con, $getCart['id']);
-    foreach ($cartProducts as $product) {
-        $totalPrice += $product['prix'] * $product['quantite'];
-    }
-}
 
 // Récupération des adresses de l'utilisateur
 $addresses = getUserAddresses($con, $userData['id']);
@@ -114,24 +105,7 @@ $paymentMethods = getUserPaymentMethods($con, $userData['id']);
 
 $userID = $_SESSION['user_id'];
 
-// Vérifier si le formulaire a été soumis
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
 
-    // Appeler la fonction addOrder pour créer une commande
-    $orderID = addOrder($con, $userID);
-
-    $_SESSION['order_message'] = "Merci pour votre commande ! Votre numéro de commande est $orderID. 
-Le montant total est de €$totalAmount. Votre commande sera livrée $deliveryDate.";
-
-    if ($orderID) {
-        // Rediriger vers une page de confirmation de commande
-        header("Location: index.php");
-        exit();
-    } else {
-        // Afficher un message d'erreur ou rediriger vers une page d'erreur
-        echo "Erreur lors de la création de la commande. Veuillez réessayer.";
-    }
-}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $action = $_POST['action'] ?? '';
