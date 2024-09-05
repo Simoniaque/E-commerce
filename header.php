@@ -1,4 +1,13 @@
-<?php $currentPage = urlencode($_SERVER['REQUEST_URI']); ?>
+<?php $currentPage = urlencode($_SERVER['REQUEST_URI']); 
+
+include_once 'config.php';
+include_once 'API/usersRequests.php';
+include_once 'API/categoriesRequests.php';
+include_once 'API/cartRequests.php';
+
+include_once 'functions.php';
+
+?>
 
 <header>
     <nav class="navbar navbar-light bg-light">
@@ -28,14 +37,16 @@
                         <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Catégories</a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <?php
-                            $sqlrequest = "SELECT * FROM categories;";
-                            $result = $con->query($sqlrequest);
+                            $categories = GetCategories($pdo);
 
-                            while ($row = $result->fetch_assoc()) {
-                                $categoryName = $row['nom'];
-                                $categoryID = $row['id'];
-
-                                echo "<li><a class='dropdown-item' href='category.php?id=$categoryID'>$categoryName</a></li>";
+                            if(!$categories){
+                                echo "<li><a class='dropdown-item' href='#'>Aucune catégorie trouvée</a></li>";
+                            }else{
+                                foreach($categories as $category){
+                                    $categoryID = $category['id'];
+                                    $categoryName = $category['nom'];
+                                    echo "<li><a class='dropdown-item' href='category.php?id=$categoryID'>$categoryName</a></li>";
+                                }
                             }
                             ?>
                         </ul>
@@ -55,24 +66,16 @@
                 <!-- Menu utilisateur -->
                 <div id="cart-container">
                     <?php
-                    $userData = checkLogin($con);
-                    $cartItemCount = 0;
+                    $user = GetCurrentUser($pdo);
 
-                    if ($userData) {
+                    if ($user) {
                         // Vérifier si le panier est vide
-                        $isEmpty = isCartEmpty($con, $userData['id']);
-                        if (!$isEmpty) {
-                            $cart = getCart($con, $userData['id']);
-                            if ($cart) {
-                                $cartProducts = getCartProducts($con, $cart['id']);
-                                $cartItemCount = count($cartProducts);
-                            }
-                        }
+                        $isEmpty = IsCartEmpty($pdo, $user['id']);
 
                         echo "<a href='cart.php' class='btn btn-outline-dark position-relative' id='cart-button' type='submit'>
                                 <i class='bi bi-cart-fill me-1'></i>
                                 Panier
-                                " . ($cartItemCount > 0 ? "<span class='position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle'>
+                                " . ($isEmpty ? "<span class='position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle'>
                                     <span class='visually-hidden'>New alerts</span>
                                 </span>" : "") . "
                               </a>
@@ -101,12 +104,9 @@
     </nav>
 
     <?php
-    if ($userData && $userData['mail_verifie'] == 0) {
-        $email = $userData['email'];
-        // Afficher un bandeau d'alerte
-        echo "<div class='alert alert-warning show mb-0 text-center' role='alert'>
-                Votre adresse mail n'a pas été vérifiée. Veuillez vérifier votre boîte mail. <a class='text-black' href='verifyaccount.php?email=$email'>Renvoyer le mail de vérification.</a>
-              </div>";
+    if ($user && $user['mail_verifie'] == 0) {
+        $email = $user['email'];
+        DisplayUnDismissibleWarning("Votre adresse mail n'a pas été vérifiée. Veuillez vérifier votre boîte mail. <a class='text-black' href='verifyaccount.php?email=$email'>Renvoyer le mail de vérification.</a>");
     }
     ?>
 
@@ -114,28 +114,24 @@
         document.addEventListener('DOMContentLoaded', function() {
             function handleNavbarCollapse() {
                 const navbar = document.querySelector('.navbar');
-                const collapseBreakpoint = 1400; // Largeur personnalisée en pixels
+                const collapseBreakpoint = 1400;
                 if (window.innerWidth > collapseBreakpoint) {
-                    navbar.classList.add('navbar-expand'); // Activer le collapse
+                    navbar.classList.add('navbar-expand');
                     hideWhenCollapsed = document.getElementById('hideWhenCollapsed');
                     showWhenCollapsed = document.getElementById('showWhenCollapsed');
                     hideWhenCollapsed.style.display = 'block';
                     showWhenCollapsed.style.display = 'none';
                 } else {
-                    navbar.classList.remove('navbar-expand'); // Désactiver le collapse
+                    navbar.classList.remove('navbar-expand');
                     hideWhenCollapsed = document.getElementById('hideWhenCollapsed');
                     showWhenCollapsed = document.getElementById('showWhenCollapsed');
                     hideWhenCollapsed.style.display = 'none';
                     showWhenCollapsed.style.display = 'block';
                 }
-
-                console.log("Navbar collapse breakpoint: " + window.innerWidth);
             }
 
-            // Exécuter lors du chargement de la page
             handleNavbarCollapse();
 
-            // Exécuter lors du redimensionnement de la fenêtre
             window.addEventListener('resize', handleNavbarCollapse);
         });
     </script>

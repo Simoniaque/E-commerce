@@ -1,15 +1,14 @@
 <?php
 session_start();
-include("config.php");
-include("functions.php");
+include_once "config.php";
+include_once "API/usersRequests.php";
+include_once "functions.php";
 
 if (isset($_SESSION['user_id'])) {
-    if(getUserByID($con, $_SESSION['user_id'])){
+    if (GetUserByID($pdo, $_SESSION['user_id'])) {
         header("Location: index.php");
         die;
-    }
-    else
-    {
+    } else {
         unset($_SESSION['user_id']);
     }
 }
@@ -23,32 +22,20 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     //Cas un champ du form est vide
     if (empty($email) || empty($password)) {
-        echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
-                    Veuillez remplir tous les champs
-                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                  </div>";
+        DisplayDismissibleAlert("Veuillez remplir tous les champs");
     } else {
-        $query = "SELECT * FROM utilisateurs WHERE email = '$email' limit 1";
-        $result = mysqli_query($con, $query);
+        $foundUser = GetUserByEmail($pdo, $email);
 
-        //Cas aucun utilisateur trouvé avec cette adresse mail
-        if (!($result && mysqli_num_rows($result) > 0)) {
-            echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
-                        Aucun compte associé à cette adresse email <a href='signup.php' class='alert-link'>Cliquez-ici pour vous créer un compte</a>
-                        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                      </div>";
-        } else {
-            $userData = mysqli_fetch_assoc($result);
-            //Cas mot de pass incorrect
-            if (password_verify($password, $user['mot_de_passe'])) {
-                echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
-                            Mot de passe incorrect
-                            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                          </div>";
-            } else {
+        if (!$foundUser) {
+            DisplayDismissibleAlert("Aucun compte associé à cette adresse email <a href='signup.php' class='alert-link'>Cliquez-ici pour vous créer un compte</a>");
+        } 
+        else {
 
-                //Cas connexion réussie
-                $_SESSION['user_id'] = $userData['id'];
+            if (!password_verify($password, $foundUser['mot_de_passe'])) {
+                DisplayDismissibleAlert("Mot de passe incorrect");
+            } 
+            else {
+                $_SESSION['user_id'] = $foundUser['id'];
                 header("Location: " . $redirectUrl);
                 die;
             }
@@ -83,11 +70,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 <form class="p-4 shadow rounded-1 bg-light" method="post">
                     <div class="form-group mb-3">
                         <label>Adresse email</label>
-                        <input name="userEmail" type="email" class="form-control">
+                        <input name="userEmail" type="email" class="form-control" required>
                     </div>
                     <div class="form-group mb-3">
                         <label>Mot de passe</label>
-                        <input name="userPassword" type="password" class="form-control" id="password">
+                        <input name="userPassword" type="password" class="form-control" id="password" required>
                     </div>
                     <div class="form-group form-check mb-3">
                         <input type="checkbox" class="form-check-input" id="togglePassword">

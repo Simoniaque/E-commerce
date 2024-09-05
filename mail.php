@@ -4,7 +4,7 @@ require 'vendor/autoload.php';
 
 use \Mailjet\Resources;
 
-function sendAccountCreatedEmail($emailAddress, $name, $urlVerif)
+function SendAccountCreatedEmail($emailAddress, $name, $urlVerif)
 {
 
     $subject = 'Bienvenue chez New Vet !';
@@ -15,7 +15,7 @@ function sendAccountCreatedEmail($emailAddress, $name, $urlVerif)
                     </div>
                     <div style=\'margin: 20px 0; background-color: #ffffff; padding: 20px; border-radius: 2px;\'>
                         <p>Bonjour ' . $name . ',</p>
-                        <p>Merci de vous être inscrit sur notre site web. Pour valider votre adresse mail, veuillez cliquer sur le lien suivant : ' . $urlVerif . '</p>
+                        <p>Merci de vous être inscrit sur notre site web. Pour valider votre adresse mail, veuillez cliquer sur le lien suivant : <a href='.$urlVerif.'>' . $urlVerif . '</a></p>
                         <br/>
                         <p>Si vous avez des questions, n\'hésitez pas à nous contacter à l\'adresse mail suivante : contact.newvet@gmail.com.</p>
                         <p>Merci et à bientôt !</p>
@@ -25,11 +25,11 @@ function sendAccountCreatedEmail($emailAddress, $name, $urlVerif)
                         <p>&copy; 2024 New Vet. Tous droits réservés.</p>
                     </div>
                 </div>';
-    return sendMail($emailAddress, $name, $subject, $textPart, $htmlPart);
+    return SendMail($emailAddress, $name, $subject, $textPart, $htmlPart);
 }
 
 
-function sendAccountDeleteEmail($emailAddress, $name)
+function SendAccountDeleteEmail($emailAddress, $name)
 {
     $subject = 'Compte supprimé !';
     $textPart = 'Votre compte a bien été supprimé';
@@ -50,10 +50,10 @@ function sendAccountDeleteEmail($emailAddress, $name)
                         <p>&copy; 2024 New Vet. Tous droits réservés.</p>
                     </div>
                 </div>';
-    return sendMail($emailAddress, $name, $subject, $textPart, $htmlPart);
+    return SendMail($emailAddress, $name, $subject, $textPart, $htmlPart);
 }
 
-function sendMail($emailAddress, $name, $subject, $textPart, $htmlPart)
+function SendMail($emailAddress, $name, $subject, $textPart, $htmlPart)
 {
     $apikey = '0bc323f63d691610b12559e414c49398';
     $apisecret = '4b5e4da435d031796507a324c034a7cd';
@@ -92,7 +92,7 @@ function sendMail($emailAddress, $name, $subject, $textPart, $htmlPart)
     }
 }
 
-function sendMailResetPassword($emailAddress, $name, $urlResetPassword)
+function SendMailResetPassword($emailAddress, $name, $urlResetPassword)
 {
 
     $subject = 'Réinitialisation de votre mot de passe';
@@ -114,10 +114,10 @@ function sendMailResetPassword($emailAddress, $name, $urlResetPassword)
                         <p>&copy; 2024 New Vet. Tous droits réservés.</p>
                     </div>
                 </div>';
-    return sendMail($emailAddress, $name, $subject, $textPart, $htmlPart);
+    return SendMail($emailAddress, $name, $subject, $textPart, $htmlPart);
 }
 
-function sendMailVerifyAccount($emailAddress, $name, $urlVerif)
+function SendMailVerifyAccount($emailAddress, $name, $urlVerif)
 {
 
 
@@ -139,5 +139,5 @@ function sendMailVerifyAccount($emailAddress, $name, $urlVerif)
                             <p>&copy; 2024 New Vet. Tous droits réservés.</p>
                         </div>
                     </div>';
-    return sendMail($emailAddress, $name, $subject, $textPart, $htmlPart);
+    return SendMail($emailAddress, $name, $subject, $textPart, $htmlPart);
 }

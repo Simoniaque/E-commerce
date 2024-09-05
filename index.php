@@ -1,11 +1,11 @@
 <?php
 session_start();
 
-include("config.php");
-include("functions.php");
+include_once ("config.php");
+//include("functions.php");
 
-$userData = checkLogin($con);
-
+include_once ("API/productRequests.php");
+include_once ("API/categoriesRequests.php");
 ?>
 
 <!DOCTYPE html>
@@ -26,32 +26,6 @@ $userData = checkLogin($con);
 </head>
 
 <body>
-<div class="overlay"></div>
-    <div class="popup">
-        <p>
-            <?php 
-            if (isset($_SESSION['order_message'])) {
-                echo $_SESSION['order_message']; 
-                unset($_SESSION['order_message']);
-            } 
-            ?>
-        </p>
-        <button onclick="closePopup()">OK</button>
-    </div>
-
-    <script>
-        // Fonction pour fermer la pop-up
-        function closePopup() {
-            document.querySelector('.popup').style.display = 'none';
-            document.querySelector('.overlay').style.display = 'none';
-        }
-
-        // Afficher la pop-up si un message de commande existe
-        <?php if (isset($_SESSION['order_message'])): ?>
-            document.querySelector('.popup').style.display = 'block';
-            document.querySelector('.overlay').style.display = 'block';
-        <?php endif; ?>
-    </script>
     <main>
         <?php include "header.php"; ?>
 
@@ -100,7 +74,7 @@ $userData = checkLogin($con);
             <div class="container mt-5">
                 <div class="row gx-4 row-cols-2 row-cols-md-3 row-cols-lg-4 justify-content-center mt-5">
                     <?php
-                    $highlightCategories = getHighlightCategories($con);
+                    $highlightCategories = GetHighlightCategories($pdo);
                     foreach ($highlightCategories as $category) {
                         $categoryID = $category['id'];
                         $categoryName = $category['nom'];
@@ -125,7 +99,7 @@ $userData = checkLogin($con);
                 <hr />
                 <div class="row gx-4 row-cols-2 row-cols-md-3 row-cols-lg-4 justify-content-center mt-5">
                     <?php
-                    $highlightProducts = getHighlightProducts($con);
+                    $highlightProducts = GetHighlightProducts($pdo);
                     foreach ($highlightProducts as $product) {
                         $productID = $product['id'];
                         $productName = $product['nom'];

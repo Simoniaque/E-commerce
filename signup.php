@@ -1,11 +1,15 @@
 <?php
+
+use GuzzleHttp\Promise\Create;
+
 session_start();
-include("config.php");
-include("functions.php");
-include("mail.php");
+include_once "config.php";
+include_once "functions.php";
+include_once "mail.php";
+include_once "API/usersRequests.php";
 
 if (isset($_SESSION['user_id'])) {
-    if(getUserByID($con, $_SESSION['user_id'])){
+    if(GetUserByID($pdo, $_SESSION['user_id'])){
         header("Location: index.php");
         die;
     }
@@ -26,45 +30,48 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if (!empty($name) && !empty($email) && !empty($password) && !empty($passwordConfirm)) {
 
         if ($password !== $passwordConfirm) {
-            echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
-                    Les mots de passe ne correspondent pas.
-                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                  </div>";
+            DisplayDismissibleAlert("Les mots de passe ne correspondent pas.");
         } else {
 
-            $userAlreadyExists = userAlreadyExists($con, $email);
+            $userExists; 
 
-            if ($userAlreadyExists) {
-                echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
-                        Cette adresse email est déjà utilisée.
-                        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                      </div>";
+            if (CheckUserExists($pdo, $email, $userExists) && $userExists) {
+                DisplayDismissibleAlert("Cette adresse email est déjà utilisée.");
             } else {
 
-                $newUserId = addUser($con, $name, $email, $password);
-
-                if ($newUserId > 0) {
-                    sendAccountCreatedEmail($email, $name, generateURLVerifyAccount($con, $newUserId));
+                if (CreateUser($pdo, $name, $email, $password,$newUserId)) {
+                    
                     $_SESSION['user_id'] = $newUserId;
 
-                    // Convertir le panier cookie en panier DB
-                    convertCookieCartToDBCart($con, $newUserId);
+                    $verificationURL = GenerateURLVerifyAccount($pdo, $newUserId);
 
-                    header("Location: " . $redirectUrl);
-                    die;
+                    if($verificationURL != false){
+                        SendAccountCreatedEmail($email, $name, $verificationURL);
+                    }
+                    else{
+                        DisplayDismissibleAlert("Une erreur est survenue lors de l'url de vérification.");
+
+                    }
+                    
+                    ConvertCookieCartToDBCart($pdo, $newUserId);
+
+                    DisplayDismissibleSuccess("Votre compte a été créé avec succès.");
+
+                    echo "
+                        <script type='text/javascript'>
+                            setTimeout(function() {
+                                window.location.href = '$redirectUrl';
+                            }, 1500);
+                        </script>";
+
+                    
                 } else {
-                    echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
-                        Une erreur est survenue lors de la création de votre compte.
-                        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                      </div>";
+                    DisplayDismissibleAlert("Une erreur est survenue lors de la création de votre compte.");
                 }
             }
         }
     } else {
-        echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
-                    Veuillez remplir tous les champs.
-                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                  </div>";
+        DisplayDismissibleAlert("Veuillez remplir tous les champs.");
     }
 }
 ?>
