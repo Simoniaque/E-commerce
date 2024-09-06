@@ -43,9 +43,9 @@ include_once 'functions.php';
                                 echo "<li><a class='dropdown-item' href='#'>Aucune catégorie trouvée</a></li>";
                             }else{
                                 foreach($categories as $category){
-                                    $categoryID = $category['id'];
-                                    $categoryName = $category['nom'];
-                                    echo "<li><a class='dropdown-item' href='category.php?id=$categoryID'>$categoryName</a></li>";
+                                    $header_categoryID = $category['id'];
+                                    $header_categoryName = $category['nom'];
+                                    echo "<li><a class='dropdown-item' href='category.php?id=$header_categoryID'>$header_categoryName</a></li>";
                                 }
                             }
                             ?>

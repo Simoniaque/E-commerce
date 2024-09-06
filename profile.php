@@ -1,134 +1,138 @@
 <?php
 session_start();
 
-include("config.php");
-include("functions.php");
-include("mail.php");
+include_once "config.php";
+include_once "functions.php";
+include_once "mail.php";
+include_once "API/usersRequests.php";
+
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     die;
 }
 
+$userID = $_SESSION['user_id'];
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $id = $_SESSION['user_id'];
 
     // Si la requête est pour supprimer le compte
-    $input = json_decode(file_get_contents('php://input'), true);
-    if (isset($input['action']) && $input['action'] === 'deleteAccount') {
+    if (isset($_POST['action']) && $_POST['action'] === 'deleteAccount') {
 
-        $userToDelete = checkLogin($con);
-        if (deleteUser($con, $id)) {
+        $userToDelete = GetCurrentUser($pdo);
+        if (DeactivateUser($pdo, $userID)) {
             sendAccountDeleteEmail($userToDelete['email'], $userToDelete['nom']);
+            $alertMessage = "Compte supprimé avec succès.";
             session_destroy();
-            echo "accountDeleted";
+            
+            $encodedMessage = urlencode("Compte supprimé avec succès.");
+            header("Location: index.php?message=" . $encodedMessage);
+            exit();
         } else {
-            echo "errorDeletingAccount";
+            DisplayDismissibleAlert("Erreur lors de la suppression du compte");
         }
-
-        exit;
     }
 
-    // Sinon, c'est une mise à jour des informations de l'utilisateur
-    $name = $_POST['name'];
-    $email = $_POST['email'];
+    // Mise à jour des informations de l'utilisateur
+    if (isset($_POST['update_info'])) {
+        $name = $_POST['name'];
+        $email = $_POST['email'];
 
-    if (EditUserInfo($con, $id, $name, $email)) {
-        echo "User info updated successfully";
-    } else {
-        echo "Error updating user info";
+        if (UpdateUserInfo($pdo, $userID, $name, $email)) {
+            DisplayDismissibleSuccess("Informations mises à jour avec succès");
+        } else {
+            DisplayDismissibleAlert("Erreur lors de la mise à jour des informations");
+        }
     }
-    exit;
+
+    // Ajout d'une adresse
+    if (isset($_POST['add_address'])) {
+        $adresseComplete = $_POST['adresse_complete'];
+        $ville = $_POST['ville'];
+        $codePostal = $_POST['code_postal'];
+        $pays = $_POST['pays'];
+
+        if (AddUserAddress($pdo, $userID, $adresseComplete, $ville, $codePostal, $pays)) {
+            DisplayDismissibleSuccess("Adresse ajoutée avec succès");
+        } else {
+            DisplayDismissibleAlert("Erreur lors de l'ajout de l'adresse");
+        }
+    }
+
+    // Ajout d'un moyen de paiement
+    if (isset($_POST['add_payment'])) {
+        $paymentType = $_POST['payment_type'];
+
+        if ($paymentType == 'card') {
+            $cardNumber = $_POST['card_number'];
+            $cardName = $_POST['card_name'];
+            $expirationDate = $_POST['expiration_date'];
+            $cvv = $_POST['cvv'];
+
+            if($cardNumber == "" || $cardName == "" || $expirationDate == "" || $cvv == ""){
+                DisplayDismissibleAlert("Veuillez remplir tous les champs pour ajouter un moyen de paiement");
+            }else{
+                
+                if (AddUserPaymentMethod($pdo, $userID, 'card', $cardNumber, $cardName, $expirationDate, $cvv, null)) {
+                    DisplayDismissibleSuccess("Moyen de paiement ajouté avec succès");
+                } else {
+                    DisplayDismissibleAlert("Erreur lors de l'ajout du moyen de paiement");
+                }
+            }
+
+            
+        } 
+        elseif ($paymentType == 'paypal') {
+            $paypalEmail = $_POST['paypal_email'];
+            if($paypalEmail == ""){
+                DisplayDismissibleAlert("Veuillez remplir tous les champs pour ajouter un moyen de paiement");
+            }else{
+                if (AddUserPaymentMethod($pdo, $userID, 'paypal', null, null, null, null, $paypalEmail)) {
+                    DisplayDismissibleSuccess("Moyen de paiement ajouté avec succès");
+                } else {
+                    DisplayDismissibleAlert("Erreur lors de l'ajout du moyen de paiement");
+                }
+            }
+        }
+    }
+
+    // Suppression d'une adresse
+    if (isset($_POST['delete_address'])) {
+        $addressId = $_POST['address_id'];
+        if (DeactivateUserAddress($pdo, $userID, $addressId)) {
+            DisplayDismissibleSuccess("Adresse supprimée avec succès.");
+        } else {
+            DisplayDismissibleAlert("Erreur lors de la suppression de l'adresse");
+        }
+    }
+
+    // Suppression d'un moyen de paiement
+    if (isset($_POST['delete_payment'])) {
+        $paymentId = $_POST['payment_id'];
+        if (DeactivateUserPaymentMethod($pdo, $userID, $paymentId)) {
+            DisplayDismissibleSuccess("Moyen de paiement supprimé avec succès.");
+        } else {
+            DisplayDismissibleAlert("Erreur lors de la suppression du moyen de paiement");
+        }
+    }
 }
 
-$userData = checkLogin($con);
-if (!$userData) {
+
+$user = GetCurrentUser($pdo);
+if (!$user) {
     header("Location: login.php");
     exit();
 }
 
-// Traitement de l'ajout d'une adresse
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'add_address') {
-    $userId = $_POST['user_id'];
-    $adresseComplete = $_POST['adresse_complete'];
-    $ville = $_POST['ville'];
-    $codePostal = $_POST['code_postal'];
-    $pays = $_POST['pays'];
-
-    $result = addUserAddress($con, $userId, $adresseComplete, $ville, $codePostal, $pays);
-
-    if ($result) {
-        echo 'success';
-    } else {
-        echo 'error';
-    }
-    exit(); // Terminer le script après traitement POST
+// Récupération des adresses et moyens de paiement de l'utilisateur
+$addresses = GetUserAddresses($pdo, $user['id']);
+if(!$addresses){
+    $addresses = array();
 }
 
-// Traitement de l'ajout d'un moyen de paiement
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'add_payment') {
-    $userId = $userData['id'];
-    $paymentType = $_POST['payment_type'];
-
-    if ($paymentType == 'card') {
-        $cardNumber = $_POST['card_number'];
-        $cardName = $_POST['card_name'];
-        $expirationDate = $_POST['expiration_date'];
-        $cvv = $_POST['cvv'];
-
-        $result = addUserPaymentMethod($con, $userId, 'card', $cardNumber, $cardName, $expirationDate, $cvv, null);
-
-        if ($result) {
-            echo 'success';
-        } else {
-            echo 'error';
-        }
-    } elseif ($paymentType == 'paypal') {
-        $paypalEmail = $_POST['paypal_email'];
-
-        $result = addUserPaymentMethod($con, $userId, 'paypal', null, null, null, null, $paypalEmail);
-
-        if ($result) {
-            echo 'success';
-        } else {
-            echo 'error';
-        }
-    }
-    exit(); // Terminer le script après traitement POST
-}
-
-
-
-// Récupération des adresses de l'utilisateur
-$addresses = getUserAddresses($con, $userData['id']);
-$paymentMethods = getUserPaymentMethods($con, $userData['id']);
-
-$userID = $_SESSION['user_id'];
-
-
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $action = $_POST['action'] ?? '';
-
-    if ($action === 'delete_address') {
-        $addressId = $_POST['address_id'] ?? 0;
-        if (deleteUserAddress($con, $userId, $addressId)) {
-            echo 'addressDeleted';
-        } else {
-            echo 'errorDeletingAddress';
-        }
-        exit;
-    }
-
-    if ($action === 'delete_payment') {
-        $paymentId = $_POST['payment_id'] ?? 0;
-        if (deleteUserPaymentMethod($con, $userId, $paymentId)) {
-            echo 'paymentDeleted';
-        } else {
-            echo 'errorDeletingPayment';
-        }
-        exit;
-    }
+$paymentMethods = GetUserPaymentMethods($pdo, $user['id']);
+if(!$paymentMethods){
+    $paymentMethods = array();
 }
 ?>
 
@@ -143,190 +147,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-
     <link rel="stylesheet" href="assets/css/style.css" />
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <script>
-        function showDeleteAccountVerification() {
-            let element = document.getElementById("verifyDeleteAccount");
-            element.setAttribute("style", "display: inline;");
-        }
-
-        function hideDeleteAccountVerification() {
-            let element = document.getElementById("verifyDeleteAccount");
-            element.setAttribute("style", "display: none;");
-        }
-
-        function deleteAccount() {
-            fetch('profile.php', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: 'deleteAccount'
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.text())
-                .then(data => {
-                    console.log(data);
-                    if (data === "accountDeleted") {
-                        alert("Votre compte a bien été supprimé");
-                        window.location.href = 'index.php';
-                    } else {
-                        alert("Erreur lors de la suppression du compte");
-                    }
-                })
-                .catch(error => {
-                    console.error(error);
-                    alert("Erreur lors de la suppression du compte");
-                });
-        }
-
-        function EditUserInfo() {
-            const formData = new FormData();
-            formData.append('name', document.getElementById("nameInput").value);
-            formData.append('email', document.getElementById("emailInput").value);
-
-            fetch('profile.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.text())
-                .then(data => {
-                    console.log(data);
-                    alert("User info updated successfully");
-                })
-                .catch(error => {
-                    console.error(error);
-                    alert("Error updating user info");
-                });
-        }
-
-        function deleteAddress(addressId) {
-            fetch('profile.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        action: 'delete_address',
-                        address_id: addressId
-                    })
-                })
-                .then(response => response.text())
-                .then(data => {
-                    if (data === 'addressDeleted') {
-                        alert('Adresse supprimée avec succès');
-                        location.reload(); // Recharger la page pour mettre à jour la liste des adresses
-                    } else {
-                        alert('Erreur lors de la suppression de l\'adresse');
-                    }
-                })
-                .catch(error => {
-                    console.error('Erreur:', error);
-                    alert('Erreur lors de la suppression de l\'adresse');
-                });
-        }
-
-        function deletePayment(paymentId) {
-            fetch('profile.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        action: 'delete_payment',
-                        payment_id: paymentId
-                    })
-                })
-                .then(response => response.text())
-                .then(data => {
-                    if (data === 'paymentDeleted') {
-                        alert('Moyen de paiement supprimé avec succès');
-                        location.reload(); // Recharger la page pour mettre à jour la liste des moyens de paiement
-                    } else {
-                        alert('Erreur lors de la suppression du moyen de paiement');
-                    }
-                })
-                .catch(error => {
-                    console.error('Erreur:', error);
-                    alert('Erreur lors de la suppression du moyen de paiement');
-                });
-        }
-
-
-        $(document).ready(function() {
-            $('#newAddressForm').on('submit', function(event) {
-                event.preventDefault();
-
-                $.ajax({
-                    url: 'checkout.php', // URL du fichier actuel
-                    type: 'POST',
-                    data: $(this).serialize() + '&action=add_address',
-                    success: function(response) {
-                        if (response === 'success') {
-                            location.reload(); // Recharger la page pour mettre à jour les adresses
-                        } else {
-                            alert('Erreur lors de l\'ajout de l\'adresse.');
-                        }
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.error('Erreur AJAX :', textStatus, errorThrown);
-                    }
-                });
-            });
-            // Gestion de l'ajout d'un moyen de paiement
-            $('#paymentForm').on('submit', function(event) {
-                event.preventDefault();
-
-                $.ajax({
-                    url: 'checkout.php',
-                    type: 'POST',
-                    data: $(this).serialize() + '&action=add_payment',
-                    success: function(response) {
-                        if (response === 'success') {
-                            location.reload(); // Recharger la page pour mettre à jour les moyens de paiement
-                        } else {
-                            alert('Erreur lors de l\'ajout du moyen de paiement.');
-                        }
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.error('Erreur AJAX :', textStatus, errorThrown);
-                    }
-                });
-            });
-
-            // Gestion de l'affichage des champs de paiement
-            $('#payment_type').on('change', function() {
-                const paymentType = $(this).val();
-                if (paymentType === 'card') {
-                    $('#card_info').show();
-                    $('#paypal_info').hide();
-                } else if (paymentType === 'paypal') {
-                    $('#card_info').hide();
-                    $('#paypal_info').show();
-                } else {
-                    $('#card_info').hide();
-                    $('#paypal_info').hide();
-                }
-            });
-        });
-    </script>
 </head>
 
 <body>
     <main>
         <?php include "header.php"; ?>
-
-        <?php
-        $userData = checkLogin($con);
-        $id = $userData['id'];
-        $name = $userData['nom'];
-        $email = $userData['email'];
-        ?>
 
         <div class='container rounded bg-white mt-5 mb-5'>
             <div class='row'>
@@ -335,160 +161,193 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div class='d-flex justify-content-between align-items-center mb-3'>
                             <h4 class='text-right'>Informations du compte</h4>
                         </div>
-                        <div class='row mt-3'>
-                            <div class='col-md-12 mb-3'>
-                                <label class='labels'>Nom</label>
-                                <input type='text' id='nameInput' class='form-control' value='<?php echo htmlspecialchars($userData['nom']); ?>'>
+                        <form method="POST" action="">
+                            <div class='row mt-3'>
+                                <div class='col-md-12 mb-3'>
+                                    <label class='labels'>Nom</label>
+                                    <input type='text' name='name' class='form-control' value='<?php echo $user['nom']; ?>'>
+                                </div>
+                                <div class='col-md-12 mb-3'>
+                                    <label class='labels'>Adresse Mail</label>
+                                    <input type='text' name='email' class='form-control' value='<?php echo $user['email']; ?>'>
+                                </div>
+                                <div class='col-md-12 mb-3'>
+                                    <button type='submit' name='update_info' class='btn btn-primary'>Mettre à jour</button>
+                                </div>
                             </div>
-                            <hr />
-                            <div class='col-md-12 mb-3'>
-                                <label class='labels'>Adresse Mail</label>
-                                <input type='text' id='emailInput' class='form-control' value='<?php echo htmlspecialchars($userData['email']); ?>'>
-                            </div>
-                            <hr />
-                            <div class='col-md-12 mb-3'>
-                                <label class='labels'>Mes Adresses</label>
-                                <ul>
-                                    <?php foreach ($addresses as $address): ?>
-                                        <li>
-                                            <?php echo htmlspecialchars($address['adresse_complète']); ?>
-
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ul>
-                                <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#newAddressModal">+ Ajouter une nouvelle adresse</button>
-                            </div>
-                            <hr />
-                            <div class='col-md-12 mb-3'>
-                                <label class='labels'>Mes Moyens de paiement</label>
-                                <ul>
-                                    <?php foreach ($paymentMethods as $paymentMethod): ?>
-                                        <li>
-                                            <?php echo $paymentMethod['type'] === 'card' ? 'Carte bancaire' : 'PayPal'; ?> :
-                                            <?php echo $paymentMethod['type'] === 'card' ? '**** **** **** ' . substr($paymentMethod['numero_carte'], -4) : htmlspecialchars($paymentMethod['paypal_email']); ?>
-
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ul>
-                                <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#newPaymentModal">+ Ajouter un nouveau moyen de paiement</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Modal pour ajouter une nouvelle adresse -->
-                <div class="modal fade" id="newAddressModal" tabindex="-1" aria-labelledby="newAddressModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <form id="newAddressForm">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="newAddressModalLabel">Nouvelle Adresse</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="mb-3">
-                                        <label for="adresse_complete" class="form-label">Adresse complète</label>
-                                        <input type="text" class="form-control" id="adresse_complete" name="adresse_complete" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="ville" class="form-label">Ville</label>
-                                        <input type="text" class="form-control" id="ville" name="ville" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="code_postal" class="form-label">Code Postal</label>
-                                        <input type="text" class="form-control" id="code_postal" name="code_postal" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="pays" class="form-label">Pays</label>
-                                        <input type="text" class="form-control" id="pays" name="pays" required>
-                                    </div>
-                                    <input type="hidden" name="user_id" value="<?php echo $userData['id']; ?>">
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                    <button type="submit" class="btn btn-primary">Ajouter l'adresse</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Modal pour ajouter un nouveau moyen de paiement -->
-                <div class="modal fade" id="newPaymentModal" tabindex="-1" aria-labelledby="newPaymentModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <form id="paymentForm">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="newPaymentModalLabel">Nouveau Moyen de Paiement</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="mb-3">
-                                        <label for="payment_type" class="form-label">Type de Paiement</label>
-                                        <select class="form-select" id="payment_type" name="payment_type" required>
-                                            <option value="">Sélectionner...</option>
-                                            <option value="card">Carte Bancaire</option>
-                                            <option value="paypal">PayPal</option>
-                                        </select>
-                                    </div>
-                                    <div id="card_info" style="display:none;">
-                                        <div class="mb-3">
-                                            <label for="card_number" class="form-label">Numéro de Carte</label>
-                                            <input type="text" class="form-control" id="card_number" name="card_number">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="card_name" class="form-label">Nom sur la Carte</label>
-                                            <input type="text" class="form-control" id="card_name" name="card_name">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="expiration_date" class="form-label">Date d'Expiration</label>
-                                            <input type="month" class="form-control" id="expiration_date" name="expiration_date">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="cvv" class="form-label">CVV</label>
-                                            <input type="text" class="form-control" id="cvv" name="cvv">
-                                        </div>
-                                    </div>
-                                    <div id="paypal_info" style="display:none;">
-                                        <div class="mb-3">
-                                            <label for="paypal_email" class="form-label">Email PayPal</label>
-                                            <input type="email" class="form-control" id="paypal_email" name="paypal_email">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                    <button type="submit" class="btn btn-primary">Ajouter le moyen de paiement</button>
-                                </div>
-                            </form>
-                        </div>
+                        </form>
                     </div>
                 </div>
                 <div class='col-md-6'>
                     <div class='p-3 py-5'>
                         <a href='myorders.php'><button class='btn btn-dark col-12 mb-3'>Mes Commandes</button></a>
-                        <a href='resetpassword.php?email=<?php echo urlencode($userData['email']); ?>'><button class='btn btn-dark col-12 mb-3'>Réinitialiser mon mot de passe</button></a>
+                        <a href='resetpassword.php?email=<?php echo urlencode($user['email']); ?>'><button class='btn btn-dark col-12 mb-3'>Réinitialiser mon mot de passe</button></a>
+
+
                         <button class='btn btn-danger col-12 mb-3' onclick='showDeleteAccountVerification()'>Supprimer mon compte</button>
+
                         <span id='verifyDeleteAccount' class='m-2' style='display: none;'>
                             <h5 class='mb-3'>Êtes-vous sûr de vouloir supprimer votre compte ?</h5>
-                            <button class='btn btn-danger col-4 mb-3 me-3' onclick='deleteAccount()'>Oui</button>
-                            <button class='btn btn-dark col-4 mb-3' onclick='hideDeleteAccountVerification()'>Non</button>
+                            <form method="POST" action="">
+                                <button type="submit" name="action" value="deleteAccount" class="btn btn-danger col-4 mb-3">Oui</button>
+                                <button class='btn btn-dark col-4 mb-3' onclick='hideDeleteAccountVerification()'>Non</button>
+                            </form>
                         </span>
-                        <?php
-
-                        if ($userData['est_admin'] == 1) {
-                            echo "<a href='backoffice/dashboard.php'><button class='btn btn-dark col-12 mb-3'>Panneau d'administration</button></a>";
-                        }
-                        ?>
+                        
+                        <?php if ($user['est_admin'] == 1): ?>
+                            <a href='backoffice/dashboard.php'><button class='btn btn-dark col-12 mb-3'>Panneau d'administration</button></a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="push"></div>
-    </main>
-    <?php include "footer.php"; ?>
+        <div class="container mt-5 shadow p-5">
+            <h4>Mes Adresses</h4>
+            <ul>
+                <?php foreach ($addresses as $address): ?>
+                    <li>
+                        <?php echo $address['adresse_complète']; ?>
+                        <form method="POST" action="" style="display:inline;">
+                            <input type="hidden" name="address_id" value="<?php echo $address['id']; ?>">
+                            <button type="submit" name="delete_address" class="btn btn-link">Supprimer</button>
+                        </form>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+            <!-- Bouton pour ouvrir la modale d'ajout d'une adresse -->
+            <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                Ajouter une adresse
+            </button>
+
+            <h4 class="mt-5">Mes Moyens de Paiement</h4>
+            <ul>
+                <?php foreach ($paymentMethods as $payment): ?>
+                    <li>
+                        <?php echo ($payment['type'] == 'paypal') ? 'PayPal : ' . $payment['paypal_email'] : 'Carte : ' . $payment['numero_carte']; ?>
+                        <form method="POST" action="" style="display:inline;">
+                            <input type="hidden" name="payment_id" value="<?php echo $payment['id']; ?>">
+                            <button type="submit" name="delete_payment" class="btn btn-link">Supprimer</button>
+                        </form>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+
+            <!-- Bouton pour ouvrir la modale d'ajout d'un moyen de paiement -->
+            <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addPaymentModal">
+                Ajouter un moyen de paiement
+            </button>
+        </div>
+
+        <!-- Modale pour ajouter une adresse -->
+        <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addAddressModalLabel">Ajouter une nouvelle adresse</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" action="">
+                            <div class="mb-3">
+                                <label for="adresse_complete" class="form-label">Adresse complète</label>
+                                <input type="text" class="form-control" name="adresse_complete" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="ville" class="form-label">Ville</label>
+                                <input type="text" class="form-control" name="ville" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="code_postal" class="form-label">Code Postal</label>
+                                <input type="text" class="form-control" name="code_postal" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="pays" class="form-label">Pays</label>
+                                <input type="text" class="form-control" name="pays" required>
+                            </div>
+                            <button type="submit" name="add_address" class="btn btn-primary">Ajouter une adresse</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modale pour ajouter un moyen de paiement -->
+        <div class="modal fade" id="addPaymentModal" tabindex="-1" aria-labelledby="addPaymentModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addPaymentModalLabel">Ajouter un moyen de paiement</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" action="">
+                            <div class="mb-3">
+                                <label for="payment_type" class="form-label">Type de paiement</label>
+                                <select class="form-select" name="payment_type" required>
+                                    <option value="card">Carte bancaire</option>
+                                    <option value="paypal">PayPal</option>
+                                </select>
+                            </div>
+
+                            <div class="card-info">
+                                <div class="mb-3">
+                                    <label for="card_number" class="form-label">Numéro de la carte</label>
+                                    <input type="text" class="form-control" name="card_number">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="card_name" class="form-label">Nom sur la carte</label>
+                                    <input type="text" class="form-control" name="card_name">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="expiration_date" class="form-label">Date d'expiration</label>
+                                    <input type="month" class="form-control" name="expiration_date">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="cvv" class="form-label">CVV</label>
+                                    <input type="text" class="form-control" name="cvv">
+                                </div>
+                            </div>
+
+                            <div class="paypal-info" style="display:none;">
+                                <div class="mb-3">
+                                    <label for="paypal_email" class="form-label">Email PayPal</label>
+                                    <input type="email" class="form-control" name="paypal_email">
+                                </div>
+                            </div>
+
+                            <button type="submit" name="add_payment" class="btn btn-primary">Ajouter un moyen de paiement</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.querySelector('select[name="payment_type"]').addEventListener('change', function () {
+            if (this.value === 'card') {
+                document.querySelector('.card-info').style.display = 'block';
+                document.querySelector('.paypal-info').style.display = 'none';
+            } else {
+                document.querySelector('.card-info').style.display = 'none';
+                document.querySelector('.paypal-info').style.display = 'block';
+            }
+        });
+    </script>
+
+    <script>
+        function showDeleteAccountVerification() {
+            document.getElementById('verifyDeleteAccount').style.display = 'block';
+        }
+
+        function hideDeleteAccountVerification() {
+            document.getElementById('verifyDeleteAccount').style.display = 'none';
+        }
+    </script>
 </body>
 
 </html>

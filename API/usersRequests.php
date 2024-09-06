@@ -202,3 +202,249 @@ function UserAlreadyHasVerificationToken($pdo, $userID, &$token){
 
     return true;
 }
+
+
+function DeactivateUser($pdo, $userID){
+
+    $query = "UPDATE utilisateurs SET est_actif = 0 WHERE id = :id";
+
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':id', $userID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+
+        echo "<script>console.error($errorMessage);</script>";
+        
+        return false;
+    }
+
+    return true;
+}
+
+function UpdateUserInfo($pdo, $id, $name, $email){
+    
+    $query = "UPDATE utilisateurs SET nom = :name, email = :email WHERE id = :id";
+
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':id', $id, PDO::PARAM_INT);
+    $statement->bindParam(':name', $name, PDO::PARAM_STR);
+    $statement->bindParam(':email', $email, PDO::PARAM_STR);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+
+        echo "<script>console.error($errorMessage);</script>";
+        
+        return false;
+    }
+
+    return true;
+}
+
+function AddUserAddress($pdo, $userId, $adresseComplete, $ville, $codePostal, $pays) {
+    $query = "INSERT INTO adresses_utilisateurs (utilisateur_id, adresse_complète, ville, code_postal, pays) 
+              VALUES (:userId, :adresseComplete, :ville, :codePostal, :pays)";
+
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':userId', $userId, PDO::PARAM_INT);
+    $statement->bindParam(':adresseComplete', $adresseComplete, PDO::PARAM_STR);
+    $statement->bindParam(':ville', $ville, PDO::PARAM_STR);
+    $statement->bindParam(':codePostal', $codePostal, PDO::PARAM_STR);
+    $statement->bindParam(':pays', $pays, PDO::PARAM_STR);
+
+    if (!$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+
+        echo "<script>console.error($errorMessage);</script>";
+        
+        return false;
+    }
+
+    return true;
+}
+
+function AddUserPaymentMethod($pdo, $userID, $payementType, $cardNumber, $cardName, $expirationDate, $cvv, $paypalEmail){
+    $expirationDate = $expirationDate ? $expirationDate . '-01' : null;
+    
+    $query = "INSERT INTO moyens_paiement (utilisateur_id, type, numero_carte, nom_titulaire, date_expiration, cvv, paypal_email) 
+              VALUES (:userID, :payementType, :cardNumber, :cardName, :expirationDate, :cvv, :paypalEmail)";
+
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+    $statement->bindParam(':payementType', $payementType, PDO::PARAM_STR);
+    $statement->bindParam(':cardNumber', $cardNumber, PDO::PARAM_STR);
+    $statement->bindParam(':cardName', $cardName, PDO::PARAM_STR);
+    $statement->bindParam(':expirationDate', $expirationDate, PDO::PARAM_STR);
+    $statement->bindParam(':cvv', $cvv, PDO::PARAM_STR);
+    $statement->bindParam(':paypalEmail', $paypalEmail, PDO::PARAM_STR);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+
+        echo "<script>console.error($errorMessage);</script>";
+        
+        return false;
+    }
+
+    return true;
+    
+}
+
+
+function GetUserAddresses($pdo, $userID, $activeOnly = 1){
+    
+        $query = "SELECT * FROM adresses_utilisateurs WHERE utilisateur_id = :userID";
+    
+        $statement = $pdo->prepare($query);
+        $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+
+        if (!@$statement->execute()) {
+            $errorInfo = $statement->errorInfo();
+            $errorMessage = json_encode($errorInfo[2]);
+    
+            echo "<script>console.error($errorMessage);</script>";
+            
+            return false;
+        }
+
+        $addressedIDs = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        if($addressedIDs == false){
+            return false;
+        }
+
+        $addresses = array();
+
+        foreach($addressedIDs as $addressID){
+            $address = GetAddressByID($pdo, $addressID['id']);
+            if($address != false){
+                array_push($addresses, $address, $activeOnly);
+            }
+        }
+    
+        return $addresses;
+}
+
+
+function GetAddressByID($pdo, $addressID,$activeOnly = 1){
+        
+    $query = "SELECT * FROM adresses_utilisateurs WHERE id = :addressID AND est_actif >= :activeOnly LIMIT 1";
+    
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':addressID', $addressID, PDO::PARAM_INT);
+    $statement->bindParam(':activeOnly', $activeOnly, PDO::PARAM_INT);
+    
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+    
+        echo "<script>console.error($errorMessage);</script>";
+        
+        return false;
+    }
+    
+    return $statement->fetch(PDO::FETCH_ASSOC);
+
+}
+
+function GetUserPaymentMethods($pdo, $userID, $activeOnly =1){
+    
+    $query = "SELECT * FROM moyens_paiement WHERE utilisateur_id = :userID";
+    
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+    
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+    
+        echo "<script>console.error($errorMessage);</script>";
+        
+        return false;
+    }
+
+    $paymentMethodIDs = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+    if($paymentMethodIDs == false){
+        return false;
+    }
+
+    $paymentMethods = array();
+
+    foreach($paymentMethodIDs as $paymentMethodID){
+        $paymentMethod = GetPaymentMethodByID($pdo, $paymentMethodID['id']);
+        if($paymentMethod != false){
+            array_push($paymentMethods, $paymentMethod);
+        }
+    }
+    
+    return $paymentMethods;
+
+}
+
+function GetPaymentMethodByID($pdo, $paymentMethodID, $activeOnly = 1){
+
+    $query = "SELECT * FROM moyens_paiement WHERE id = :paymentMethodID AND est_actif >= :activeOnly LIMIT 1";
+
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':paymentMethodID', $paymentMethodID, PDO::PARAM_INT);
+    $statement->bindParam(':activeOnly', $activeOnly, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+
+        echo "<script>console.error($errorMessage);</script>";
+        
+        return false;
+    }
+
+    return $statement->fetch(PDO::FETCH_ASSOC);
+}
+
+
+function DeactivateUserAddress($pdo, $userID, $addressID){
+    
+    $query = "UPDATE adresses_utilisateurs SET est_actif = 0 WHERE utilisateur_id = :userID AND id = :addressID";
+
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+    $statement->bindParam(':addressID', $addressID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+
+        echo "<script>console.error($errorMessage);</script>";
+        
+        return false;
+    }
+
+    return true;
+}
+
+
+function DeactivateUserPaymentMethod($pdo, $userID, $paymentID){
+
+    $query = "UPDATE moyens_paiement SET est_actif = 0 WHERE utilisateur_id = :userID AND id = :paymentID";
+
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+    $statement->bindParam(':paymentID', $paymentID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+
+        echo "<script>console.error($errorMessage);</script>";
+        
+        return false;
+    }
+
+    return true;
+}

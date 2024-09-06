@@ -2,25 +2,28 @@
 
 session_start();
 
-include("config.php");
-include("functions.php");
+include_once "config.php";
+include_once "functions.php";
+include_once "API/categoriesRequests.php";
+include_once "API/productRequests.php";
 
 if (!isset($_GET['id'])) {
-    header("Location: search.php");
+    
+    show_404();
     exit;
 }
 
-$categoryId = $_GET['id'];
-$category = getCategoryById($con, $categoryId);
+$categoryID = $_GET['id'];
+$category = GetCategoryByID($pdo, $categoryID);
 
 if (!$category) {
-    header("Location: search.php");
+    show_404();
     exit;
 }
 
 $categoryName = $category['nom'];
 $products = array();
-$products = getProductsByCategory($con, $categoryId);
+$products = GetProductsByCategory($pdo, $categoryID);
 
 //check if $products is empty
 if ($products) {
@@ -77,8 +80,12 @@ if ($products) {
             <div class="row">
                 <div class="col-12">
                     <div class="image-container shadow">
-                        <img src="<?php echo PATH_CATEGORY_IMAGES . $categoryId . '.png'; ?>" class="img-fluid">
-                        <h1 class="overlay-text"><?php echo $category['nom']; ?></h1>
+                        <?php 
+                        $imgPath = PATH_CATEGORY_IMAGES . $categoryID . '.png';
+                        echo "
+                        <img src='$imgPath' class='img-fluid' />
+                        <h1 class='overlay-text'>$categoryName</h1>";
+                        ?>
                     </div>
                     <p class="description"><?php echo $category['description']; ?></p>
                 </div>

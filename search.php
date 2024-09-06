@@ -1,9 +1,10 @@
 <?php
 session_start();
 // Inclure les fonctions de la base de données
-include "config.php";
-include 'functions.php';
-include 'searchfunctions.php';
+include_once "config.php";
+include_once 'searchfunctions.php';
+include_once 'API/productRequests.php';
+include_once 'API/categoriesRequests.php';
 
 // Initialiser les variables de filtrage
 $searchText = '';
@@ -19,7 +20,7 @@ $maxPrice = isset($_GET['max_price']) ? (float)$_GET['max_price'] : 500;
 $inStock = isset($_GET['in_stock']) ? true : false;
 
 // Récupérer les produits selon les critères
-$products = searchProducts($con, $searchText, $minPrice, $maxPrice, $inStock);
+$products = SearchProducts($pdo, $searchText, $minPrice, $maxPrice, $inStock);
 
 // Trier les produits en fonction de la méthode de tri, sauf pour la pertinence
 if ($sortingMethod !== 4) {
@@ -137,7 +138,8 @@ if ($sortingMethod !== 4) {
                                             <input type="checkbox" name="in_stock" <?= $inStock ? 'checked' : '' ?>>
                                             Uniquement produits en stock
                                         </label>
-                                        <button class="btn btn-block btn-dark" type="submit">Appliquer</button>
+                                        <br/>
+                                        <button class="btn btn-block btn-dark mt-4" type="submit">Appliquer</button>
                                     </div>
                                 </div>
                             </article>

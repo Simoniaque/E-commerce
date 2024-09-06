@@ -1,8 +1,8 @@
 <?php 
-function searchProducts($con, $searchText, $minPrice, $maxPrice, $inStock) {
+function SearchProducts($pdo, $searchText, $minPrice, $maxPrice, $inStock) {
     
     // Récupère tous les produits
-    $products = getProducts($con);
+    $products = GetProducts($pdo);
     $searchText = formaterString($searchText);
 
     // Si le texte de recherche est vide, filtre les produits selon les prix et stock
@@ -28,8 +28,8 @@ function searchProducts($con, $searchText, $minPrice, $maxPrice, $inStock) {
         $productPrice = $product['prix'];
         $productStock = $product['stock'];
         $productDescription = formaterString($product['description']);
-        $productCategoryName = formaterString(getCategoryById($con, $product['categorie_id'])['nom']);
-        $productMaterials = getMaterialsByProduct($con, $productID);
+        $productCategoryName = formaterString(GetCategoryById($pdo, $product['categorie_id'])['nom']);
+        $productMaterials = GetProductMaterials($pdo, $productID);
 
         // Filtrage des produits par prix et stock
         if (($inStock && $productStock <= 0) || $productPrice > $maxPrice || $productPrice < $minPrice) {
