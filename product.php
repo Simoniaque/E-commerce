@@ -1,9 +1,18 @@
 <?php
 session_start();
-include "config.php";
-include "functions.php";
+include_once "config.php";
+include_once "functions.php";
+include_once "API/productRequests.php";
+include_once "API/categoriesRequests.php";
+
 
 if (!isset($_GET['id'])) {
+    show_404();
+    exit();
+}
+
+$product = GetProductByID($pdo, $_GET['id']);
+if ($product == false) {
     show_404();
     exit();
 }
@@ -50,17 +59,17 @@ if (!isset($_GET['id'])) {
     <main>
         <?php include "header.php";
 
-        $product = getProductById($con, $_GET['id']);
-        if (!$product) {
-            show_404();
-            exit();
-        }
-
         $productID = $product['id'];
         $name = $product['nom'];
         $price = $product['prix'];
         $description = $product['description'];
-        $materials = getMaterialsByProduct($con, $productID);
+        $categoryID = $product['categorie_id'];
+        $categoryName = "";
+        $category = GetCategoryByID($pdo, $categoryID);
+        if($category){
+            $categoryName = $category["nom"];	
+        }
+        $materials = GetProductMaterials($pdo, $productID);
         $materialsString = "";
         if($materials){
             $materialNames = array_column($materials, 'nom');
@@ -110,7 +119,7 @@ if (!isset($_GET['id'])) {
         <div class='col-lg-6'>
             <div class='ps-lg-3'>
                 <h3 class='title text-dark'>$name</h3>
-                <h5>Catégorie</h5>
+                <h5>$categoryName</h5>
                 <div class='mb-3'>
                     <span class='h5'>$price €</span>
                 </div>
@@ -137,9 +146,16 @@ if (!isset($_GET['id'])) {
 
 
         //Ajouter 6 produits aléatoire de la même catégorie
-        $categoryID = $product['categorie_id'];
 
-        $products = getProductsByCategory($con, $categoryID);
+        $products = GetProductsByCategory($pdo, $categoryID);
+        if($products == false){
+            echo "
+            <hr/><div class='push'></div>
+            </main>";
+            include 'footer.php';
+            exit();
+
+        }
 
         $products = array_filter($products, function ($product) use ($productID) {
             return $product['id'] != $productID;

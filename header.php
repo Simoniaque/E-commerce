@@ -37,7 +37,7 @@ include_once 'functions.php';
                         <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Catégories</a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <?php
-                            $categories = GetActiveCategories($pdo);
+                            $categories = GetCategories($pdo);
 
                             if(!$categories){
                                 echo "<li><a class='dropdown-item' href='#'>Aucune catégorie trouvée</a></li>";
@@ -66,7 +66,7 @@ include_once 'functions.php';
                 <!-- Menu utilisateur -->
                 <div id="cart-container">
                     <?php
-                    $user = GetCurrentActiveUser($pdo);
+                    $user = GetCurrentUser($pdo);
 
                     if ($user) {
                         // Vérifier si le panier est vide

@@ -1,11 +1,12 @@
 <?php
 
-function GetCurrentActiveUser($pdo) {
+function GetCurrentUser($pdo, $activeOnly = 1) {
     if (isset($_SESSION['user_id'])) {
         $id = $_SESSION['user_id'];
-        $query = "SELECT * FROM utilisateurs WHERE id = :id AND est_actif = 1 LIMIT 1 ";
+        $query = "SELECT * FROM utilisateurs WHERE id = :id AND est_actif >= :activeOnly LIMIT 1 ";
         $statement = $pdo->prepare($query);
         $statement->bindParam(':id', $id, PDO::PARAM_INT);
+        $statement->bindParam(':activeOnly', $activeOnly, PDO::PARAM_INT);
 
         if (!@$statement->execute()) {
             $errorInfo = $statement->errorInfo();
@@ -19,10 +20,11 @@ function GetCurrentActiveUser($pdo) {
     return false;
 }
 
-function GetActiveUserByID($pdo, $userID) {
-    $query = "SELECT * FROM utilisateurs WHERE id = :userID AND est_actif = 1 LIMIT 1";
+function GetUserByID($pdo, $userID, $activeOnly = 1) {
+    $query = "SELECT * FROM utilisateurs WHERE id = :userID AND est_actif >= :activeOnly LIMIT 1";
     $statement = $pdo->prepare($query);
     $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+    $statement->bindParam(':activeOnly', $activeOnly, PDO::PARAM_INT);
 
     if (!@$statement->execute()) {
         $errorInfo = $statement->errorInfo();
@@ -35,11 +37,12 @@ function GetActiveUserByID($pdo, $userID) {
 }
 
 
-function GetActiveUserByEmail($pdo, $userEmail) {
-    $query = "SELECT * FROM utilisateurs WHERE email = :email AND est_actif = 1 LIMIT 1";
+function GetUserByEmail($pdo, $userEmail, $activeOnly = 1) {
+    $query = "SELECT * FROM utilisateurs WHERE email = :email AND est_actif >= :activeOnly LIMIT 1 ";
     $statement = $pdo->prepare($query);
     
     $statement->bindParam(':email', $userEmail, PDO::PARAM_STR);
+    $statement->bindParam(':activeOnly', $activeOnly, PDO::PARAM_INT);
     
     if (!@$statement->execute()) {
         $errorInfo = $statement->errorInfo();
@@ -132,7 +135,7 @@ function GenerateURLVerifyAccount($pdo, $userID){
     $dateMax = date('Y-m-d H:i:s', strtotime('+15 minutes'));
 
     if(CreateVerificationToken($pdo, $userID, $newTokenValue, $dateMax) === true){
-        $url = WEBSITE_URL . "verifyaccount.php?email=".GetActiveUserByID($pdo, $userID)['email']."&token=".$newTokenValue; 
+        $url = WEBSITE_URL . "verifyaccount.php?email=".GetUserByID($pdo, $userID)['email']."&token=".$newTokenValue; 
         return $url;
     }
 }

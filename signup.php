@@ -9,7 +9,7 @@ include_once "mail.php";
 include_once "API/usersRequests.php";
 
 if (isset($_SESSION['user_id'])) {
-    if(GetActiveUserByID($pdo, $_SESSION['user_id'])){
+    if(GetUserByID($pdo, $_SESSION['user_id'])){
         header("Location: index.php");
         die;
     }

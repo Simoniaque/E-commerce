@@ -60,3 +60,9 @@ function ConvertCookieCartToDBCart($pdo, $userID){
 
     return true;
 }
+
+function show_404() {
+    
+    echo "<script>window.location.href = '/E-Commerce/404.php';</script>";
+    exit();
+}

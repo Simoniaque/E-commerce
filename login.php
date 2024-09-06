@@ -5,7 +5,7 @@ include_once "API/usersRequests.php";
 include_once "functions.php";
 
 if (isset($_SESSION['user_id'])) {
-    if (GetActiveUserByID($pdo, $_SESSION['user_id'])) {
+    if (GetUserByID($pdo, $_SESSION['user_id'])) {
         header("Location: index.php");
         die;
     } else {
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if (empty($email) || empty($password)) {
         DisplayDismissibleAlert("Veuillez remplir tous les champs");
     } else {
-        $foundUser = GetActiveUserByEmail($pdo, $email);
+        $foundUser = GetUserByEmail($pdo, $email);
 
         if (!$foundUser) {
             if(CheckUserExistsAndIsActive($pdo, $email, $exists, $active) && $exists && !$active){
