@@ -9,7 +9,7 @@ include_once "mail.php";
 include_once "API/usersRequests.php";
 
 if (isset($_SESSION['user_id'])) {
-    if(GetUserByID($pdo, $_SESSION['user_id'])){
+    if(GetActiveUserByID($pdo, $_SESSION['user_id'])){
         header("Location: index.php");
         die;
     }
@@ -35,8 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
             $userExists; 
 
-            if (CheckUserExists($pdo, $email, $userExists) && $userExists) {
-                DisplayDismissibleAlert("Cette adresse email est déjà utilisée.");
+            if (CheckUserExistsAndIsActive($pdo, $email, $userExists, $userIsActive) && $userExists) {
+                if($userIsActive){
+                    DisplayDismissibleAlert("Cette adresse email est déjà utilisée.");
+                }else{
+                    DisplayDismissibleAlert("Votre compte est inactif, veuillez contacter le support.");
+                }
             } else {
 
                 if (CreateUser($pdo, $name, $email, $password,$newUserId)) {

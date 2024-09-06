@@ -1,8 +1,8 @@
 <?php
 
 
-function GetCategories($pdo) {
-    $query = "SELECT * FROM categories";
+function GetActiveCategories($pdo) {
+    $query = "SELECT * FROM categories WHERE est_actif = 1";
     $statement = $pdo->prepare($query);
 
     if (!@$statement->execute()) {
@@ -31,7 +31,7 @@ function GetHighlightCategories($pdo) {
     $categories = array();
     
     foreach ($categoriesIDs as $categoryID) {
-        $category = GetCategoryByID($pdo, $categoryID['categorie_id']);
+        $category = GetActiveCategoryByID($pdo, $categoryID['categorie_id']);
         if ($category) {
             array_push($categories, $category);
         }
@@ -41,8 +41,8 @@ function GetHighlightCategories($pdo) {
     return $categories;
 }
 
-function GetCategoryByID($pdo, $categoryID) {
-    $query = "SELECT * FROM categories WHERE id = :categoryID";
+function GetActiveCategoryByID($pdo, $categoryID) {
+    $query = "SELECT * FROM categories WHERE id = :categoryID AND est_actif = 1";
     $statement = $pdo->prepare($query);
     $statement->bindParam(':categoryID', $categoryID, PDO::PARAM_INT);
 

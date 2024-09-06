@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : jeu. 29 août 2024 à 03:10
+-- Généré le : ven. 06 sep. 2024 à 20:47
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -34,18 +34,19 @@ CREATE TABLE `adresses_utilisateurs` (
   `ville` varchar(100) NOT NULL,
   `code_postal` varchar(20) NOT NULL,
   `pays` varchar(100) NOT NULL,
-  `date_creation` timestamp NOT NULL DEFAULT current_timestamp()
+  `date_creation` timestamp NOT NULL DEFAULT current_timestamp(),
+  `est_actif` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Déchargement des données de la table `adresses_utilisateurs`
 --
 
-INSERT INTO `adresses_utilisateurs` (`id`, `utilisateur_id`, `adresse_complète`, `ville`, `code_postal`, `pays`, `date_creation`) VALUES
-(0, 1, 'test', 'test', 'test', 'test', '2024-08-28 23:39:06'),
-(7, 1, 'test2', 'azdlazkjgdia', 'zadazmouihdj', 'azdoazuihid', '2024-08-28 23:57:43'),
-(9, 1, 'Avenue de la paix', 'Toulouse', '31400', 'France', '2024-08-29 00:47:05'),
-(10, 1, 'Rue des champs Elysées ', 'Paris', '75000', 'France', '2024-08-29 00:47:28');
+INSERT INTO `adresses_utilisateurs` (`id`, `utilisateur_id`, `adresse_complète`, `ville`, `code_postal`, `pays`, `date_creation`, `est_actif`) VALUES
+(0, 1, 'test', 'test', 'test', 'test', '2024-08-28 23:39:06', 1),
+(7, 1, 'test2', 'azdlazkjgdia', 'zadazmouihdj', 'azdoazuihid', '2024-08-28 23:57:43', 1),
+(9, 1, 'Avenue de la paix', 'Toulouse', '31400', 'France', '2024-08-29 00:47:05', 1),
+(10, 1, 'Rue des champs Elysées ', 'Paris', '75000', 'France', '2024-08-29 00:47:28', 1);
 
 -- --------------------------------------------------------
 
@@ -56,21 +57,22 @@ INSERT INTO `adresses_utilisateurs` (`id`, `utilisateur_id`, `adresse_complète`
 CREATE TABLE `categories` (
   `id` int(11) NOT NULL,
   `nom` varchar(100) NOT NULL,
-  `description` varchar(255) NOT NULL
+  `description` varchar(255) NOT NULL,
+  `est_actif` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `categories`
 --
 
-INSERT INTO `categories` (`id`, `nom`, `description`) VALUES
-(1, 'Robes', 'Découvrez notre collection de robes qui combine élégance, confort et tendance. Que vous cherchiez une robe fluide pour l\'été, une robe de soirée chic ou une robe décontractée pour le quotidien, nous avons le modèle parfait pour chaque occasion'),
-(2, 'Hauts', 'Explorez notre sélection de hauts, conçus pour s\'adapter à toutes vos envies et à chaque moment de la journée. Du t-shirt basique au chemisier raffiné, en passant par les blouses et les débardeurs, chaque pièce est pensée pour offrir confort et élégance. '),
-(3, 'Pantalons', 'Nos pantalons allient style et fonctionnalité pour vous offrir une allure impeccable. Que vous préfériez les coupes ajustées, les pantalons larges ou les modèles plus casual, notre collection répondra à toutes vos attentes. Fabriqués avec des matériaux de'),
-(4, 'Chaussures', 'Complétez votre tenue avec notre gamme de chaussures, alliant confort et style pour chaque pas. Des baskets tendances aux escarpins élégants, en passant par les sandales d\'été et les bottines hivernales, trouvez la paire qui correspond à votre style et à '),
-(5, 'Accessoires', 'Les accessoires sont la touche finale qui sublime votre look. Explorez notre collection de sacs, bijoux, ceintures, et autres petits trésors pour personnaliser vos tenues avec style. Que vous cherchiez une pièce discrète ou un accessoire statement, notre '),
-(9, 'Pulls', 'Découvrez notre collection de pulls, conçus pour vous offrir chaleur et style. Des classiques intemporels aux modèles tendance, nos pulls ajoutent une touche de confort à vos tenues tout au long de l’année. Trouvez votre pièce idéale pour allier douceur e'),
-(10, 'Vestes', 'Alliant élégance et praticité, nos modèles vous assurent un look impeccable et un confort optimal. Trouvez la veste parfaite pour compléter votre tenue et affronter chaque journée avec style.');
+INSERT INTO `categories` (`id`, `nom`, `description`, `est_actif`) VALUES
+(1, 'Robes', 'Découvrez notre collection de robes qui combine élégance, confort et tendance. Que vous cherchiez une robe fluide pour l\'été, une robe de soirée chic ou une robe décontractée pour le quotidien, nous avons le modèle parfait pour chaque occasion', 1),
+(2, 'Hauts', 'Explorez notre sélection de hauts, conçus pour s\'adapter à toutes vos envies et à chaque moment de la journée. Du t-shirt basique au chemisier raffiné, en passant par les blouses et les débardeurs, chaque pièce est pensée pour offrir confort et élégance. ', 1),
+(3, 'Pantalons', 'Nos pantalons allient style et fonctionnalité pour vous offrir une allure impeccable. Que vous préfériez les coupes ajustées, les pantalons larges ou les modèles plus casual, notre collection répondra à toutes vos attentes. Fabriqués avec des matériaux de', 1),
+(4, 'Chaussures', 'Complétez votre tenue avec notre gamme de chaussures, alliant confort et style pour chaque pas. Des baskets tendances aux escarpins élégants, en passant par les sandales d\'été et les bottines hivernales, trouvez la paire qui correspond à votre style et à ', 1),
+(5, 'Accessoires', 'Les accessoires sont la touche finale qui sublime votre look. Explorez notre collection de sacs, bijoux, ceintures, et autres petits trésors pour personnaliser vos tenues avec style. Que vous cherchiez une pièce discrète ou un accessoire statement, notre ', 1),
+(9, 'Pulls', 'Découvrez notre collection de pulls, conçus pour vous offrir chaleur et style. Des classiques intemporels aux modèles tendance, nos pulls ajoutent une touche de confort à vos tenues tout au long de l’année. Trouvez votre pièce idéale pour allier douceur e', 1),
+(10, 'Vestes', 'Alliant élégance et praticité, nos modèles vous assurent un look impeccable et un confort optimal. Trouvez la veste parfaite pour compléter votre tenue et affronter chaque journée avec style.', 0);
 
 -- --------------------------------------------------------
 
@@ -107,32 +109,33 @@ CREATE TABLE `commandes` (
   `statut` int(1) NOT NULL DEFAULT 1,
   `adresse_de_facturation` int(11) NOT NULL,
   `adresse_de_livraison` int(11) NOT NULL,
-  `moyen_de_paiement` int(11) NOT NULL
+  `moyen_de_paiement` int(11) NOT NULL,
+  `est_actif` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `commandes`
 --
 
-INSERT INTO `commandes` (`id`, `utilisateur_id`, `date_creation`, `prix_total`, `statut`, `adresse_de_facturation`, `adresse_de_livraison`, `moyen_de_paiement`) VALUES
-(1, 1, '2024-06-21', 119.98, 4, 0, 0, 0),
-(2, 2, '2024-06-21', 89.97, 2, 0, 0, 0),
-(3, 1, '2024-08-22', 219.96, 3, 0, 0, 0),
-(4, 2, '2024-08-23', 299.97, 2, 0, 0, 0),
-(5, 3, '2024-08-24', 79.98, 4, 0, 0, 0),
-(6, 1, '2024-08-25', 159.98, 1, 0, 0, 0),
-(7, 2, '2024-08-26', 49.99, 4, 0, 0, 0),
-(8, 3, '2024-08-27', 249.95, 3, 0, 0, 0),
-(9, 1, '2024-08-28', 399.95, 2, 0, 0, 0),
-(12, 1, '2024-08-29', 79.99, 1, 7, 7, 0),
-(13, 1, '2024-08-29', 79.99, 1, 0, 0, 0),
-(14, 1, '2024-08-29', 79.99, 1, 0, 7, 0),
-(15, 1, '2024-08-29', 79.99, 1, 9, 10, 5),
-(16, 1, '2024-08-29', 40.00, 1, 9, 10, 5),
-(17, 1, '2024-08-29', 109.98, 1, 0, 0, 0),
-(18, 1, '2024-08-29', 49.00, 1, 0, 0, 0),
-(30, 1, '2024-08-29', 29.99, 1, 10, 10, 5),
-(31, 1, '2024-08-29', 14.99, 1, 10, 10, 5);
+INSERT INTO `commandes` (`id`, `utilisateur_id`, `date_creation`, `prix_total`, `statut`, `adresse_de_facturation`, `adresse_de_livraison`, `moyen_de_paiement`, `est_actif`) VALUES
+(1, 1, '2024-06-21', 119.98, 4, 0, 0, 0, 1),
+(2, 2, '2024-06-21', 89.97, 2, 0, 0, 0, 1),
+(3, 1, '2024-08-22', 219.96, 3, 0, 0, 0, 1),
+(4, 2, '2024-08-23', 299.97, 2, 0, 0, 0, 1),
+(5, 3, '2024-08-24', 79.98, 4, 0, 0, 0, 1),
+(6, 1, '2024-08-25', 159.98, 1, 0, 0, 0, 1),
+(7, 2, '2024-08-26', 49.99, 4, 0, 0, 0, 1),
+(8, 3, '2024-08-27', 249.95, 3, 0, 0, 0, 1),
+(9, 1, '2024-08-28', 399.95, 2, 0, 0, 0, 1),
+(12, 1, '2024-08-29', 79.99, 1, 7, 7, 0, 1),
+(13, 1, '2024-08-29', 79.99, 1, 0, 0, 0, 1),
+(14, 1, '2024-08-29', 79.99, 1, 0, 7, 0, 1),
+(15, 1, '2024-08-29', 79.99, 1, 9, 10, 5, 1),
+(16, 1, '2024-08-29', 40.00, 1, 9, 10, 5, 1),
+(17, 1, '2024-08-29', 109.98, 1, 0, 0, 0, 1),
+(18, 1, '2024-08-29', 49.00, 1, 0, 0, 0, 1),
+(30, 1, '2024-08-29', 29.99, 1, 10, 10, 5, 1),
+(31, 1, '2024-08-29', 14.99, 1, 10, 10, 5, 1);
 
 -- --------------------------------------------------------
 
@@ -203,19 +206,20 @@ CREATE TABLE `details_paniers` (
 
 CREATE TABLE `materiaux` (
   `id` int(11) NOT NULL,
-  `nom` varchar(100) NOT NULL
+  `nom` varchar(100) NOT NULL,
+  `est_actif` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `materiaux`
 --
 
-INSERT INTO `materiaux` (`id`, `nom`) VALUES
-(1, 'Coton'),
-(2, 'Polyester'),
-(3, 'Cuir'),
-(4, 'Laine'),
-(5, 'Soie');
+INSERT INTO `materiaux` (`id`, `nom`, `est_actif`) VALUES
+(1, 'Coton', 1),
+(2, 'Polyester', 1),
+(3, 'Cuir', 1),
+(4, 'Laine', 1),
+(5, 'Soie', 1);
 
 -- --------------------------------------------------------
 
@@ -248,18 +252,19 @@ CREATE TABLE `moyens_paiement` (
   `date_expiration` date DEFAULT NULL,
   `cvv` varchar(4) DEFAULT NULL,
   `paypal_email` varchar(100) DEFAULT NULL,
-  `date_ajout` timestamp NOT NULL DEFAULT current_timestamp()
+  `date_ajout` timestamp NOT NULL DEFAULT current_timestamp(),
+  `est_actif` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Déchargement des données de la table `moyens_paiement`
 --
 
-INSERT INTO `moyens_paiement` (`id`, `utilisateur_id`, `type`, `numero_carte`, `nom_titulaire`, `date_expiration`, `cvv`, `paypal_email`, `date_ajout`) VALUES
-(0, 19, 'paypal', '', '', '0000-00-00', '', 'simon.auriac@limayrac.fr', '2024-08-25 18:25:07'),
-(2, 19, 'card', '00', 'auriac simon', '0000-00-00', '000', '', '2024-08-25 18:26:06'),
-(4, 1, 'card', 'azdazkbdim', 'zjahdmoiazjd', '0000-00-00', '477', '', '2024-08-29 00:05:59'),
-(5, 1, 'card', '1234 5678 9123 4567', 'Emma Martin', '0000-00-00', '200', '', '2024-08-29 00:48:06');
+INSERT INTO `moyens_paiement` (`id`, `utilisateur_id`, `type`, `numero_carte`, `nom_titulaire`, `date_expiration`, `cvv`, `paypal_email`, `date_ajout`, `est_actif`) VALUES
+(0, 19, 'paypal', '', '', '0000-00-00', '', 'simon.auriac@limayrac.fr', '2024-08-25 18:25:07', 1),
+(2, 19, 'card', '00', 'auriac simon', '0000-00-00', '000', '', '2024-08-25 18:26:06', 1),
+(4, 1, 'card', 'azdazkbdim', 'zjahdmoiazjd', '0000-00-00', '477', '', '2024-08-29 00:05:59', 1),
+(5, 1, 'card', '1234 5678 9123 4567', 'Emma Martin', '0000-00-00', '200', '', '2024-08-29 00:48:06', 1);
 
 -- --------------------------------------------------------
 
@@ -293,27 +298,28 @@ CREATE TABLE `produits` (
   `prix` decimal(10,2) NOT NULL,
   `stock` int(11) DEFAULT 0,
   `date_ajout` date NOT NULL DEFAULT current_timestamp(),
-  `en_priorite` tinyint(1) NOT NULL DEFAULT 0
+  `en_priorite` tinyint(1) NOT NULL DEFAULT 0,
+  `est_actif` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `produits`
 --
 
-INSERT INTO `produits` (`id`, `categorie_id`, `nom`, `description`, `prix`, `stock`, `date_ajout`, `en_priorite`) VALUES
-(1, 1, 'Robe Zébrée', 'Robe zébrée élégante pour toutes les occasion', 40.00, 30, '2024-08-13', 0),
-(2, 1, 'Robe Maxi Florale', 'Robe longue avec motif floral, parfaite pour l&#039;été.', 79.99, 30, '2024-08-09', 0),
-(3, 2, 'Chemisier à Manches Longues', 'Chemisier féminin à manches longues.', 29.99, 80, '2024-04-24', 0),
-(4, 2, 'Débardeur Basique', 'Débardeur confortable pour une tenue décontractée.', 14.99, 100, '2024-02-16', 0),
-(5, 3, 'Jean Skinny Stretch', 'Jean stretch et ajusté pour un look moderne.', 49.99, 0, '2024-08-21', 0),
-(6, 4, 'Bottes Hautes', 'Bottes élégantes pour l&#039;hiver.', 89.99, 0, '2024-08-28', 1),
-(7, 4, 'Sandales à Talons', 'Sandales à talons pour les soirées.', 69.99, 20, '2024-01-10', 1),
-(10, 4, 'Chaussure à talon', 'Chaussure à talon en cuir', 49.00, 20, '2018-08-15', 0),
-(11, 3, 'Pantalon Onlraffy-Yo Life', 'Ce produit est fabriqué à partir de polyester recyclé. Le polyester recyclé préserve les ressources naturelles et réduit la quantité de déchets.', 39.99, 50, '2024-08-20', 0),
-(13, 5, 'Sac paille', 'Sac rond en paille avec anses dorées', 25.00, 50, '2024-08-26', 0),
-(22, 3, 'Pantallon Habillé', 'Pantalon fluide à jambes larges, taille réglable avec liens ton sur ton et poches sur les côtés', 35.00, 50, '2024-08-26', 0),
-(28, 5, ' Lunette de Soleil Polarisées', 'Protection UV400 Surdimensionnées Lunettes Classique Grand Cadre Lunettes de Soleil Femmes B2289', 19.99, 100, '2024-08-26', 0),
-(32, 1, 'Pull noir en coton', 'Pull noir confortable et chaud', 35.00, 50, '2024-08-28', 0);
+INSERT INTO `produits` (`id`, `categorie_id`, `nom`, `description`, `prix`, `stock`, `date_ajout`, `en_priorite`, `est_actif`) VALUES
+(1, 1, 'Robe Zébrée', 'Robe zébrée élégante pour toutes les occasion', 40.00, 30, '2024-08-13', 0, 1),
+(2, 1, 'Robe Maxi Florale', 'Robe longue avec motif floral, parfaite pour l&#039;été.', 79.99, 30, '2024-08-09', 0, 1),
+(3, 2, 'Chemisier à Manches Longues', 'Chemisier féminin à manches longues.', 29.99, 80, '2024-04-24', 0, 1),
+(4, 2, 'Débardeur Basique', 'Débardeur confortable pour une tenue décontractée.', 14.99, 100, '2024-02-16', 0, 1),
+(5, 3, 'Jean Skinny Stretch', 'Jean stretch et ajusté pour un look moderne.', 49.99, 0, '2024-08-21', 0, 0),
+(6, 4, 'Bottes Hautes', 'Bottes élégantes pour l&#039;hiver.', 89.99, 0, '2024-08-28', 1, 1),
+(7, 4, 'Sandales à Talons', 'Sandales à talons pour les soirées.', 69.99, 20, '2024-01-10', 1, 1),
+(10, 4, 'Chaussure à talon', 'Chaussure à talon en cuir', 49.00, 20, '2018-08-15', 0, 1),
+(11, 3, 'Pantalon Onlraffy-Yo Life', 'Ce produit est fabriqué à partir de polyester recyclé. Le polyester recyclé préserve les ressources naturelles et réduit la quantité de déchets.', 39.99, 50, '2024-08-20', 0, 1),
+(13, 5, 'Sac paille', 'Sac rond en paille avec anses dorées', 25.00, 50, '2024-08-26', 0, 1),
+(22, 3, 'Pantallon Habillé', 'Pantalon fluide à jambes larges, taille réglable avec liens ton sur ton et poches sur les côtés', 35.00, 50, '2024-08-26', 0, 1),
+(28, 5, ' Lunette de Soleil Polarisées', 'Protection UV400 Surdimensionnées Lunettes Classique Grand Cadre Lunettes de Soleil Femmes B2289', 19.99, 100, '2024-08-26', 0, 1),
+(32, 1, 'Pull noir en coton', 'Pull noir confortable et chaud', 35.00, 50, '2024-08-28', 0, 1);
 
 -- --------------------------------------------------------
 
@@ -394,6 +400,13 @@ CREATE TABLE `tokens_verification_mail` (
   `date_max` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Déchargement des données de la table `tokens_verification_mail`
+--
+
+INSERT INTO `tokens_verification_mail` (`utilisateur_id`, `token`, `date_max`) VALUES
+(50, '8134ef29f7fb4636e3ca1e246608bfdb81fd087afb026b3213b28bb0b2d5ad37', '2024-09-06 20:59:58');
+
 -- --------------------------------------------------------
 
 --
@@ -406,18 +419,20 @@ CREATE TABLE `utilisateurs` (
   `email` varchar(100) NOT NULL,
   `mot_de_passe` varchar(255) NOT NULL,
   `est_admin` tinyint(1) DEFAULT 0,
-  `mail_verifie` tinyint(1) DEFAULT 0
+  `mail_verifie` tinyint(1) DEFAULT 0,
+  `est_actif` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `utilisateurs`
 --
 
-INSERT INTO `utilisateurs` (`id`, `nom`, `email`, `mot_de_passe`, `est_admin`, `mail_verifie`) VALUES
-(1, 'Emma martin', 'emma@example.com', '$2y$10$MNayNfh78UrmFgvGR2noreUtwYUQ3kOh7QUh3AoG1MEhQvue/pcUi', 0, 1),
-(2, 'Laura Dubois', 'laura@example.com', 'motdepasse2', 0, 0),
-(3, 'Sophie Lefevre', 'sophie@example.com', 'motdepasse3', 0, 0),
-(19, 'Simoniaque', 'simon.auriac@limayrac.fr', 'azerty', 0, 1);
+INSERT INTO `utilisateurs` (`id`, `nom`, `email`, `mot_de_passe`, `est_admin`, `mail_verifie`, `est_actif`) VALUES
+(1, 'Emma martin', 'emma@example.com', '$2y$10$6ElWRb3K2iqxKEMbdJItaOzlsEW25XyVAMBNWXaYIvNbRkQg70j9C', 0, 1, 1),
+(2, 'Laura Dubois', 'laura@example.com', 'motdepasse2', 0, 0, 1),
+(3, 'Sophie Lefevre', 'sophie@example.com', 'motdepasse3', 0, 0, 1),
+(19, 'Simoniaque', 'simon.auriac@limayrac.fr', '$2y$10$RzVdvHwrXJu9Zqz4aWTqOeqD7bpEjyJSWA.kzGti3obYTLO11bpPm', 0, 1, 0),
+(50, 'Test', 'mateus.Fariasfreire@limayrac.fr', '$2y$10$Tte9rZ6vx6E2BNAeH..Gv.uLIRlv1ehpsyvGDUGMi6lVlSCLE9/Iq', 0, 0, 1);
 
 --
 -- Index pour les tables déchargées
@@ -623,7 +638,7 @@ ALTER TABLE `produits_materiaux`
 -- AUTO_INCREMENT pour la table `utilisateurs`
 --
 ALTER TABLE `utilisateurs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- Contraintes pour les tables déchargées

@@ -5,7 +5,7 @@ include_once "API/usersRequests.php";
 include_once "functions.php";
 
 if (isset($_SESSION['user_id'])) {
-    if (GetUserByID($pdo, $_SESSION['user_id'])) {
+    if (GetActiveUserByID($pdo, $_SESSION['user_id'])) {
         header("Location: index.php");
         die;
     } else {
@@ -24,10 +24,15 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if (empty($email) || empty($password)) {
         DisplayDismissibleAlert("Veuillez remplir tous les champs");
     } else {
-        $foundUser = GetUserByEmail($pdo, $email);
+        $foundUser = GetActiveUserByEmail($pdo, $email);
 
         if (!$foundUser) {
-            DisplayDismissibleAlert("Aucun compte associé à cette adresse email <a href='signup.php' class='alert-link'>Cliquez-ici pour vous créer un compte</a>");
+            if(CheckUserExistsAndIsActive($pdo, $email, $exists, $active) && $exists && !$active){
+
+                DisplayDismissibleAlert("Votre compte est inactif, veuillez contacter le support.");
+            }else{
+                DisplayDismissibleAlert("Aucun compte associé à cette adresse email <a href='signup.php' class='alert-link'>Cliquez-ici pour vous créer un compte</a>");
+            }
         } 
         else {
 

@@ -15,7 +15,7 @@ function GetHighlightProducts($pdo) {
 
     $products = array();
     foreach ($productsIDs as $productID) {
-        $product = GetProductByID($pdo, $productID['produit_id']);
+        $product = GetActiveProductByID($pdo, $productID['produit_id']);
         if ($product) {
             array_push($products, $product);
         }
@@ -24,8 +24,8 @@ function GetHighlightProducts($pdo) {
     return $products;
 }
 
-function GetProductByID($pdo, $productID) {
-    $query = "SELECT * FROM produits WHERE id = :productID";
+function GetActiveProductByID($pdo, $productID) {
+    $query = "SELECT * FROM produits WHERE id = :productID AND est_actif = 1";
     $statement = $pdo->prepare($query);
     $statement->bindParam(':productID', $productID, PDO::PARAM_INT);
 
