@@ -4,7 +4,7 @@ session_start();
 include_once ("config.php");
 //include("functions.php");
 
-include_once ("API/productRequests.php");
+include_once ("API/productsRequests.php");
 include_once ("API/categoriesRequests.php");
 ?>
 

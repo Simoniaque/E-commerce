@@ -117,16 +117,12 @@ function CreateUser ($pdo, $name, $email, $password, &$newUserId){
 function GenerateURLVerifyAccount($pdo, $userID){
 
     if(UserAlreadyHasVerificationToken($pdo, $userID, $userToken) === false){
-        
-        echo "ici";
         return false;
     }
 
     //si l'utilisateur a déjà un token on le supprime
     if($userToken != false){
-        if(DeleteVerificationToken($pdo, $userToken['id']) === false){
-            
-        echo "ici2";
+        if(DeleteVerificationToken($pdo, $userToken['utilisateur_id']) === false){
             return false;
         }
     }
@@ -162,12 +158,12 @@ function CreateVerificationToken($pdo, $id, $tokenValue, $dateMax){
 
 }
 
-function DeleteVerificationToken($pdo, $id){
+function DeleteVerificationToken($pdo, $userID){
 
-    $query = "DELETE FROM tokens_verification_mail WHERE id = :id";
+    $query = "DELETE FROM tokens_verification_mail WHERE utilisateur_id = :userID";
 
     $statement = $pdo->prepare($query);
-    $statement->bindParam(':id', $id, PDO::PARAM_INT);
+    $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
 
     if (!@$statement->execute()) {
         $errorInfo = $statement->errorInfo();
@@ -184,10 +180,10 @@ function DeleteVerificationToken($pdo, $id){
 
 function UserAlreadyHasVerificationToken($pdo, $userID, &$token){
 
-    $query = "SELECT * FROM tokens_verification_mail WHERE utilisateur_id = :id";
+    $query = "SELECT * FROM tokens_verification_mail WHERE utilisateur_id = :userID";
 
     $statement = $pdo->prepare($query);
-    $statement->bindParam(':id', $userID, PDO::PARAM_INT);
+    $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
 
     if (!@$statement->execute()) {
         $errorInfo = $statement->errorInfo();
@@ -244,13 +240,13 @@ function UpdateUserInfo($pdo, $id, $name, $email){
     return true;
 }
 
-function AddUserAddress($pdo, $userId, $adresseComplete, $ville, $codePostal, $pays) {
-    $query = "INSERT INTO adresses_utilisateurs (utilisateur_id, adresse_complète, ville, code_postal, pays) 
-              VALUES (:userId, :adresseComplete, :ville, :codePostal, :pays)";
+function AddUserAddress($pdo, $userId, $voie, $ville, $codePostal, $pays) {
+    $query = "INSERT INTO adresses_utilisateurs (utilisateur_id, voie, ville, code_postal, pays) 
+              VALUES (:userId, :voie, :ville, :codePostal, :pays)";
 
     $statement = $pdo->prepare($query);
     $statement->bindParam(':userId', $userId, PDO::PARAM_INT);
-    $statement->bindParam(':adresseComplete', $adresseComplete, PDO::PARAM_STR);
+    $statement->bindParam(':voie', $voie, PDO::PARAM_STR);
     $statement->bindParam(':ville', $ville, PDO::PARAM_STR);
     $statement->bindParam(':codePostal', $codePostal, PDO::PARAM_STR);
     $statement->bindParam(':pays', $pays, PDO::PARAM_STR);
@@ -321,9 +317,9 @@ function GetUserAddresses($pdo, $userID, $activeOnly = 1){
         $addresses = array();
 
         foreach($addressedIDs as $addressID){
-            $address = GetAddressByID($pdo, $addressID['id']);
+            $address = GetAddressByID($pdo, $addressID['id'],$activeOnly);
             if($address != false){
-                array_push($addresses, $address, $activeOnly);
+                array_push($addresses, $address);
             }
         }
     
@@ -436,6 +432,193 @@ function DeactivateUserPaymentMethod($pdo, $userID, $paymentID){
     $statement = $pdo->prepare($query);
     $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
     $statement->bindParam(':paymentID', $paymentID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+
+        echo "<script>console.error($errorMessage);</script>";
+        
+        return false;
+    }
+
+    return true;
+}
+
+
+function CheckTokenAndVerifyUser($pdo, $userID, $token){
+    
+    if(CheckTokenValidity($pdo, $userID, $token) === false){
+        return false;
+    }
+
+    if(VerifyUser($pdo, $userID) === false){
+        return false;
+    }
+    
+
+    return true;
+}
+
+function CheckTokenValidity($pdo, $userID, $token){
+    $query = "SELECT * FROM tokens_verification_mail WHERE utilisateur_id = :userID AND token = :token AND date_max > NOW()";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+    $statement->bindParam(':token', $token, PDO::PARAM_STR);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+
+        echo "<script>console.error($errorMessage);</script>";
+        
+        return false;
+    }
+
+    $tokenFound = $statement->fetch(PDO::FETCH_ASSOC);
+
+    if($tokenFound == false){
+        return false;
+    }
+
+    return true;
+}
+
+function VerifyUser($pdo, $userID){
+
+    $query = "UPDATE utilisateurs SET mail_verifie = 1 WHERE id = :userID";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+
+        echo "<script>console.error($errorMessage);</script>";
+        
+        return false;
+    }
+    return true;
+}
+
+
+function CheckPasswordResetTokenValidity($pdo, $userID ,$token){
+    
+    $query = "SELECT * FROM tokens_reinitialisation_mdp WHERE utilisateur_id = :userID AND token = :token AND date_max > NOW()";
+
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+    $statement->bindParam(':token', $token, PDO::PARAM_STR);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+
+        echo "<script>console.error($errorMessage);</script>";
+        
+        return false;
+    }
+
+    $tokenFound = $statement->fetch(PDO::FETCH_ASSOC);
+
+    if($tokenFound == false){
+        return false;
+    }
+
+    return true;
+}
+
+function ResetPassword($pdo, $userID, $newPassword){
+    
+    $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+
+    $query = "UPDATE utilisateurs SET mot_de_passe = :newPassword WHERE id = :userID";
+
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':newPassword', $hashedPassword, PDO::PARAM_STR);
+    $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+
+        echo "<script>console.error($errorMessage);</script>";
+        
+        return false;
+    }
+    return true;
+}
+
+function GenerateURLResetPassword($pdo, $userID){
+
+    if(UserAlreadyHasResetToken($pdo, $userID, $foundToken) === false){
+        return false;
+    }
+
+    if($foundToken != false){
+        if(DeleteResetPasswordToken($pdo, $foundToken['utilisateur_id']) === false){
+            return false;
+        }
+    }
+
+    $newTokenValue = bin2hex(random_bytes(32));
+    $dateMax = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+
+    if(CreateResetPasswordToken($pdo, $userID, $newTokenValue, $dateMax) === true){
+        $url = WEBSITE_URL . "resetpassword.php?email=".GetUserByID($pdo, $userID)['email']."&token=".$newTokenValue; 
+        return $url;
+    }
+
+}
+
+function UserAlreadyHasResetToken($pdo, $userID, &$token){
+    
+    $query = "SELECT * FROM tokens_reinitialisation_mdp WHERE utilisateur_id = :userID";
+
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+
+        echo "<script>console.error($errorMessage);</script>";
+        
+        return false;
+    }
+
+    $token = $statement->fetch(PDO::FETCH_ASSOC);
+
+    return true;
+}
+
+function DeleteResetPasswordToken($pdo, $userID){
+
+    $query = "DELETE FROM tokens_reinitialisation_mdp WHERE utilisateur_id = :userID";
+
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+
+        echo "<script>console.error($errorMessage);</script>";
+        
+        return false;
+    }
+
+    return true;
+}
+
+function CreateResetPasswordToken($pdo, $userID, $newTokenValue, $dateMax){
+    
+    $query = "INSERT INTO tokens_reinitialisation_mdp (utilisateur_id, token, date_max) VALUES (:userID, :newTokenValue, :dateMax)";
+
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+    $statement->bindParam(':newTokenValue', $newTokenValue, PDO::PARAM_STR);
+    $statement->bindParam(':dateMax', $dateMax, PDO::PARAM_STR);
 
     if (!@$statement->execute()) {
         $errorInfo = $statement->errorInfo();

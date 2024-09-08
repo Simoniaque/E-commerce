@@ -47,12 +47,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Ajout d'une adresse
     if (isset($_POST['add_address'])) {
-        $adresseComplete = $_POST['adresse_complete'];
+        $voie = $_POST['voie'];
         $ville = $_POST['ville'];
         $codePostal = $_POST['code_postal'];
         $pays = $_POST['pays'];
 
-        if (AddUserAddress($pdo, $userID, $adresseComplete, $ville, $codePostal, $pays)) {
+        if (AddUserAddress($pdo, $userID, $voie, $ville, $codePostal, $pays)) {
             DisplayDismissibleSuccess("Adresse ajoutée avec succès");
         } else {
             DisplayDismissibleAlert("Erreur lors de l'ajout de l'adresse");
@@ -98,8 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Suppression d'une adresse
     if (isset($_POST['delete_address'])) {
-        $addressId = $_POST['address_id'];
-        if (DeactivateUserAddress($pdo, $userID, $addressId)) {
+        if (DeactivateUserAddress($pdo, $userID, $_POST['address_id'])) {
             DisplayDismissibleSuccess("Adresse supprimée avec succès.");
         } else {
             DisplayDismissibleAlert("Erreur lors de la suppression de l'adresse");
@@ -205,15 +204,23 @@ if(!$paymentMethods){
         <div class="container mt-5 shadow p-5">
             <h4>Mes Adresses</h4>
             <ul>
-                <?php foreach ($addresses as $address): ?>
+                <?php 
+
+                foreach ($addresses as $address)
+                {
+                    $addressID = $address['id'];
+                    $fullAddress = $address['voie'] . ", " . $address['ville'] . ", " . $address['code_postal'] . ", " . $address['pays'];
+
+                    echo"
                     <li>
-                        <?php echo $address['adresse_complète']; ?>
-                        <form method="POST" action="" style="display:inline;">
-                            <input type="hidden" name="address_id" value="<?php echo $address['id']; ?>">
-                            <button type="submit" name="delete_address" class="btn btn-link">Supprimer</button>
+                        $fullAddress
+                        <form method='POST' action='' style='display:inline;'>
+                            <input type='hidden' name='address_id' value='$addressID'>
+                            <button type='submit'name='delete_address' class='btn btn-link'>Supprimer</button>
                         </form>
-                    </li>
-                <?php endforeach; ?>
+                    </li>";
+                }
+                ?>
             </ul>
 
             <!-- Bouton pour ouvrir la modale d'ajout d'une adresse -->
@@ -251,8 +258,8 @@ if(!$paymentMethods){
                     <div class="modal-body">
                         <form method="POST" action="">
                             <div class="mb-3">
-                                <label for="adresse_complete" class="form-label">Adresse complète</label>
-                                <input type="text" class="form-control" name="adresse_complete" required>
+                                <label for="voie" class="form-label">Adresse complète</label>
+                                <input type="text" class="form-control" name="voie" required>
                             </div>
                             <div class="mb-3">
                                 <label for="ville" class="form-label">Ville</label>
@@ -346,6 +353,12 @@ if(!$paymentMethods){
 
         function hideDeleteAccountVerification() {
             document.getElementById('verifyDeleteAccount').style.display = 'none';
+        }
+    </script>
+
+    <script>
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
         }
     </script>
 </body>

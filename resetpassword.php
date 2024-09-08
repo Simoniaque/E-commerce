@@ -1,8 +1,10 @@
 <?php
 session_start();
-include("config.php");
-include("functions.php");
-include("mail.php");
+include_once ("config.php");
+include_once ("functions.php");
+include_once ("mail.php");
+include_once "API/usersRequests.php";
+
 
 $message = "";
 $allowPasswordReset = false;
@@ -30,16 +32,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $allowPasswordReset = true;
         } else {
             // Récupération de l'utilisateur par email
-            $user = getUserByEmail($con, $email);
+            $user = GetUserByEmail($pdo, $email);
             if (!$user) {
                 $message = "Aucun compte associé à cette adresse email";
             } else {
                 // Vérification du jeton de réinitialisation
-                if (!checkPasswordResetToken($con, $user['id'], $token)) {
+                if (!CheckPasswordResetTokenValidity($pdo, $user['id'], $token)) {
                     $message = "Lien de réinitialisation invalide !";
                 } else {
                     // Réinitialisation du mot de passe
-                    if (resetPassword($con, $user['id'], $password)) {
+                    if (ResetPassword($pdo, $user['id'], $password)) {
                         $message = "Mot de passe réinitialisé avec succès !";
                     } else {
                         $message = "Une erreur est survenue lors de la réinitialisation de votre mot de passe.";
@@ -57,21 +59,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // Récupération de l'utilisateur par email
         $email = $_GET['email'];
-        $user = getUserByEmail($con, $email);
+        $user = GetUserByEmail($pdo, $email);
         if (!$user) {
             $message = "Aucun compte associé à l'adresse mail : " . $email;
         } else {
             // Vérification de la présence du jeton
             if (isset($_GET['token'])) {
                 $token = $_GET['token'];
-                if (!checkPasswordResetToken($con, $user['id'], $token)) {
+                if (!CheckPasswordResetTokenValidity($pdo, $user['id'], $token)) {
                     $message = "Lien de réinitialisation invalide !";
                 } else {
                     $allowPasswordReset = true;
                 }
             } else {
                 // Envoi de l'email de réinitialisation
-                sendMailResetPassword($user['email'], $user['nom'], generateURLResetPassword($con, $user['id']));
+                SendMailResetPassword($user['email'], $user['nom'], GenerateURLResetPassword($pdo, $user['id']));
                 $message = "Un email de réinitialisation vous a été envoyé à l'adresse : " . $user['email'] . ".";
             }
         }

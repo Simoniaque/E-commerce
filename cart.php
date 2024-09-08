@@ -1,17 +1,20 @@
 <?php
 session_start();
-include("config.php");
-include("functions.php");
+include_once "config.php";
+include_once "functions.php";
+include_once "API/usersRequests.php";
+include_once "API/productsRequests.php";
+include_once "API/cartsRequests.php";
 
-$userData = checkLogin($con);
-$isLoggedIn = $userData != null;
+$user = GetCurrentUser($pdo);
+$isLoggedIn = $user != null;
 $cartProducts = [];
 $totalPrice = 0;
 
 if ($isLoggedIn) {
-    $getCart = getCart($con, $userData['id']);
+    $getCart = GetCart($pdo, $user['id']);
     if ($getCart) {
-        $cartProducts = getCartProducts($con, $getCart['id']);
+        $cartProducts = GetCartProducts($pdo, $getCart['id']);
     }
 } else {
     // Gestion du panier pour les utilisateurs non connectés
@@ -21,7 +24,7 @@ if ($isLoggedIn) {
     if (!empty($cart)) {
         foreach ($cart as $productID => $quantity) {
             // Obtenez les détails du produit à partir de l'ID
-            $product = getProductById($con, $productID);
+            $product = GetProductById($pdo, $productID);
             if ($product) {
                 $product['quantite'] = $quantity;
                 $cartProducts[] = $product;
@@ -29,118 +32,30 @@ if ($isLoggedIn) {
         }
     }
 }
-
-
 ?>
 
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>Panier</title>
-    <link rel="icon" type="image/x-icon" href="assets/img/logo-black.png" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="assets/css/style.css" />
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const inputs = document.querySelectorAll('input[name="quantity"]');
-
-            inputs.forEach(input => {
-                input.addEventListener('change', function() {
-                    const quantity = parseInt(this.value, 10);
-                    const productID = this.dataset.productId;
-                    const pricePerUnit = parseFloat(this.dataset.pricePerUnit);
-                    const maxStock = parseInt(this.max, 10);
-
-                    if (isNaN(quantity) || quantity < 0 || quantity > maxStock) {
-                        this.value = maxStock; // Réinitialiser à maxStock si invalide
-                        return;
-                    }
-
-                    // Calculer le prix total pour le produit
-                    const totalPriceForProduct = quantity * pricePerUnit;
-
-                    // Mettre à jour le prix dans le tableau
-                    const priceElement = document.querySelector(`p[id="${productID}"]`);
-                    if (priceElement) {
-                        priceElement.textContent = totalPriceForProduct.toFixed(2) + ' €';
-                    } else {
-                        console.error(`Element de prix pour productID ${productID} non trouvé.`);
-                    }
-
-                    // Supprimer la ligne du produit si la quantité est 0
-                    if (quantity === 0) {
-                        const row = this.closest('tr');
-                        if (row) {
-                            row.remove();
-                            // Mettre à jour les totaux après la suppression de la ligne
-                            updateTotals();
-                            // Envoyer une requête AJAX pour supprimer le produit du panier
-                            const xhr = new XMLHttpRequest();
-                            xhr.open('POST', 'cart_manager.php', true);
-                            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                            xhr.send('productID=' + encodeURIComponent(productID) + '&quantity=0&action=update');
-                            if (document.querySelector('tbody').children.length === 0) {
-                                document.getElementById('checkoutButton').disabled = true;
-
-                            }
-                        }
-                    } else {
-                        // Mettre à jour les totaux si la quantité n'est pas 0
-                        updateTotals();
-
-                        // Envoyer une requête AJAX pour mettre à jour la quantité du panier
-                        const xhr = new XMLHttpRequest();
-                        xhr.open('POST', 'cart_manager.php', true);
-                        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                        xhr.onreadystatechange = function() {
-                            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                                // Optionnellement, vous pouvez gérer la réponse du serveur ici
-                            }
-                        };
-                        xhr.send('productID=' + encodeURIComponent(productID) + '&quantity=' + encodeURIComponent(quantity) + '&action=update');
-                    }
-                });
-            });
-
-            function updateTotals() {
-                const priceElements = document.querySelectorAll('p[id]');
-                let totalPrice = 0;
-
-                priceElements.forEach(priceElement => {
-                    const priceText = priceElement.textContent.replace(' €', '');
-                    const price = parseFloat(priceText);
-                    if (!isNaN(price)) {
-                        totalPrice += price;
-                    }
-                });
-
-                const totalElements = document.querySelectorAll('.ca');
-                totalElements.forEach(totalElement => {
-                    totalElement.textContent = totalPrice.toFixed(2) + ' €';
-                });
-            }
-        });
-    </script>
 </head>
-
 <body>
     <main>
         <?php include "header.php"; ?>
         <div class="container h-100 py-5">
             <div class="row d-flex justify-content-center align-items-start h-100">
                 <?php if (empty($cartProducts)) : ?>
-                    <!-- Message pour panier vide -->
                     <div class="col-lg-8 text-center">
                         <div class="alert alert-dark" role="alert">
                             Votre panier est vide. <a href="search.php" class="text-dark mt-2">Cliquez ici pour explorer notre catalogue</a>
                         </div>
                     </div>
                 <?php else : ?>
-                    <!-- Cadre panier -->
                     <div class="col-lg-8 shadow">
                         <div class="table-responsive">
                             <table class="table">
@@ -187,14 +102,11 @@ if ($isLoggedIn) {
                         </div>
                     </div>
 
-                    <!-- Cadre total -->
                     <div class="col-lg-4 mt-sm-5 mt-md-0">
-                        <?php echo "
-                            <div class='d-flex justify-content-between' style='font-weight: 500;'>
-                                <p class='mb-2'>Sous-total</p>
-                                <p class='mb-2 ca'>" . number_format($totalPrice, 2, ',', ' ') . " €</p>
-                            </div>";
-                        ?>
+                        <div class="d-flex justify-content-between" style="font-weight: 500;">
+                            <p class="mb-2">Sous-total</p>
+                            <p class="mb-2 ca"><?php echo number_format($totalPrice, 2, ',', ' ') . ' €'; ?></p>
+                        </div>
 
                         <div class="d-flex justify-content-between" style="font-weight: 500;">
                             <p class="mb-0">Livraison</p>
@@ -203,24 +115,16 @@ if ($isLoggedIn) {
 
                         <hr class="my-4">
 
-                        <?php echo "
-                            <div class='d-flex justify-content-between mb-4' style='font-weight: 500;'>
-                                <p class='mb-2'>Total</p>
-                                <p class='mb-2 ca'>" . number_format($totalPrice, 2, ',', ' ') . " €</p>
-                            </div>";
-                        ?>
+                        <div class="d-flex justify-content-between mb-4" style="font-weight: 500;">
+                            <p class="mb-2">Total</p>
+                            <p class="mb-2 ca"><?php echo number_format($totalPrice, 2, ',', ' ') . ' €'; ?></p>
+                        </div>
 
-                        <!-- Remplacer le bouton actuel -->
                         <?php if ($isLoggedIn) : ?>
-                            <a href="checkout.php" class="btn btn-dark btn-block btn-lg">
-                                Passer la commande
-                            </a>
+                            <a href="checkout.php" class="btn btn-dark btn-block btn-lg">Passer la commande</a>
                         <?php else : ?>
-                            <a href="signup.php?redirect_to=<?php echo urlencode($_SERVER['REQUEST_URI']); ?>" class="btn btn-dark btn-block btn-lg">
-                                Créer un compte
-                            </a>
+                            <a href="signup.php?redirect_to=<?php echo urlencode($_SERVER['REQUEST_URI']); ?>" class="btn btn-dark btn-block btn-lg">Créer un compte</a>
                         <?php endif; ?>
-
                     </div>
                 <?php endif; ?>
             </div>
@@ -230,7 +134,8 @@ if ($isLoggedIn) {
 
     <?php include "footer.php"; ?>
 
+    <!-- Lien vers le fichier JS -->
+    <script src="assets/js/cart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
-
 </html>

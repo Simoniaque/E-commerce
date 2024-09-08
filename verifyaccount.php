@@ -1,10 +1,11 @@
 <?php
 session_start();
-include("config.php");
-include("functions.php");
-include("mail.php");
+include_once "config.php";
+include_once "functions.php";
+include_once "mail.php";
+include_once "API/usersRequests.php";
 
-$user = checkLogin($con);
+$user = GetCurrentUser($pdo);
 if ($user != null &&  $user['mail_verifie'] != 0) {
     header("Location: index.php");
     die;
@@ -16,7 +17,7 @@ if (!empty($_GET)) {
     if (isset($_GET['email'])) {
 
         $email = $_GET['email'];
-        $user = getUserByEmail($con, $email);
+        $user = GetUserByEmail($pdo, $email);
         if (!$user) {
             header("Location: index.php");
             die;
@@ -24,13 +25,13 @@ if (!empty($_GET)) {
 
         if (isset($_GET['token'])) {
             $token = $_GET['token'];
-            if (verifyAccount($con, $user['id'], $token)) {
+            if (CheckTokenAndVerifyUser($pdo, $user['id'], $token)) {
                 $message = "Compte verifié avec succès !";
             } else {
                 $message = "Lien de vérification invalide !";
             }
         } else {
-            sendMailVerifyAccount($user['email'], $user['nom'], generateURLVerifyAccount($con, $user['id']));
+            SendMailVerifyAccount($user['email'], $user['nom'], GenerateURLVerifyAccount($pdo, $user['id']));
 
             $message = "Un email de vérification vous a été envoyé à l'adresse : " . $user['email'] . ".";
         }

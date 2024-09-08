@@ -1,5 +1,7 @@
 <?php
 
+include_once 'API/productsRequests.php';
+
 function GetCart($pdo, $userID) {
     $query = "SELECT * FROM paniers WHERE utilisateur_id = :userID";
     $statement = $pdo->prepare($query);
@@ -83,28 +85,23 @@ function GetCartProducts($pdo, $cartID) {
 
 function AddProductToCart($pdo, $userID, $productID, $quantity){
     
-   $cart = GetCart($pdo, $userID);
+    $cart = GetCart($pdo, $userID);
 
     if($cart){
         $cartID = $cart['id']; 
     }
     else{
         $cartID = CreateCart($pdo, $userID);
-        if($cartID === false){
-            return false;
-        }
+        if($cartID === false) return false;
     }
 
-    if(CartContainsProduct($pdo, $cartID, $productID)){
-        if(UpdateProductQuantityInCart($pdo, $cartID, $productID, $quantity) === false){
-            return false;
-        }
-
-    }else{
-        if(AddNewProductToCart($pdo, $cartID, $productID, $quantity) === false)
-        {
-            return false;
-        }
+    $quantityInCart = CartContainsProduct($pdo, $cartID, $productID);
+    if($quantityInCart === false){
+        if(AddNewProductToCart($pdo, $cartID, $productID, $quantity) === false) return false;
+    }
+    else{
+        $quantity += $quantityInCart["quantity"];
+        if(UpdateProductQuantityInCart($pdo, $userID, $productID, $quantity) === false) return false;
     }
 
     return true;
@@ -127,7 +124,7 @@ function CreateCart($pdo, $userID){
 
 function CartContainsProduct($pdo, $cartID, $productID){
     
-    $query = "SELECT * FROM details_paniers WHERE panier_id = :cartID AND produit_id = :productID";
+    $query = "SELECT quantite as quantity FROM details_paniers WHERE panier_id = :cartID AND produit_id = :productID";
     $statement = $pdo->prepare($query);
     $statement->bindParam(':cartID', $cartID, PDO::PARAM_INT);
     $statement->bindParam(':productID', $productID, PDO::PARAM_INT);
@@ -143,8 +140,19 @@ function CartContainsProduct($pdo, $cartID, $productID){
     return $statement->fetch(PDO::FETCH_ASSOC);
 }
 
-function UpdateProductQuantityInCart($pdo, $cartID, $productID, $newQuantity){
-    if($newQuantity <= 0){
+function UpdateProductQuantityInCart($pdo, $userID, $productID, $newQuantity){
+
+    $cart = GetCart($pdo, $userID);
+
+    if($cart){
+        $cartID = $cart['id']; 
+    }
+    else{
+        $cartID = CreateCart($pdo, $userID);
+        if($cartID === false) return false;
+    }
+    
+    if($newQuantity < 0){
         return false;
     }
 
@@ -159,16 +167,44 @@ function UpdateProductQuantityInCart($pdo, $cartID, $productID, $newQuantity){
     }
 
     
+    if($newQuantity == 0){
+        return DeleteProductFromCart($pdo, $userID, $productID);
+    }
+
+    
     $query = "UPDATE details_paniers SET quantite = :quantity WHERE panier_id = :cartID AND produit_id = :productID";
     $statement = $pdo->prepare($query);
     $statement->bindParam(':quantity', $newQuantity, PDO::PARAM_INT);
     $statement->bindParam(':cartID', $cartID, PDO::PARAM_INT);
+    $statement->bindParam(':productID', $productID, PDO::PARAM_INT);
     
+    if (@!$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+
+    return true;
+}
+
+function DeleteProductFromCart($pdo, $userID, $productID){
+    $cart = GetCart($pdo, $userID);
+    if(!$cart){
+        return false;
+    }
+
+    $cartID = $cart['id'];
+
+    $query = "DELETE FROM details_paniers WHERE panier_id = :cartID AND produit_id = :productID";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':cartID', $cartID, PDO::PARAM_INT);
+    $statement->bindParam(':productID', $productID, PDO::PARAM_INT);
+
     if (!@$statement->execute()) {
         $errorInfo = $statement->errorInfo();
         $errorMessage = json_encode($errorInfo[2]);
         echo "<script>console.error($errorMessage);</script>";
-        echo "erreur ici";
         return false;
     }
 
@@ -184,10 +220,12 @@ function AddNewProductToCart($pdo, $cartID, $productID, $quantity){
 
     $product = GetProductByID($pdo, $productID);
     if($product === false){
+        echo "<script>console.error('Produit non trouvé');</script>";
         return false;
     }
 
     if($quantity > $product['stock']){
+        echo "<script>console.error('Stock insuffisant');</script>";
         return false;
     }
 
@@ -201,8 +239,6 @@ function AddNewProductToCart($pdo, $cartID, $productID, $quantity){
         $errorInfo = $statement->errorInfo();
         $errorMessage = json_encode($errorInfo[2]);
         echo "<script>console.error($errorMessage);</script>";
-        
-        echo "erreur là";
         return false;
     }
 }

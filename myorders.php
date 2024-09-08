@@ -1,8 +1,9 @@
 <?php
 session_start();
 
-include("config.php");
-include("functions.php");
+include_once "config.php";
+include_once "functions.php";
+include_once "API/ordersRequests.php";
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
@@ -17,9 +18,9 @@ if (isset($_GET['orderNumber'])) {
 
 $orders = array();
 if ($searchOrderNumber > 0) {
-    $orders = getOrdersByUserIdAndNumber($con, $_SESSION['user_id'], $searchOrderNumber);
+    $orders = GetUserOrderByNumber($pdo, $_SESSION['user_id'], $searchOrderNumber);
 } else {
-    $orders = getOrdersByUserIdNewest($con, $_SESSION['user_id']);
+    $orders = GetUserOrdersByNewest($pdo, $_SESSION['user_id']);
 }
 ?>
 
@@ -86,7 +87,6 @@ if ($searchOrderNumber > 0) {
 
                             if (is_array($orders)) {
                                 foreach ($orders as $order) {
-                                    $orderDetails = getOrderDetails($con, $order['id']);
                                     $orderId = $order['id'];
                                     $orderDate = $order['date_creation'];
                                     $orderTotal = $order['prix_total'];
@@ -132,7 +132,11 @@ if ($searchOrderNumber > 0) {
                                     </div>";
                                 }
                             } else {
-                                echo "<h2 class='mt-5 shadow p-5'>Aucune commande</h2>";
+                                DisplayDismissibleAlert("Erreur lors de la récupération de vos commandes");
+                            }
+
+                            if(empty($orders)){
+                                echo "<h2 class='mt-5 text-center'>Vous n'avez pas encore passé de commande.</h2>";
                             }
 
                             ?>

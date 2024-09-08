@@ -3,7 +3,7 @@
 include_once 'config.php';
 include_once 'API/usersRequests.php';
 include_once 'API/categoriesRequests.php';
-include_once 'API/cartRequests.php';
+include_once 'API/cartsRequests.php';
 
 include_once 'functions.php';
 
@@ -75,10 +75,15 @@ include_once 'functions.php';
                         echo "<a href='cart.php' class='btn btn-outline-dark position-relative' id='cart-button' type='submit'>
                                 <i class='bi bi-cart-fill me-1'></i>
                                 Panier
-                                " . ($isEmpty ? "<span class='position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle'>
-                                    <span class='visually-hidden'>New alerts</span>
-                                </span>" : "") . "
-                              </a>
+                                " 
+                                . 
+                                ($isEmpty ?
+                                    "" : 
+                                    "<span class='position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle'><span class='visually-hidden'>New alerts</span></span>") 
+                                    
+                                . 
+                            
+                                "</a>
                               <a class='btn btn-outline-dark ms-3' href='profile.php'>Mon compte</a>
                               <a class='btn btn-outline-dark ms-3' href='logout.php'>Se déconnecter</a>";
                     } else {
@@ -90,10 +95,13 @@ include_once 'functions.php';
                         echo "<a href='cart.php' class='btn btn-outline-dark position-relative' id='cart-button' type='submit'>
                                 <i class='bi bi-cart-fill me-1'></i>
                                 Panier
-                                " . ($cartItemCount > 0 ? "<span class='position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle'>
-                                    <span class='visually-hidden'>New alerts</span>
-                                </span>" : "") . "
-                              </a>
+                                " 
+                                . 
+                                ($cartItemCount > 0 ? 
+                                "<span class='position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle'><span class='visually-hidden'>New alerts</span></span>" : 
+                                "") 
+                                . 
+                              "</a>
                               <a class='btn btn-outline-dark ms-3' href='login.php?redirect_to=$currentPage'>Se Connecter</a>
                               <a class='btn btn-outline-dark ms-3' href='signup.php?redirect_to=$currentPage'>S'inscrire</a>";
                     }

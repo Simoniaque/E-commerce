@@ -1,28 +1,29 @@
-function addToCart(productID, quantity, action = 'add') {
-    // Créer une nouvelle requête AJAX
+function addToCart(productID, quantity) {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', 'cart_manager.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     
-    // Préparer les données à envoyer
-    const data = `productID=${encodeURIComponent(productID)}&quantity=${encodeURIComponent(quantity)}&action=${encodeURIComponent(action)}`;
+    const data = `productID=${encodeURIComponent(productID)}&quantity=${encodeURIComponent(quantity)}`;
     
-    // Fonction appelée lorsque la requête est terminée
     xhr.onreadystatechange = function() {
         if (xhr.readyState === XMLHttpRequest.DONE) {
-            if (xhr.status === 200) {
-                // La réponse du serveur est réussie
-                alert('Le produit a été ajouté au panier.');
+            try {
+                const response = JSON.parse(xhr.responseText);
                 
-                // Mettre à jour le header après l'ajout au panier
-                window.location.reload();
-
-            } else {
-                alert('Une erreur est survenue lors de l\'ajout du produit au panier.');
+                if (xhr.status === 200) {
+                    alert(response.message || 'Le produit a été ajouté au panier.');
+                    
+                    window.location.reload();
+                    
+                } else {
+                    alert(`Erreur: ${response.error}`);
+                }
+            } catch (e) {
+                alert('Une erreur inattendue est survenue.');
+                console.error('Réponse non valide reçue du serveur:', xhr.responseText);
             }
         }
     };
     
-    // Envoyer la requête avec les données
     xhr.send(data);
 }

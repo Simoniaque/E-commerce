@@ -3,7 +3,7 @@ session_start();
 // Inclure les fonctions de la base de données
 include_once "config.php";
 include_once 'searchfunctions.php';
-include_once 'API/productRequests.php';
+include_once 'API/productsRequests.php';
 include_once 'API/categoriesRequests.php';
 
 // Initialiser les variables de filtrage

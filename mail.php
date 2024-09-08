@@ -104,7 +104,7 @@ function SendMailResetPassword($emailAddress, $name, $urlResetPassword)
                     <div style=\'margin: 20px 0; background-color: #ffffff; padding: 20px; border-radius: 2px;\'>
                         <p>Bonjour ' . $name . ',</p>
                         <p>Vous avez effectué une demande pour réinitialiser votre mot de passe.</p>
-                        <p>Cliquez sur le lien suivant pour réinitialiser votre mot de passe : ' . $urlResetPassword . '</p>
+                        <p>Cliquez sur le lien suivant pour réinitialiser votre mot de passe : <a href=' . $urlResetPassword . '>' . $urlResetPassword . '</p>
                         <br/>
                         <p>Si vous avez des questions, n\'hésitez pas à nous contacter à l\'adresse mail suivante : contact.newvet@gmail.com.</p>
                         <p>Merci et à bientôt !</p>
@@ -129,7 +129,7 @@ function SendMailVerifyAccount($emailAddress, $name, $urlVerif)
                         </div>
                         <div style=\'margin: 20px 0; background-color: #ffffff; padding: 20px; border-radius: 2px;\'>
                             <p>Bonjour ' . $name . ',</p>
-                            <p>Merci de vous être inscrit sur notre site web. Pour valider votre adresse mail, veuillez cliquer sur le lien suivant : ' . $urlVerif . '</p>
+                            <p>Merci de vous être inscrit sur notre site web. Pour valider votre adresse mail, veuillez cliquer sur le lien suivant : <a href='.$urlVerif.'>' . $urlVerif . '</a></p>
                             <br/>
                             <p>Si vous avez des questions, n\'hésitez pas à nous contacter à l\'adresse mail suivante : contact.newvet@gmail.com.</p>
                             <p>Merci et à bientôt !</p>

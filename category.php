@@ -5,7 +5,7 @@ session_start();
 include_once "config.php";
 include_once "functions.php";
 include_once "API/categoriesRequests.php";
-include_once "API/productRequests.php";
+include_once "API/productsRequests.php";
 
 if (!isset($_GET['id'])) {
     
