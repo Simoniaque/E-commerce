@@ -171,7 +171,7 @@ if(!$paymentMethods){
                                     <input type='text' name='email' class='form-control' value='<?php echo $user['email']; ?>'>
                                 </div>
                                 <div class='col-md-12 mb-3'>
-                                    <button type='submit' name='update_info' class='btn btn-primary'>Mettre à jour</button>
+                                    <button type='submit' name='update_info' class='btn btn-dark'>Mettre à jour</button>
                                 </div>
                             </div>
                         </form>
@@ -224,7 +224,7 @@ if(!$paymentMethods){
             </ul>
 
             <!-- Bouton pour ouvrir la modale d'ajout d'une adresse -->
-            <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+            <button type="button" class="btn btn-dark mt-3" data-bs-toggle="modal" data-bs-target="#addAddressModal">
                 Ajouter une adresse
             </button>
 
@@ -242,7 +242,7 @@ if(!$paymentMethods){
             </ul>
 
             <!-- Bouton pour ouvrir la modale d'ajout d'un moyen de paiement -->
-            <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addPaymentModal">
+            <button type="button" class="btn btn-dark mt-3" data-bs-toggle="modal" data-bs-target="#addPaymentModal">
                 Ajouter un moyen de paiement
             </button>
         </div>
@@ -273,7 +273,7 @@ if(!$paymentMethods){
                                 <label for="pays" class="form-label">Pays</label>
                                 <input type="text" class="form-control" name="pays" required>
                             </div>
-                            <button type="submit" name="add_address" class="btn btn-primary">Ajouter une adresse</button>
+                            <button type="submit" name="add_address" class="btn btn-dark">Ajouter une adresse</button>
                         </form>
                     </div>
                 </div>
@@ -324,7 +324,7 @@ if(!$paymentMethods){
                                 </div>
                             </div>
 
-                            <button type="submit" name="add_payment" class="btn btn-primary">Ajouter un moyen de paiement</button>
+                            <button type="submit" name="add_payment" class="btn btn-dark">Ajouter un moyen de paiement</button>
                         </form>
                     </div>
                 </div>

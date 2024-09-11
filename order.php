@@ -1,41 +1,51 @@
 <?php
 session_start();
 
-include "config.php";
-include "functions.php";
+include_once "config.php";
+include_once "functions.php";
+include_once "API/usersRequests.php";
+include_once "API/ordersRequests.php";
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     die;
 }
 
-$orderId = $_GET['id'];
-$order = getOrderById($con, $orderId);
+$userID = $_SESSION['user_id'];
+$user = GetCurrentUser($pdo);
+if ($userID != $user['id']) {
+    echo "<script>
+        console.
+        alert('Vous ne pouvez pas accéder à cette page');
+        window.location.href = 'index.php';
+    </script>";
+    die;
+}
+
+$userName = $user['nom'];
+
+$orderID = $_GET['id'];
+$order = GetUserOrderByNumber($pdo, $userID, $orderID);
+if ($order == false) {
+    echo "<script>
+        alert('Commande introuvable');
+        window.location.href = 'index.php';
+    </script>";
+    die;
+}
+
 $total = $order['prix_total'];
 $date = $order['date_creation'];
 $status = $order['statut'];
 
-$orderDetails = getOrderDetails($con, $orderId);
-
-$user = checkLogin($con);
-$userName = $user['nom'];
-
-//Recup les infos de l'utilisateur
-$billingAdresssID = $order["adresse_de_facturation"];
-$billingAdresssInfo = getAddressById($con, $billingAdresssID);
-
-$billingAddress = $billingAdresssInfo['adresse_complète'];
-$billingCity = $billingAdresssInfo['ville'];
-$billingCountry = $billingAdresssInfo['pays'];
-$billingPostalCode = $billingAdresssInfo['code_postal'];
-
-$shippingAdresssID = $order["adresse_de_livraison"];
-$shippingAdresssInfo = getAddressById($con, $shippingAdresssID);
-
-$shippingAddress = $shippingAdresssInfo['adresse_complète'];
-$shippingCity = $shippingAdresssInfo['ville'];
-$shippingCountry = $shippingAdresssInfo['pays'];
-$shippingPostalCode = $shippingAdresssInfo['code_postal'];
+$orderDetails = GetOrderDetails($pdo, $orderID);
+if ($orderDetails == false) {
+    echo "<script>
+        alert('Détails de la commande introuvables');
+        window.location.href = 'index.php';
+    </script>";
+    die;
+}
 
 
 ?>
@@ -65,7 +75,7 @@ $shippingPostalCode = $shippingAdresssInfo['code_postal'];
 
             <div class="container">
                 <div class="d-flex justify-content-between align-items-center py-3">
-                    <h2 class="h5 mb-0">Commande n° <?php echo "$orderId" ?></h2>
+                    <h2 class="h5 mb-0">Commande n° <?php echo "$orderID" ?></h2>
                 </div>
 
                 <div class="row">
@@ -109,7 +119,7 @@ $shippingPostalCode = $shippingAdresssInfo['code_postal'];
 
                                         foreach ($orderDetails as $orderDetail) {
                                             $productID = $orderDetail['produit_id'];
-                                            $product = getProductById($con, $productID);
+                                            $product = GetProductById($pdo, $productID, 0);
                                             $productName = $product['nom'];
                                             $productQuantity = $orderDetail['quantite'];
                                             $price = $product['prix'] * $productQuantity;
@@ -153,31 +163,55 @@ $shippingPostalCode = $shippingAdresssInfo['code_postal'];
 
                                     <?php
                                     $stringPayementMethod = "";
-                                    $payementMethod = getPayementMethod($con,$order['moyen_de_paiement']);
+                                    $payementMethod = GetPaymentMethodByID($pdo, $order['moyen_de_paiement'], 0);
+                                    if ($payementMethod === false) {
+                                        echo "<script>alert('Moyen de paiement introuvable');</script>";
+                                        die;
+                                    } else {
 
-                                    if($payementMethod['type'] == "paypal"){
-                                        $paypalEmail = $payementMethod['paypal_email'];
-                                        $stringPayementMethod = "<div><p>Paypal $paypalEmail</p></div>";
-                                    }else{
-                                        $cardNumberLast4Digits = substr($payementMethod['numero_carte'], -4);;
-                                        $stringPayementMethod = "<div><p>Visa **** **** **** $cardNumberLast4Digits</p></div>";
+                                        if ($payementMethod['type'] == "paypal") {
+                                            $paypalEmail = $payementMethod['paypal_email'];
+                                            $stringPayementMethod = "<div><p>Paypal $paypalEmail</p></div>";
+                                        } else {
+                                            $cardNumberLast4Digits = substr($payementMethod['numero_carte'], -4);;
+                                            $stringPayementMethod = "<div><p>Visa **** **** **** $cardNumberLast4Digits</p></div>";
+                                        }
+
+                                        $billingAdresssID = $order["adresse_de_facturation"];
+                                        $billingAdresssInfo = GetAddressByID($pdo, $billingAdresssID, 0);
+
+                                        if ($billingAdresssInfo === false) {
+                                            echo "<script>alert('Adresse de facturation introuvable');</script>";
+                                            die;
+                                        } else {
+                                            $billingAddress = $billingAdresssInfo['voie'];
+                                            $billingCity = $billingAdresssInfo['ville'];
+                                            $billingCountry = $billingAdresssInfo['pays'];
+                                            $billingPostalCode = $billingAdresssInfo['code_postal'];
+                                            $billingName = $userName;
+
+                                            if(isset($payementMethod['nom_titulaire']) && !empty($payementMethod['nom_titulaire'])){
+                                                $billingName = $payementMethod['nom_titulaire'];
+                                            }
+
+                                            echo "
+                                            <div class='col-lg-6'>
+                                                <h3 class='h6'>Adresse de facturation</h3>
+                                                <hr>
+                                                <address>
+                                                    <strong>$billingName</strong><br>
+                                                    $billingAddress<br>
+                                                    $billingCity, $billingCountry<br>
+                                                </address>
+                                                </div>
+                                                <div class='col-lg-6'>
+                                                    <h3 class='h6'>Methode de paiement</h3>
+                                                    <hr>
+                                                    $stringPayementMethod
+                                                </div>
+                                            </div>";
+                                        }
                                     }
-
-                                    echo "<div class='col-lg-6'>
-                                        <h3 class='h6'>Adresse de facturation</h3>
-                                        <hr>
-                                        <address>
-                                            <strong>$userName</strong><br>
-                                            $billingAddress<br>
-                                            $billingCity, $billingCountry<br>
-                                        </address>
-                                        </div>
-                                        <div class='col-lg-6'>
-                                            <h3 class='h6'>Methode de paiement</h3>
-                                            <hr>
-                                            $stringPayementMethod
-                                        </div>
-                                    </div>";
 
                                     ?>
                                 </div>
@@ -189,14 +223,29 @@ $shippingPostalCode = $shippingAdresssInfo['code_postal'];
 
                             <div class="card mb-4">
                                 <div class="card-body">
-                                    <?php echo "
+                                    <?php
+                                    $shippingAdresssID = $order["adresse_de_livraison"];
+                                    $shippingAdresssInfo = GetAddressByID($pdo, $shippingAdresssID, 0);
+                                    if ($shippingAdresssInfo === false) {
+                                        echo "<script>alert('Adresse de livraison introuvable');</script>";
+                                        die;
+                                    } else {
+                                        $shippingAddress = $shippingAdresssInfo['voie'];
+                                        $shippingCity = $shippingAdresssInfo['ville'];
+                                        $shippingCountry = $shippingAdresssInfo['pays'];
+                                        $shippingPostalCode = $shippingAdresssInfo['code_postal'];
+
+                                        echo "
                                             <h3 class='h6'>Adresse de livraison</h3>
                                             <hr>
                                             <address>
                                                 <strong>$userName</strong><br>
                                                 $shippingAddress<br>
                                                 $shippingCity, $shippingPostalCode<br>
-                                            </address>"; ?>
+                                            </address>";
+                                    }
+
+                                    ?>
                                 </div>
                             </div>
                         </div>
