@@ -70,6 +70,7 @@ include_once 'functions.php';
 
                     if ($user) {
                         // Vérifier si le panier est vide
+                        RemoveUnActiveProductsFromCart($pdo, $user['id']);
                         $isEmpty = IsCartEmpty($pdo, $user['id']);
 
                         echo "<a href='cart.php' class='btn btn-outline-dark position-relative' id='cart-button' type='submit'>
@@ -90,6 +91,7 @@ include_once 'functions.php';
                         // Récupérer le panier depuis les cookies pour les utilisateurs non connectés
                         $cartCookieName = 'cart';
                         $cart = isset($_COOKIE[$cartCookieName]) ? json_decode($_COOKIE[$cartCookieName], true) : [];
+
                         $cartItemCount = count($cart);
 
                         echo "<a href='cart.php' class='btn btn-outline-dark position-relative' id='cart-button' type='submit'>

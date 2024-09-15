@@ -56,7 +56,7 @@ function IsCartEmpty($pdo, $userID) {
 }
 
 
-function GetCartProducts($pdo, $cartID) {
+function GetCartProducts($pdo, $cartID, $activeOnly = 1) {
     $query = "SELECT * FROM details_paniers WHERE panier_id = :cartID";
     $statement = $pdo->prepare($query);
     $statement->bindParam(':cartID', $cartID, PDO::PARAM_INT);
@@ -72,7 +72,7 @@ function GetCartProducts($pdo, $cartID) {
     $products = array();
 
     foreach ($cartDetails as $cartDetail) {
-        $product = GetProductByID($pdo, $cartDetail['produit_id']);
+        $product = GetProductByID($pdo, $cartDetail['produit_id'],$activeOnly);
         if ($product) {
             $product['quantite'] = $cartDetail['quantite'];
             $products[] = $product;
@@ -241,4 +241,94 @@ function AddNewProductToCart($pdo, $cartID, $productID, $quantity){
         echo "<script>console.error($errorMessage);</script>";
         return false;
     }
+}
+
+function ClearCart($pdo, $userID){
+    $cart = GetCart($pdo, $userID);
+    if(!$cart){
+        return false;
+    }
+
+    $cartID = $cart['id'];
+
+    $query = "DELETE FROM details_paniers WHERE panier_id = :cartID";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':cartID', $cartID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+
+    return true;
+}
+
+
+function RemoveUnActiveProductsFromCart($pdo, $userID){
+
+    $cart = GetCart($pdo, $userID);
+    if(!$cart){
+        return false;
+    }
+
+    $cartID = $cart['id'];
+
+    $query = "DELETE FROM details_paniers WHERE panier_id = :cartID AND produit_id NOT IN (SELECT id FROM produits WHERE est_actif = 1)";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':cartID', $cartID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+
+    //check how many items have been deleted 
+    $deletedItems = $statement->rowCount();
+
+    return ($deletedItems > 0);
+
+
+}
+
+
+function AdaptQuantityInCart($pdo, $userID){
+
+    $cart = GetCart($pdo, $userID);
+    if(!$cart){
+        return false;
+    }
+
+    $cartID = $cart['id'];
+
+    $query = "SELECT produit_id, quantite FROM details_paniers WHERE panier_id = :cartID";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':cartID', $cartID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+
+    $cartDetails = $statement->fetchAll(PDO::FETCH_ASSOC);
+    $changesMade = false;
+
+    foreach ($cartDetails as $cartDetail) {
+        $product = GetProductByID($pdo, $cartDetail['produit_id']);
+        if($product === false){
+            DeleteProductFromCart($pdo, $userID, $cartDetail['produit_id']);
+            $changesMade = true;
+        }
+        else if($cartDetail['quantite'] > $product['stock']){
+            UpdateProductQuantityInCart($pdo, $userID, $cartDetail['produit_id'], $product['stock']);
+            $changesMade = true;
+        }
+    }
+
+    return $changesMade;
 }

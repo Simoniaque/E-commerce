@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const updateCart = (productID, quantity, action = 'add') => {
+    const updateCart = (productID, quantity, action = 'add', callback) => {
         const xhr = new XMLHttpRequest();
         xhr.open('POST', 'cart_manager.php', true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (xhr.status === 200) {
                     const response = JSON.parse(xhr.responseText);
                     if (response.success) {
-                        console.log(response.message);
+                        if (callback) callback();
                     } else {
                         console.error(response.message);
                         location.reload();
@@ -36,12 +36,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const pricePerUnit = parseFloat(input.dataset.pricePerUnit);
             const totalPriceForProduct = quantity * pricePerUnit;
-            document.querySelector(`p[id="${productID}"]`).textContent = `${totalPriceForProduct.toFixed(2)} €`;
+            document.querySelector(`p[id="${productID}"]`).textContent = `${totalPriceForProduct.toFixed(2).replace('.', ',')} €`;
 
             if (quantity === 0) {
                 input.closest('tr').remove();
-                updateCart(productID, 0, 'set');
-                location.reload();
+                updateCart(productID, 0, 'set', () => {
+                    location.reload(); // Recharger la page après succès
+                });
             } else {
                 updateCart(productID, quantity, 'set');
             }
@@ -51,8 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const updateTotals = () => {
         const total = Array.from(document.querySelectorAll('p[id]'))
-            .reduce((acc, priceElement) => acc + parseFloat(priceElement.textContent.replace(' €', '')), 0);
-        document.querySelectorAll('.ca').forEach(el => el.textContent = `${total.toFixed(2)} €`);
+            .reduce((acc, priceElement) => {
+                const priceText = priceElement.textContent.trim().replace(' €', '').replace(',', '.');
+                const priceValue = parseFloat(priceText);
+                
+                return acc + (isNaN(priceValue) ? 0 : priceValue);
+            }, 0);
         
+        document.querySelectorAll('.ca').forEach(el => el.textContent = `${total.toFixed(2).replace('.', ',')} €`);
     };
 });

@@ -122,3 +122,19 @@ function GetProductsByCategory($pdo, $categoryID, $activeOnly = 1) {
 
     return $statement->fetchAll(PDO::FETCH_ASSOC);
 }
+
+
+function UpdateProductStock($pdo, $productID, $newStock){
+    $query = "UPDATE produits SET stock = :newStock WHERE id = :productID";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':newStock', $newStock, PDO::PARAM_INT);
+    $statement->bindParam(':productID', $productID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+    return true;
+}

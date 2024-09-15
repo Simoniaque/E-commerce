@@ -14,10 +14,28 @@ $totalPrice = 0;
 if ($isLoggedIn) {
     $getCart = GetCart($pdo, $user['id']);
     if ($getCart) {
-        $cartProducts = GetCartProducts($pdo, $getCart['id']);
+        if(RemoveUnActiveProductsFromCart($pdo, $user['id']) === true){
+            DisplayDismissibleWarning("Certains produits de votre panier ne sont plus disponibles et ont été retirés.");
+        }
+
+        if(AdaptQuantityInCart($pdo, $user['id']) === true){
+            DisplayDismissibleWarning("La quantité de certains produits de votre panier a été ajustée selon nos stocks.");
+
+        }
+        $cartProducts = GetCartProducts($pdo, $getCart['id'], 0);
     }
 } else {
     // Gestion du panier pour les utilisateurs non connectés
+    
+    if(RemoveUnActiveProductsFromCookieCart($pdo) === true){
+        DisplayDismissibleWarning("Certains produits de votre panier ne sont plus disponibles et ont été retirés.");
+    }
+    if(AdaptQuantityInCookieCart($pdo) === true){
+        DisplayDismissibleWarning("La quantité de certains produits de votre panier a été ajustée selon nos stocks.");
+
+    }
+
+
     $cartCookieName = 'cart';
     $cart = isset($_COOKIE[$cartCookieName]) ? json_decode($_COOKIE[$cartCookieName], true) : [];
 
