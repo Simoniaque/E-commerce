@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : ven. 06 sep. 2024 à 20:47
+-- Généré le : mar. 17 sep. 2024 à 11:02
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -30,23 +30,13 @@ SET time_zone = "+00:00";
 CREATE TABLE `adresses_utilisateurs` (
   `id` int(11) NOT NULL,
   `utilisateur_id` int(11) NOT NULL,
-  `adresse_complète` varchar(255) NOT NULL,
+  `voie` varchar(255) NOT NULL,
   `ville` varchar(100) NOT NULL,
   `code_postal` varchar(20) NOT NULL,
   `pays` varchar(100) NOT NULL,
   `date_creation` timestamp NOT NULL DEFAULT current_timestamp(),
   `est_actif` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
---
--- Déchargement des données de la table `adresses_utilisateurs`
---
-
-INSERT INTO `adresses_utilisateurs` (`id`, `utilisateur_id`, `adresse_complète`, `ville`, `code_postal`, `pays`, `date_creation`, `est_actif`) VALUES
-(0, 1, 'test', 'test', 'test', 'test', '2024-08-28 23:39:06', 1),
-(7, 1, 'test2', 'azdlazkjgdia', 'zadazmouihdj', 'azdoazuihid', '2024-08-28 23:57:43', 1),
-(9, 1, 'Avenue de la paix', 'Toulouse', '31400', 'France', '2024-08-29 00:47:05', 1),
-(10, 1, 'Rue des champs Elysées ', 'Paris', '75000', 'France', '2024-08-29 00:47:28', 1);
 
 -- --------------------------------------------------------
 
@@ -113,30 +103,6 @@ CREATE TABLE `commandes` (
   `est_actif` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Déchargement des données de la table `commandes`
---
-
-INSERT INTO `commandes` (`id`, `utilisateur_id`, `date_creation`, `prix_total`, `statut`, `adresse_de_facturation`, `adresse_de_livraison`, `moyen_de_paiement`, `est_actif`) VALUES
-(1, 1, '2024-06-21', 119.98, 4, 0, 0, 0, 1),
-(2, 2, '2024-06-21', 89.97, 2, 0, 0, 0, 1),
-(3, 1, '2024-08-22', 219.96, 3, 0, 0, 0, 1),
-(4, 2, '2024-08-23', 299.97, 2, 0, 0, 0, 1),
-(5, 3, '2024-08-24', 79.98, 4, 0, 0, 0, 1),
-(6, 1, '2024-08-25', 159.98, 1, 0, 0, 0, 1),
-(7, 2, '2024-08-26', 49.99, 4, 0, 0, 0, 1),
-(8, 3, '2024-08-27', 249.95, 3, 0, 0, 0, 1),
-(9, 1, '2024-08-28', 399.95, 2, 0, 0, 0, 1),
-(12, 1, '2024-08-29', 79.99, 1, 7, 7, 0, 1),
-(13, 1, '2024-08-29', 79.99, 1, 0, 0, 0, 1),
-(14, 1, '2024-08-29', 79.99, 1, 0, 7, 0, 1),
-(15, 1, '2024-08-29', 79.99, 1, 9, 10, 5, 1),
-(16, 1, '2024-08-29', 40.00, 1, 9, 10, 5, 1),
-(17, 1, '2024-08-29', 109.98, 1, 0, 0, 0, 1),
-(18, 1, '2024-08-29', 49.00, 1, 0, 0, 0, 1),
-(30, 1, '2024-08-29', 29.99, 1, 10, 10, 5, 1),
-(31, 1, '2024-08-29', 14.99, 1, 10, 10, 5, 1);
-
 -- --------------------------------------------------------
 
 --
@@ -149,41 +115,6 @@ CREATE TABLE `details_commandes` (
   `produit_id` int(11) NOT NULL,
   `quantite` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Déchargement des données de la table `details_commandes`
---
-
-INSERT INTO `details_commandes` (`id`, `commande_id`, `produit_id`, `quantite`) VALUES
-(1, 1, 1, 2),
-(2, 2, 3, 3),
-(3, 3, 1, 1),
-(4, 3, 2, 1),
-(5, 3, 4, 2),
-(6, 4, 3, 2),
-(7, 4, 7, 1),
-(9, 5, 5, 1),
-(10, 5, 6, 1),
-(11, 5, 10, 2),
-(12, 6, 2, 1),
-(13, 6, 4, 1),
-(14, 6, 7, 2),
-(15, 7, 3, 1),
-(17, 8, 1, 2),
-(18, 8, 6, 1),
-(19, 8, 10, 1),
-(20, 9, 5, 2),
-(21, 9, 7, 1),
-(28, 12, 2, 1),
-(29, 13, 2, 1),
-(30, 14, 2, 1),
-(31, 15, 2, 1),
-(32, 16, 1, 1),
-(33, 17, 2, 1),
-(34, 17, 3, 1),
-(35, 18, 10, 1),
-(44, 30, 3, 1),
-(45, 31, 4, 1);
 
 -- --------------------------------------------------------
 
@@ -256,16 +187,6 @@ CREATE TABLE `moyens_paiement` (
   `est_actif` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
---
--- Déchargement des données de la table `moyens_paiement`
---
-
-INSERT INTO `moyens_paiement` (`id`, `utilisateur_id`, `type`, `numero_carte`, `nom_titulaire`, `date_expiration`, `cvv`, `paypal_email`, `date_ajout`, `est_actif`) VALUES
-(0, 19, 'paypal', '', '', '0000-00-00', '', 'simon.auriac@limayrac.fr', '2024-08-25 18:25:07', 1),
-(2, 19, 'card', '00', 'auriac simon', '0000-00-00', '000', '', '2024-08-25 18:26:06', 1),
-(4, 1, 'card', 'azdazkbdim', 'zjahdmoiazjd', '0000-00-00', '477', '', '2024-08-29 00:05:59', 1),
-(5, 1, 'card', '1234 5678 9123 4567', 'Emma Martin', '0000-00-00', '200', '', '2024-08-29 00:48:06', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -276,13 +197,6 @@ CREATE TABLE `paniers` (
   `id` int(11) NOT NULL,
   `utilisateur_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Déchargement des données de la table `paniers`
---
-
-INSERT INTO `paniers` (`id`, `utilisateur_id`) VALUES
-(11, 1);
 
 -- --------------------------------------------------------
 
@@ -308,17 +222,17 @@ CREATE TABLE `produits` (
 
 INSERT INTO `produits` (`id`, `categorie_id`, `nom`, `description`, `prix`, `stock`, `date_ajout`, `en_priorite`, `est_actif`) VALUES
 (1, 1, 'Robe Zébrée', 'Robe zébrée élégante pour toutes les occasion', 40.00, 30, '2024-08-13', 0, 1),
-(2, 1, 'Robe Maxi Florale', 'Robe longue avec motif floral, parfaite pour l&#039;été.', 79.99, 30, '2024-08-09', 0, 1),
-(3, 2, 'Chemisier à Manches Longues', 'Chemisier féminin à manches longues.', 29.99, 80, '2024-04-24', 0, 1),
-(4, 2, 'Débardeur Basique', 'Débardeur confortable pour une tenue décontractée.', 14.99, 100, '2024-02-16', 0, 1),
-(5, 3, 'Jean Skinny Stretch', 'Jean stretch et ajusté pour un look moderne.', 49.99, 0, '2024-08-21', 0, 0),
+(2, 1, 'Robe Maxi Florale', 'Robe longue avec motif floral, parfaite pour l&#039;été.', 79.99, 0, '2024-08-09', 0, 1),
+(3, 2, 'Chemisier à Manches Longues', 'Chemisier féminin à manches longues.', 29.99, 0, '2024-04-24', 0, 1),
+(4, 2, 'Débardeur Basique', 'Débardeur confortable pour une tenue décontractée.', 14.99, 0, '2024-02-16', 0, 1),
+(5, 3, 'Jean Skinny Stretch', 'Jean stretch et ajusté pour un look moderne.', 49.99, 5, '2024-08-21', 0, 1),
 (6, 4, 'Bottes Hautes', 'Bottes élégantes pour l&#039;hiver.', 89.99, 0, '2024-08-28', 1, 1),
-(7, 4, 'Sandales à Talons', 'Sandales à talons pour les soirées.', 69.99, 20, '2024-01-10', 1, 1),
+(7, 4, 'Sandales à Talons', 'Sandales à talons pour les soirées.', 69.99, 20, '2024-01-10', 1, 0),
 (10, 4, 'Chaussure à talon', 'Chaussure à talon en cuir', 49.00, 20, '2018-08-15', 0, 1),
 (11, 3, 'Pantalon Onlraffy-Yo Life', 'Ce produit est fabriqué à partir de polyester recyclé. Le polyester recyclé préserve les ressources naturelles et réduit la quantité de déchets.', 39.99, 50, '2024-08-20', 0, 1),
 (13, 5, 'Sac paille', 'Sac rond en paille avec anses dorées', 25.00, 50, '2024-08-26', 0, 1),
 (22, 3, 'Pantallon Habillé', 'Pantalon fluide à jambes larges, taille réglable avec liens ton sur ton et poches sur les côtés', 35.00, 50, '2024-08-26', 0, 1),
-(28, 5, ' Lunette de Soleil Polarisées', 'Protection UV400 Surdimensionnées Lunettes Classique Grand Cadre Lunettes de Soleil Femmes B2289', 19.99, 100, '2024-08-26', 0, 1),
+(28, 5, 'Lunette de Soleil Polarisées', 'Protection UV400 Surdimensionnées Lunettes Classique Grand Cadre Lunettes de Soleil Femmes B2289', 19.99, 100, '2024-08-26', 0, 1),
 (32, 1, 'Pull noir en coton', 'Pull noir confortable et chaud', 35.00, 50, '2024-08-28', 0, 1);
 
 -- --------------------------------------------------------
@@ -400,13 +314,6 @@ CREATE TABLE `tokens_verification_mail` (
   `date_max` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Déchargement des données de la table `tokens_verification_mail`
---
-
-INSERT INTO `tokens_verification_mail` (`utilisateur_id`, `token`, `date_max`) VALUES
-(50, '8134ef29f7fb4636e3ca1e246608bfdb81fd087afb026b3213b28bb0b2d5ad37', '2024-09-06 20:59:58');
-
 -- --------------------------------------------------------
 
 --
@@ -422,17 +329,6 @@ CREATE TABLE `utilisateurs` (
   `mail_verifie` tinyint(1) DEFAULT 0,
   `est_actif` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Déchargement des données de la table `utilisateurs`
---
-
-INSERT INTO `utilisateurs` (`id`, `nom`, `email`, `mot_de_passe`, `est_admin`, `mail_verifie`, `est_actif`) VALUES
-(1, 'Emma martin', 'emma@example.com', '$2y$10$6ElWRb3K2iqxKEMbdJItaOzlsEW25XyVAMBNWXaYIvNbRkQg70j9C', 0, 1, 1),
-(2, 'Laura Dubois', 'laura@example.com', 'motdepasse2', 0, 0, 1),
-(3, 'Sophie Lefevre', 'sophie@example.com', 'motdepasse3', 0, 0, 1),
-(19, 'Simoniaque', 'simon.auriac@limayrac.fr', '$2y$10$RzVdvHwrXJu9Zqz4aWTqOeqD7bpEjyJSWA.kzGti3obYTLO11bpPm', 0, 1, 0),
-(50, 'Test', 'mateus.Fariasfreire@limayrac.fr', '$2y$10$Tte9rZ6vx6E2BNAeH..Gv.uLIRlv1ehpsyvGDUGMi6lVlSCLE9/Iq', 0, 0, 1);
 
 --
 -- Index pour les tables déchargées
@@ -560,7 +456,7 @@ ALTER TABLE `utilisateurs`
 -- AUTO_INCREMENT pour la table `adresses_utilisateurs`
 --
 ALTER TABLE `adresses_utilisateurs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT pour la table `categories`
@@ -578,19 +474,19 @@ ALTER TABLE `categories_en_avant`
 -- AUTO_INCREMENT pour la table `commandes`
 --
 ALTER TABLE `commandes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT pour la table `details_commandes`
 --
 ALTER TABLE `details_commandes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
 
 --
 -- AUTO_INCREMENT pour la table `details_paniers`
 --
 ALTER TABLE `details_paniers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=114;
 
 --
 -- AUTO_INCREMENT pour la table `materiaux`
@@ -608,13 +504,13 @@ ALTER TABLE `messages_contact`
 -- AUTO_INCREMENT pour la table `moyens_paiement`
 --
 ALTER TABLE `moyens_paiement`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT pour la table `paniers`
 --
 ALTER TABLE `paniers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT pour la table `produits`
@@ -638,7 +534,7 @@ ALTER TABLE `produits_materiaux`
 -- AUTO_INCREMENT pour la table `utilisateurs`
 --
 ALTER TABLE `utilisateurs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- Contraintes pour les tables déchargées
