@@ -37,14 +37,14 @@ include_once 'functions.php';
                         <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Catégories</a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <?php
-                            $categories = GetCategories($pdo);
+                            $header_categories = GetCategories($pdo);
 
-                            if(!$categories){
+                            if(!$header_categories){
                                 echo "<li><a class='dropdown-item' href='#'>Aucune catégorie trouvée</a></li>";
                             }else{
-                                foreach($categories as $category){
-                                    $header_categoryID = $category['id'];
-                                    $header_categoryName = $category['nom'];
+                                foreach($header_categories as $header_category){
+                                    $header_categoryID = $header_category['id'];
+                                    $header_categoryName = $header_category['nom'];
                                     echo "<li><a class='dropdown-item' href='category.php?id=$header_categoryID'>$header_categoryName</a></li>";
                                 }
                             }

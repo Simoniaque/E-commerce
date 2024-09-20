@@ -1,7 +1,22 @@
 <?php
+session_start();
 
-include('../config.php');
-include('../functions.php');
+include_once "../config.php";
+include_once "../API/usersRequests.php";
+include_once "../API/productsRequests.php";
+include_once "../API/categoriesRequests.php";
+
+$user = GetCurrentUser($pdo);
+
+if($user === false){
+    header('Location: ../index.php');
+    exit;
+}
+
+if($user['est_admin'] == 0){
+    header('Location: ../index.php');
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -16,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
               </div>';
     } else {
-        if (setHighlightCategories($con, $category1, $category2, $category3, $category4)) {
+        if (SetHighlightCategories($pdo, $category1, $category2, $category3, $category4)) {
             echo "<div class='alert alert-success alert-dismissible fade show' role='alert'>
                     Catégories en avant modifiées avec succès.
                     <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
@@ -40,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
               </div>';
     } else {
-        if (setHighlightProducts($con, $product1, $product2, $product3, $product4)) {
+        if (SetHighlightProducts($pdo, $product1, $product2, $product3, $product4)) {
             echo "<div class='alert alert-success alert-dismissible fade show' role='alert'>
                     Produits en avant modifiés avec succès.
                     <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
@@ -123,8 +138,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <h1>Catégories en avant</h1>
                     <div class="table-responsive">
                         <?php
-                        $categories = getCategoriesList($con);
-                        $highlightCategories = getHighlightCategories($con);
+                        $categories = GetCategories($pdo);
+                        $highlightCategories = GetHighlightCategories($pdo);
                         function generateOptions($categories, $highlightedId)
                         {
                             $options = "";
@@ -160,8 +175,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <h1>Produits en avant</h1>
                     <div class="table-responsive">
                         <?php
-                        $products = getAllProducts($con);
-                        $highlightProducts = getHighlightProducts($con);
+                        $products = GetProducts($pdo);
+                        $highlightProducts = getHighlightProducts($pdo);
 
                         function generateProductOptions($products, $highlightedId)
                         {

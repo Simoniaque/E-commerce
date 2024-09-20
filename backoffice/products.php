@@ -1,27 +1,39 @@
 <?php
-include('../config.php');
-include('../functions.php');
 
-$products = getAllProducts($con);
+session_start();
+
+include_once "../config.php";
+include_once "../API/usersRequests.php";
+include_once "../API/productsRequests.php";
+include_once "../API/categoriesRequests.php";
+include_once "../functions.php";
+
+$user = GetCurrentUser($pdo);
+
+if($user === false){
+    header('Location: ../index.php');
+    exit;
+}
+
+if($user['est_admin'] == 0){
+    header('Location: ../index.php');
+    exit;
+}
+
+$products = GetProducts($pdo, 0);
 
 if (isset($_GET['delete_id'])) {
-    $idproduct = intval($_GET['delete_id']);
+    $productID = intval($_GET['delete_id']);
 
-    $result = deleteProduct($con, $idproduct);
+    $result = DisableProduct($pdo, $productID);
 
     if ($result) {
-        echo "<div class='alert alert-success alert-dismissible fade show' role='alert'>
-                Produit supprimé avec succès.
-                <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-            </div>";
+        DisplayDismissibleSuccess("Produit désactivé avec succès.");
     } else {
-        echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-                Erreur lors de la suppresion du produit.
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>';
+        DisplayDismissibleAlert("Erreur lors de la suppression du produit.");
     }
 
-    $products = getAllProducts($con);
+    $products = GetProducts($pdo, 0);
 }
 ?>
 
@@ -64,6 +76,7 @@ if (isset($_GET['delete_id'])) {
                                     <th>Stock</th>
                                     <th>Catégorie</th>
                                     <th>Actions</th>
+                                    <th>Est Actif</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -74,11 +87,12 @@ if (isset($_GET['delete_id'])) {
                                         <td><?php echo $product['description']; ?></td>
                                         <td><?php echo number_format($product['prix'], 2, ',', ' '); ?> €</td>
                                         <td><?php echo $product['stock']; ?></td>
-                                        <td><?php echo getProductCategory($con, $product['id'])['nom']; ?></td>
+                                        <td><?php echo GetProductCategory($pdo, $product['id'])['nom']; ?></td>
                                         <td>
-                                            <a class="btn btn-warning btn-sm mb-2" href="product.php?id=<?php echo $product['id']; ?>">Modifier</a>
-                                            <a class="btn btn-danger btn-sm mb-2" href="products.php?delete_id=<?php echo $product['id']; ?>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">Supprimer</a>
+                                            <a class="btn btn-dark btn-sm mb-2" href="product.php?id=<?php echo $product['id']; ?>">Modifier</a>
+                                            <a class="btn btn-danger btn-sm mb-2" href="products.php?delete_id=<?php echo $product['id']; ?>" onclick="return confirm('Êtes-vous sûr de vouloir désactiver ce produit ?');">Désactiver</a>
                                         </td>
+                                        <td class="bg-<?php echo $product['est_actif'] == 1 ? 'success' : 'danger'; ?>"></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -91,6 +105,12 @@ if (isset($_GET['delete_id'])) {
 
     <!-- Bootstrap JS and dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+    </script>
 </body>
 
 </html>

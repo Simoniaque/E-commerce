@@ -1,7 +1,5 @@
 <?php
 
-include_once 'API/cartsRequests.php';
-include_once 'API/productsRequests.php';
 
 function DisplayDismissibleAlert($message)
 {

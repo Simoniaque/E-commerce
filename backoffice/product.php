@@ -1,38 +1,57 @@
 <?php
-// Product.php
 session_start();
-include('../config.php');
-include('../functions.php');
+
+include_once "../config.php";
+include_once "../API/usersRequests.php";
+include_once "../API/productsRequests.php";
+include_once "../API/categoriesRequests.php";
+include_once "../functions.php";
+
+$user = GetCurrentUser($pdo);
+
+if($user === false){
+    header('Location: ../index.php');
+    exit;
+}
+
+if($user['est_admin'] == 0){
+    header('Location: ../index.php');
+    exit;
+}
 
 if (!isset($_GET['id'])) {
     die('Produit non trouvé.');
 }
 
 $productID = intval($_GET['id']);
-$product = getProductById($con, $productID);
+$product = GetProductById($pdo, $productID, 0);
 
-//check if post method is used
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nom = $_POST['nom'];
-    $description = $_POST['description'];
-    $prix = $_POST['prix'];
-    $stock = $_POST['stock'];
-    $categorie_id = $_POST['categorie_id'];
-    $material = isset($_POST['material']) ? $_POST['material'] : [];
 
-    $result = updateProduct($con, $productID, $nom, $description, $prix, $stock, $categorie_id, $material);
-
-    if ($result) {
-        echo "<div class='alert alert-success alert-dismissible fade show' role='alert'>
-                Produit modifié avec succès.
-                <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-            </div>";
-    } else {
-        echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-                Erreur lors de la modification du produit.
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>';
+    //check if everything is in post array
+    if (!isset($_POST['nom']) || !isset($_POST['description']) || !isset($_POST['prix']) || !isset($_POST['stock']) || !isset($_POST['categorie_id']) || !isset($_POST['isActive'])) {
+        DisplayDismissibleAlert("Veuillez remplir tous les champs.");
+        $product = GetProductById($pdo, $productID, 0);
+    }else{
+        $nom = $_POST['nom'];
+        $description = $_POST['description'];
+        $prix = $_POST['prix'];
+        $stock = $_POST['stock'];
+        $categorie_id = $_POST['categorie_id'];
+        $material = isset($_POST['material']) ? $_POST['material'] : [];
+        $isActive = $_POST['isActive'];
+    
+    
+        $result = UpdateProduct($pdo, $productID, $nom, $description, $prix, $stock, $categorie_id, $material, $isActive);
+    
+        if ($result) {
+            DisplayDismissibleSuccess("Produit modifié avec succès.");
+        } else {
+            DisplayDismissibleAlert("Erreur lors de la modification du produit.");
+        }
+    
+        $product = GetProductById($pdo, $productID, 0);
     }
 }
 
@@ -46,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modifier Produit</title>
-    <!-- Bootstrap CSS -->
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="icon" href="../assets/img/logo-black.png" type="image/x-icon">
@@ -77,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="container mt-4">
                     <div id="alertContainer"></div>
 
-                    <h1 class="mb-4">Modifier le Produit</h1>
+                    <h1 class="mb-4">Modifier Produit</h1>
                     <form id="productForm" method="POST" enctype="multipart/form-data">
                         <div class="row mb-3">
                             <div class="col">
@@ -126,8 +145,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div class="mb-3">
                             <label for='material' class='form-label'>Matériaux:</label><br />
                             <?php
-                            $materials = getMaterials($con);
-                            $associatedMaterialIds = getMaterialsIDByProduct($con, $productID);
+                            $materials = GetMaterials($pdo,0);
+                            $associatedMaterialIds = GetMaterialsIDByProduct($pdo, $productID);
+
+                            if($associatedMaterialIds == false){
+                                $associatedMaterialIds = [];
+                            }
 
                             foreach ($materials as $material) {
                                 $idMat = $material['id'];
@@ -142,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <label for="categorie_id" class="form-label">Catégorie:</label>
                             <select id="categorie_id" name="categorie_id" class="form-select">
                                 <?php
-                                $categories = getCategories($con);
+                                $categories = GetCategories($pdo);
                                 foreach ($categories as $cat) {
                                     $selected = ($cat['id'] == $product['categorie_id']) ? ' selected' : '';
                                     echo "<option value='{$cat['id']}'$selected>{$cat['nom']}</option>";
@@ -151,7 +174,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </select>
                         </div>
 
-                        <button type="submit" class="btn btn-primary">Modifier le Produit</button>
+                        <div class="mb-5">
+                            <label for="isActive" class="form-label">Est Actif:</label>
+                            <select id="isActive" name="isActive" class="form-select">
+                                <option value="1" <?php echo $product['est_actif'] == 1 ? 'selected' : ''; ?>>Oui</option>
+                                <option value="0" <?php echo $product['est_actif'] == 0 ? 'selected' : ''; ?>>Non</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-dark mb-3">Modifier le Produit</button>
                     </form>
                 </div>
             </div>
@@ -160,9 +191,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+
     <script>
         document.getElementById('productForm').addEventListener('submit', (e) => {
             e.preventDefault();
+            document.querySelector('button[type="submit"]').disabled = true;
+            
             uploadImages();
         });
 
@@ -208,6 +242,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 if (response.ok) {
                     console.log(`Succès: ${result.message}`);
+
+                    //add a bootstrap success alert
+                    const alertContainer = document.getElementById('alertContainer');
+                    const alert = document.createElement('div');
+                    alert.className = 'alert alert-success alert-dismissible';
+                    alert.innerHTML = `<button type="button" class="btn-close" data-bs-dismiss="alert"></button>${result.message}`;
+                    alertContainer.appendChild(alert);
                 } else {
                     alert(`Erreur: ${result.message}`);
                 }
@@ -235,6 +276,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         document.getElementById('image1').addEventListener('change', (e) => previewImage(e, 'previewImage1'));
         document.getElementById('image2').addEventListener('change', (e) => previewImage(e, 'previewImage2'));
         document.getElementById('image3').addEventListener('change', (e) => previewImage(e, 'previewImage3'));
+    </script>
+    <script>
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
     </script>
 </body>
 

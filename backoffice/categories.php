@@ -1,22 +1,35 @@
 <?php
-include('../config.php'); // Connexion à la base de données
-include('../functions.php'); // Assurez-vous que cette fonction est définie
+session_start();
 
-// Traitement de la suppression de catégorie
+include_once "../config.php";
+include_once "../API/usersRequests.php";
+include_once "../API/categoriesRequests.php";
+include_once "../functions.php";
+
+$user = GetCurrentUser($pdo);
+
+if($user === false){
+    header('Location: ../index.php');
+    exit;
+}
+
+if($user['est_admin'] == 0){
+    header('Location: ../index.php');
+    exit;
+}
+
 if (isset($_GET['delete_id'])) {
-    $idcategory = intval($_GET['delete_id']); // Assurez-vous que l'ID est un entier
+    $categoryID = intval($_GET['delete_id']);
     
-    if (deleteCategory($con, $idcategory)) {
-        $message = "Catégorie supprimée avec succès.";
-        $alert_type = "success";
+    if (DisableCategory($pdo, $categoryID)) {
+        DisplayDismissibleSuccess("Catégorie désactivée avec succès.");
     } else {
-        $message = "Une erreur est survenue lors de la suppression de la catégorie.";
-        $alert_type = "danger";
+        DisplayDismissibleAlert("Erreur lors de la désactivation de la catégorie.");
     }
 }
 
 // Récupérer toutes les catégories
-$categories = getCategories($con);
+$categories = GetCategories($pdo,0);
 ?>
 
 <!DOCTYPE html>
@@ -46,13 +59,6 @@ $categories = getCategories($con);
                     <h1>Liste des Catégories</h1>
                     <a class="btn btn-dark mb-3" href="addcategory.php">Ajouter catégorie</a>
 
-                    <!-- Afficher le message de succès ou d'erreur -->
-                    <?php if (isset($message)): ?>
-                        <div class="alert alert-<?php echo $alert_type; ?>" role="alert">
-                            <?php echo $message; ?>
-                        </div>
-                    <?php endif; ?>
-
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">
                             <thead class="bg-dark text-light">
@@ -62,6 +68,7 @@ $categories = getCategories($con);
                                     <th>Description</th>
                                     <th>Image</th>
                                     <th>Actions</th>
+                                    <th>Est Active</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -74,9 +81,11 @@ $categories = getCategories($con);
                                         <img src="<?php echo 'https://imgproduitnewvet.blob.core.windows.net/imagescategories/' . $category['id'] . '.png'; ?>" alt="Image de la catégorie" style="width: 100px; height: auto;">
                                     </td>
                                     <td>
-                                        <a class="btn btn-warning btn-sm" href="category.php?id=<?php echo $category['id']; ?>">Modifier</a>
-                                        <a class="btn btn-danger btn-sm" href="?delete_id=<?php echo $category['id']; ?>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?');">Supprimer</a>
+                                        <a class="btn btn-dark btn-sm mb-2" href="category.php?id=<?php echo $category['id']; ?>">Modifier</a>
+                                        <a class="btn btn-danger btn-sm" href="?delete_id=<?php echo $category['id']; ?>" onclick="return confirm('Êtes-vous sûr de vouloir désactiver cette catégorie ?');">Désactiver</a>
                                     </td>
+                                    
+                                    <td class="bg-<?php echo $category['est_actif'] == 1 ? 'success' : 'danger'; ?>"></td>
                                 </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -87,7 +96,11 @@ $categories = getCategories($con);
         </div>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+    </script>
 </body>
 </html>
