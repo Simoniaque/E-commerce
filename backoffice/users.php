@@ -1,19 +1,34 @@
 <?php
+session_start();
 
-include('../config.php');
-include('../functions.php');
+include_once "../config.php";
+include_once "../API/usersRequests.php";
+include_once "../functions.php";
 
-$users = getAllUsers($con);
+$user = GetCurrentUser($pdo);
+
+if ($user == false) {
+    header('Location: ../index.php');
+    exit;
+}
+
+if ($user['est_admin'] == 0) {
+    header('Location: ../index.php');
+    exit;
+}
+
+
+$users = GetUsers($pdo,0);
 
 if(isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id'])) {
     $id = $_GET['id'];
-    if(deleteUser($con, $id)){
-        echo '<div class="alert alert-success" role="alert">Utilisateur supprimé avec succès.</div>';
+    if(DeactivateUser($pdo, $id)){
+        DisplayDismissibleSuccess('Utilisateur désactivé avec succès.');
     }else{
-        echo '<div class="alert alert-danger" role="alert">Erreur lors de la suppression de l\'utilisateur.</div>';
+        DisplayDismissibleAlert('Erreur lors de la désactivation de l\'utilisateur.');
     }
 
-    $users = getAllUsers($con);
+    $users = GetUsers($pdo,0);
     
 }
 
@@ -51,7 +66,9 @@ if(isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id'])) 
                                 <tr>
                                     <th>ID</th>
                                     <th>Nom</th>
-                                    <th>email</th>
+                                    <th>Email</th>
+                                    <th>Actions</th>
+                                    <th>Est actif</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -61,9 +78,10 @@ if(isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id'])) 
                                     <td><?php echo $row['nom']; ?></td>
                                     <td><?php echo $row['email']; ?></td>
                                     <td>
-                                        <a class="btn btn-warning btn-sm" href="user.php?id=<?php echo $row['id']; ?>">Modifier</a>
+                                        <a class="btn btn-dark btn-sm" href="user.php?id=<?php echo $row['id']; ?>">Modifier</a>
                                         <a class="btn btn-danger btn-sm" href="users.php?action=delete&id=<?php echo $row['id']; ?>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">Supprimer</a>
                                     </td>
+                                    <td class="bg-<?php echo $row['est_actif'] == 1 ? 'success' : 'danger'; ?>"></td>
                                 </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -76,6 +94,11 @@ if(isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id'])) 
 
     <!-- Bootstrap JS and dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+    </script>
 </body>
 </html>
 

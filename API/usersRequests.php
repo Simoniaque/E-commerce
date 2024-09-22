@@ -1,6 +1,23 @@
 <?php
 
-function GetCurrentUser($pdo, $activeOnly = 1) {
+function GetUsers($pdo, $activeOnly = 1)
+{
+    $query = "SELECT * FROM utilisateurs WHERE est_actif >= :activeOnly";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':activeOnly', $activeOnly, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+
+    return $statement->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function GetCurrentUser($pdo, $activeOnly = 1)
+{
     if (isset($_SESSION['user_id'])) {
         $id = $_SESSION['user_id'];
         $query = "SELECT * FROM utilisateurs WHERE id = :id AND est_actif >= :activeOnly LIMIT 1 ";
@@ -20,7 +37,8 @@ function GetCurrentUser($pdo, $activeOnly = 1) {
     return false;
 }
 
-function GetUserByID($pdo, $userID, $activeOnly = 1) {
+function GetUserByID($pdo, $userID, $activeOnly = 1)
+{
     $query = "SELECT * FROM utilisateurs WHERE id = :userID AND est_actif >= :activeOnly LIMIT 1";
     $statement = $pdo->prepare($query);
     $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
@@ -37,20 +55,21 @@ function GetUserByID($pdo, $userID, $activeOnly = 1) {
 }
 
 
-function GetUserByEmail($pdo, $userEmail, $activeOnly = 1) {
+function GetUserByEmail($pdo, $userEmail, $activeOnly = 1)
+{
     $query = "SELECT * FROM utilisateurs WHERE email = :email AND est_actif >= :activeOnly LIMIT 1 ";
     $statement = $pdo->prepare($query);
-    
+
     $statement->bindParam(':email', $userEmail, PDO::PARAM_STR);
     $statement->bindParam(':activeOnly', $activeOnly, PDO::PARAM_INT);
-    
+
     if (!@$statement->execute()) {
         $errorInfo = $statement->errorInfo();
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
-        
+
+
         return false;
     }
 
@@ -59,7 +78,8 @@ function GetUserByEmail($pdo, $userEmail, $activeOnly = 1) {
 }
 
 
-function CheckUserExistsAndIsActive($pdo, $email, &$exists, &$active){
+function CheckUserExistsAndIsActive($pdo, $email, &$exists, &$active)
+{
 
     $exists = false;
     $active = false;
@@ -73,25 +93,26 @@ function CheckUserExistsAndIsActive($pdo, $email, &$exists, &$active){
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
     $result = $statement->fetch(PDO::FETCH_ASSOC);
-    
-    if($result != false){
+
+    if ($result != false) {
         $exists = true;
 
-        if($result["est_actif"] == 1){
+        if ($result["est_actif"] == 1) {
             $active = true;
         }
     }
-    
+
 
     return true;
 }
 
-function CreateUser ($pdo, $name, $email, $password, &$newUserId){
+function CreateUser($pdo, $name, $email, $password, &$newUserId)
+{
 
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
@@ -106,7 +127,7 @@ function CreateUser ($pdo, $name, $email, $password, &$newUserId){
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
@@ -114,15 +135,16 @@ function CreateUser ($pdo, $name, $email, $password, &$newUserId){
     return true;
 }
 
-function GenerateURLVerifyAccount($pdo, $userID){
+function GenerateURLVerifyAccount($pdo, $userID)
+{
 
-    if(UserAlreadyHasVerificationToken($pdo, $userID, $userToken) === false){
+    if (UserAlreadyHasVerificationToken($pdo, $userID, $userToken) === false) {
         return false;
     }
 
     //si l'utilisateur a déjà un token on le supprime
-    if($userToken != false){
-        if(DeleteVerificationToken($pdo, $userToken['utilisateur_id']) === false){
+    if ($userToken != false) {
+        if (DeleteVerificationToken($pdo, $userToken['utilisateur_id']) === false) {
             return false;
         }
     }
@@ -130,13 +152,14 @@ function GenerateURLVerifyAccount($pdo, $userID){
     $newTokenValue = bin2hex(random_bytes(32));
     $dateMax = date('Y-m-d H:i:s', strtotime('+15 minutes'));
 
-    if(CreateVerificationToken($pdo, $userID, $newTokenValue, $dateMax) === true){
-        $url = WEBSITE_URL . "verifyaccount.php?email=".GetUserByID($pdo, $userID)['email']."&token=".$newTokenValue; 
+    if (CreateVerificationToken($pdo, $userID, $newTokenValue, $dateMax) === true) {
+        $url = WEBSITE_URL . "verifyaccount.php?email=" . GetUserByID($pdo, $userID)['email'] . "&token=" . $newTokenValue;
         return $url;
     }
 }
 
-function CreateVerificationToken($pdo, $id, $tokenValue, $dateMax){
+function CreateVerificationToken($pdo, $id, $tokenValue, $dateMax)
+{
 
     $query = "INSERT INTO tokens_verification_mail (utilisateur_id, token, date_max) VALUES (:id, :token, :dateMax)";
 
@@ -150,15 +173,15 @@ function CreateVerificationToken($pdo, $id, $tokenValue, $dateMax){
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
     return true;
-
 }
 
-function DeleteVerificationToken($pdo, $userID){
+function DeleteVerificationToken($pdo, $userID)
+{
 
     $query = "DELETE FROM tokens_verification_mail WHERE utilisateur_id = :userID";
 
@@ -170,15 +193,15 @@ function DeleteVerificationToken($pdo, $userID){
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
     return true;
-
 }
 
-function UserAlreadyHasVerificationToken($pdo, $userID, &$token){
+function UserAlreadyHasVerificationToken($pdo, $userID, &$token)
+{
 
     $query = "SELECT * FROM tokens_verification_mail WHERE utilisateur_id = :userID";
 
@@ -190,7 +213,7 @@ function UserAlreadyHasVerificationToken($pdo, $userID, &$token){
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
@@ -200,7 +223,8 @@ function UserAlreadyHasVerificationToken($pdo, $userID, &$token){
 }
 
 
-function DeactivateUser($pdo, $userID){
+function DeactivateUser($pdo, $userID)
+{
 
     $query = "UPDATE utilisateurs SET est_actif = 0 WHERE id = :id";
 
@@ -212,15 +236,16 @@ function DeactivateUser($pdo, $userID){
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
     return true;
 }
 
-function UpdateUserInfo($pdo, $id, $name, $email){
-    
+function UpdateUserInfo($pdo, $id, $name, $email)
+{
+
     $query = "UPDATE utilisateurs SET nom = :name, email = :email WHERE id = :id";
 
     $statement = $pdo->prepare($query);
@@ -233,14 +258,15 @@ function UpdateUserInfo($pdo, $id, $name, $email){
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
     return true;
 }
 
-function AddUserAddress($pdo, $userId, $voie, $ville, $codePostal, $pays) {
+function AddUserAddress($pdo, $userId, $voie, $ville, $codePostal, $pays)
+{
     $query = "INSERT INTO adresses_utilisateurs (utilisateur_id, voie, ville, code_postal, pays) 
               VALUES (:userId, :voie, :ville, :codePostal, :pays)";
 
@@ -256,16 +282,17 @@ function AddUserAddress($pdo, $userId, $voie, $ville, $codePostal, $pays) {
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
     return true;
 }
 
-function AddUserPaymentMethod($pdo, $userID, $payementType, $cardNumber, $cardName, $expirationDate, $cvv, $paypalEmail){
+function AddUserPaymentMethod($pdo, $userID, $payementType, $cardNumber, $cardName, $expirationDate, $cvv, $paypalEmail)
+{
     $expirationDate = $expirationDate ? $expirationDate . '-01' : null;
-    
+
     $query = "INSERT INTO moyens_paiement (utilisateur_id, type, numero_carte, nom_titulaire, date_expiration, cvv, paypal_email) 
               VALUES (:userID, :payementType, :cardNumber, :cardName, :expirationDate, :cvv, :paypalEmail)";
 
@@ -283,107 +310,108 @@ function AddUserPaymentMethod($pdo, $userID, $payementType, $cardNumber, $cardNa
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
     return true;
-    
 }
 
 
-function GetUserAddresses($pdo, $userID, $activeOnly = 1){
-    
-        $query = "SELECT * FROM adresses_utilisateurs WHERE utilisateur_id = :userID";
-    
-        $statement = $pdo->prepare($query);
-        $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+function GetUserAddresses($pdo, $userID, $activeOnly = 1)
+{
 
-        if (!@$statement->execute()) {
-            $errorInfo = $statement->errorInfo();
-            $errorMessage = json_encode($errorInfo[2]);
-    
-            echo "<script>console.error($errorMessage);</script>";
-            
-            return false;
+    $query = "SELECT * FROM adresses_utilisateurs WHERE utilisateur_id = :userID";
+
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+
+        echo "<script>console.error($errorMessage);</script>";
+
+        return false;
+    }
+
+    $addressedIDs = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+    if ($addressedIDs == false) {
+        return false;
+    }
+
+    $addresses = array();
+
+    foreach ($addressedIDs as $addressID) {
+        $address = GetAddressByID($pdo, $addressID['id'], $activeOnly);
+        if ($address != false) {
+            array_push($addresses, $address);
         }
+    }
 
-        $addressedIDs = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-        if($addressedIDs == false){
-            return false;
-        }
-
-        $addresses = array();
-
-        foreach($addressedIDs as $addressID){
-            $address = GetAddressByID($pdo, $addressID['id'],$activeOnly);
-            if($address != false){
-                array_push($addresses, $address);
-            }
-        }
-    
-        return $addresses;
+    return $addresses;
 }
 
 
-function GetAddressByID($pdo, $addressID,$activeOnly = 1){
-        
+function GetAddressByID($pdo, $addressID, $activeOnly = 1)
+{
+
     $query = "SELECT * FROM adresses_utilisateurs WHERE id = :addressID AND est_actif >= :activeOnly LIMIT 1";
-    
+
     $statement = $pdo->prepare($query);
     $statement->bindParam(':addressID', $addressID, PDO::PARAM_INT);
     $statement->bindParam(':activeOnly', $activeOnly, PDO::PARAM_INT);
-    
+
     if (!@$statement->execute()) {
         $errorInfo = $statement->errorInfo();
         $errorMessage = json_encode($errorInfo[2]);
-    
+
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
-    
-    return $statement->fetch(PDO::FETCH_ASSOC);
 
+    return $statement->fetch(PDO::FETCH_ASSOC);
 }
 
-function GetUserPaymentMethods($pdo, $userID, $activeOnly =1){
-    
+function GetUserPaymentMethods($pdo, $userID, $activeOnly = 1)
+{
+
     $query = "SELECT * FROM moyens_paiement WHERE utilisateur_id = :userID";
-    
+
     $statement = $pdo->prepare($query);
     $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
-    
+
     if (!@$statement->execute()) {
         $errorInfo = $statement->errorInfo();
         $errorMessage = json_encode($errorInfo[2]);
-    
+
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
     $paymentMethodIDs = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-    if($paymentMethodIDs == false){
+    if ($paymentMethodIDs == false) {
         return false;
     }
 
     $paymentMethods = array();
 
-    foreach($paymentMethodIDs as $paymentMethodID){
+    foreach ($paymentMethodIDs as $paymentMethodID) {
         $paymentMethod = GetPaymentMethodByID($pdo, $paymentMethodID['id']);
-        if($paymentMethod != false){
+        if ($paymentMethod != false) {
             array_push($paymentMethods, $paymentMethod);
         }
     }
-    
-    return $paymentMethods;
 
+    return $paymentMethods;
 }
 
-function GetPaymentMethodByID($pdo, $paymentMethodID, $activeOnly = 1){
+function GetPaymentMethodByID($pdo, $paymentMethodID, $activeOnly = 1)
+{
 
     $query = "SELECT * FROM moyens_paiement WHERE id = :paymentMethodID AND est_actif >= :activeOnly LIMIT 1";
 
@@ -396,7 +424,7 @@ function GetPaymentMethodByID($pdo, $paymentMethodID, $activeOnly = 1){
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
@@ -404,8 +432,9 @@ function GetPaymentMethodByID($pdo, $paymentMethodID, $activeOnly = 1){
 }
 
 
-function DeactivateUserAddress($pdo, $userID, $addressID){
-    
+function DeactivateUserAddress($pdo, $userID, $addressID)
+{
+
     $query = "UPDATE adresses_utilisateurs SET est_actif = 0 WHERE utilisateur_id = :userID AND id = :addressID";
 
     $statement = $pdo->prepare($query);
@@ -417,7 +446,7 @@ function DeactivateUserAddress($pdo, $userID, $addressID){
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
@@ -425,7 +454,8 @@ function DeactivateUserAddress($pdo, $userID, $addressID){
 }
 
 
-function DeactivateUserPaymentMethod($pdo, $userID, $paymentID){
+function DeactivateUserPaymentMethod($pdo, $userID, $paymentID)
+{
 
     $query = "UPDATE moyens_paiement SET est_actif = 0 WHERE utilisateur_id = :userID AND id = :paymentID";
 
@@ -438,7 +468,7 @@ function DeactivateUserPaymentMethod($pdo, $userID, $paymentID){
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
@@ -446,21 +476,23 @@ function DeactivateUserPaymentMethod($pdo, $userID, $paymentID){
 }
 
 
-function CheckTokenAndVerifyUser($pdo, $userID, $token){
-    
-    if(CheckTokenValidity($pdo, $userID, $token) === false){
+function CheckTokenAndVerifyUser($pdo, $userID, $token)
+{
+
+    if (CheckTokenValidity($pdo, $userID, $token) === false) {
         return false;
     }
 
-    if(VerifyUser($pdo, $userID) === false){
+    if (VerifyUser($pdo, $userID) === false) {
         return false;
     }
-    
+
 
     return true;
 }
 
-function CheckTokenValidity($pdo, $userID, $token){
+function CheckTokenValidity($pdo, $userID, $token)
+{
     $query = "SELECT * FROM tokens_verification_mail WHERE utilisateur_id = :userID AND token = :token AND date_max > NOW()";
     $statement = $pdo->prepare($query);
     $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
@@ -471,20 +503,21 @@ function CheckTokenValidity($pdo, $userID, $token){
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
     $tokenFound = $statement->fetch(PDO::FETCH_ASSOC);
 
-    if($tokenFound == false){
+    if ($tokenFound == false) {
         return false;
     }
 
     return true;
 }
 
-function VerifyUser($pdo, $userID){
+function VerifyUser($pdo, $userID)
+{
 
     $query = "UPDATE utilisateurs SET mail_verifie = 1 WHERE id = :userID";
     $statement = $pdo->prepare($query);
@@ -495,15 +528,16 @@ function VerifyUser($pdo, $userID){
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
     return true;
 }
 
 
-function CheckPasswordResetTokenValidity($pdo, $userID ,$token){
-    
+function CheckPasswordResetTokenValidity($pdo, $userID, $token)
+{
+
     $query = "SELECT * FROM tokens_reinitialisation_mdp WHERE utilisateur_id = :userID AND token = :token AND date_max > NOW()";
 
     $statement = $pdo->prepare($query);
@@ -515,21 +549,22 @@ function CheckPasswordResetTokenValidity($pdo, $userID ,$token){
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
     $tokenFound = $statement->fetch(PDO::FETCH_ASSOC);
 
-    if($tokenFound == false){
+    if ($tokenFound == false) {
         return false;
     }
 
     return true;
 }
 
-function ResetPassword($pdo, $userID, $newPassword){
-    
+function ResetPassword($pdo, $userID, $newPassword)
+{
+
     $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
 
     $query = "UPDATE utilisateurs SET mot_de_passe = :newPassword WHERE id = :userID";
@@ -543,20 +578,21 @@ function ResetPassword($pdo, $userID, $newPassword){
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
     return true;
 }
 
-function GenerateURLResetPassword($pdo, $userID){
+function GenerateURLResetPassword($pdo, $userID)
+{
 
-    if(UserAlreadyHasResetToken($pdo, $userID, $foundToken) === false){
+    if (UserAlreadyHasResetToken($pdo, $userID, $foundToken) === false) {
         return false;
     }
 
-    if($foundToken != false){
-        if(DeleteResetPasswordToken($pdo, $foundToken['utilisateur_id']) === false){
+    if ($foundToken != false) {
+        if (DeleteResetPasswordToken($pdo, $foundToken['utilisateur_id']) === false) {
             return false;
         }
     }
@@ -564,15 +600,15 @@ function GenerateURLResetPassword($pdo, $userID){
     $newTokenValue = bin2hex(random_bytes(32));
     $dateMax = date('Y-m-d H:i:s', strtotime('+15 minutes'));
 
-    if(CreateResetPasswordToken($pdo, $userID, $newTokenValue, $dateMax) === true){
-        $url = WEBSITE_URL . "resetpassword.php?email=".GetUserByID($pdo, $userID)['email']."&token=".$newTokenValue; 
+    if (CreateResetPasswordToken($pdo, $userID, $newTokenValue, $dateMax) === true) {
+        $url = WEBSITE_URL . "resetpassword.php?email=" . GetUserByID($pdo, $userID)['email'] . "&token=" . $newTokenValue;
         return $url;
     }
-
 }
 
-function UserAlreadyHasResetToken($pdo, $userID, &$token){
-    
+function UserAlreadyHasResetToken($pdo, $userID, &$token)
+{
+
     $query = "SELECT * FROM tokens_reinitialisation_mdp WHERE utilisateur_id = :userID";
 
     $statement = $pdo->prepare($query);
@@ -583,7 +619,7 @@ function UserAlreadyHasResetToken($pdo, $userID, &$token){
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
@@ -592,7 +628,8 @@ function UserAlreadyHasResetToken($pdo, $userID, &$token){
     return true;
 }
 
-function DeleteResetPasswordToken($pdo, $userID){
+function DeleteResetPasswordToken($pdo, $userID)
+{
 
     $query = "DELETE FROM tokens_reinitialisation_mdp WHERE utilisateur_id = :userID";
 
@@ -604,15 +641,16 @@ function DeleteResetPasswordToken($pdo, $userID){
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
     return true;
 }
 
-function CreateResetPasswordToken($pdo, $userID, $newTokenValue, $dateMax){
-    
+function CreateResetPasswordToken($pdo, $userID, $newTokenValue, $dateMax)
+{
+
     $query = "INSERT INTO tokens_reinitialisation_mdp (utilisateur_id, token, date_max) VALUES (:userID, :newTokenValue, :dateMax)";
 
     $statement = $pdo->prepare($query);
@@ -625,9 +663,98 @@ function CreateResetPasswordToken($pdo, $userID, $newTokenValue, $dateMax){
         $errorMessage = json_encode($errorInfo[2]);
 
         echo "<script>console.error($errorMessage);</script>";
-        
+
         return false;
     }
 
+    return true;
+}
+
+function UpdateUser($pdo, $userID, $name, $email, $password, $isAdmin, $emailVerified, $isActive)
+{
+
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
+    $query = "UPDATE utilisateurs SET nom = :name, email = :email, mot_de_passe = :password, est_admin = :isAdmin, mail_verifie = :emailVerified, est_actif = :isActive WHERE id = :userID";
+
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+    $statement->bindParam(':name', $name, PDO::PARAM_STR);
+    $statement->bindParam(':email', $email, PDO::PARAM_STR);
+    $statement->bindParam(':password', $hashedPassword, PDO::PARAM_STR);
+    $statement->bindParam(':isAdmin', $isAdmin, PDO::PARAM_INT);
+    $statement->bindParam(':emailVerified', $emailVerified, PDO::PARAM_INT);
+    $statement->bindParam(':isActive', $isActive, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+
+        echo "<script>console.error($errorMessage);</script>";
+
+        return false;
+    }
+
+    return true;
+}
+
+function AddMessage($pdo, $name, $email, $phone, $subject, $message){
+    $query = "INSERT INTO messages_contact (nom, email, telephone, sujet, message) VALUES (:name, :email, :phone, :subject, :message)";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':name', $name, PDO::PARAM_STR);
+    $statement->bindParam(':email', $email, PDO::PARAM_STR);
+    $statement->bindParam(':phone', $phone, PDO::PARAM_STR);
+    $statement->bindParam(':subject', $subject, PDO::PARAM_STR);
+    $statement->bindParam(':message', $message, PDO::PARAM_STR);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+    return true;
+}
+
+function GetMessages($pdo){
+    $query = "SELECT * FROM messages_contact";
+    $statement = $pdo->prepare($query);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+
+    return $statement->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+function DeleteMessage($pdo, $messageID){
+    $query = "DELETE FROM messages_contact WHERE id = :messageID";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':messageID', $messageID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+    return true;
+}
+
+function ProcessMessage($pdo, $messageID){
+    $query = "UPDATE messages_contact SET traite = 1 WHERE id = :messageID";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':messageID', $messageID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
     return true;
 }

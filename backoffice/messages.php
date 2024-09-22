@@ -1,24 +1,53 @@
 <?php
-include('../config.php');
-include('../functions.php');
+session_start();
+
+include_once "../config.php";
+include_once "../API/usersRequests.php";
+include_once "../functions.php";
+
+$user = GetCurrentUser($pdo);
+
+if ($user == false) {
+    header('Location: ../index.php');
+    exit;
+}
+
+if ($user['est_admin'] == 0) {
+    header('Location: ../index.php');
+    exit;
+}
 
 if (isset($_GET['delete_id'])) {
     $id = $_GET['delete_id'];
-    $result = deleteMessage($con, $id);
 
-    if ($result) {
-        echo "<div class='alert alert-success alert-dismissible fade show' role='alert'>
-                Message supprimé avec succès.
-                <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-            </div>";
+    if (DeleteMessage($pdo, $id)) {
+        DisplayDismissibleSuccess('Message supprimé avec succès.');
     } else {
-        echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-                Erreur lors de la suppression du message.
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>';
+        DisplayDismissibleAlert('Erreur lors de la suppression du message.');
     }    
 }
-$messages = getAllMessages($con);
+
+if(isset($_GET['traiter_id'])) {
+    $id = $_GET['traiter_id'];
+
+    if (ProcessMessage($pdo, $id)) {
+        DisplayDismissibleSuccess('Message traité avec succès.');
+    } else {
+        DisplayDismissibleAlert('Erreur lors du traitement du message.');
+    }
+
+}
+
+$messages = GetMessages($pdo);
+
+//Trier les message selon la date et selon s'ils ont déjà été traités
+usort($messages, function($a, $b) {
+    if ($a['traite'] == $b['traite']) {
+        return $a['date_message'] <=> $b['date_message'];
+    }
+    return $a['traite'] <=> $b['traite'];
+});
+
 ?>
 
 <!DOCTYPE html>
@@ -56,7 +85,9 @@ $messages = getAllMessages($con);
                                     <th>Email</th>
                                     <th>Numéro</th>
                                     <th>Message</th>
+                                    <th>Date</th>
                                     <th>Actions</th>
+                                    <th>Traité</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -67,9 +98,16 @@ $messages = getAllMessages($con);
                                     <td><?php echo $message['email']; ?></td>
                                     <td><?php echo $message['telephone']; ?></td>
                                     <td><?php echo $message['message']; ?></td>
+                                    <td><?php echo $message['date_message']; ?></td>
                                     <td>
+                                        <?php
+                                        if($message['traite'] == 0) {
+                                            echo '<a class="btn btn-dark btn-sm mb-1" href="?traiter_id='.$message['id'].'">Marquer comme traité</a>';
+                                        } 
+                                        ?>
                                         <a class="btn btn-danger btn-sm" href="?delete_id=<?php echo $message['id']; ?>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce message ?');">Supprimer</a>
                                     </td>
+                                    <td class="bg-<?php echo $message['traite'] == 1 ? 'success' : 'danger'; ?>"></td>
                                 </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -80,7 +118,11 @@ $messages = getAllMessages($con);
         </div>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+    </script>
 </body>
 </html>

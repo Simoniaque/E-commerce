@@ -1,8 +1,10 @@
 <?php
 session_start();
-include("config.php");
-include("functions.php");
-include("mail.php");  // Inclure la fonction sendMail
+include_once("config.php");
+include_once("functions.php");
+include_once("mail.php");
+include_once("API/usersRequests.php");
+
 
 // Initialiser des variables pour les messages de statut
 $contactMessage = '';
@@ -67,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
         $emailSent = sendMail($email, $name, $subjectClient, $textPartClient, $htmlPartClient);
 
-        addMessage($con, $name, $email, $phone, $subject, $message);
+        AddMessage($pdo, $name, $email, $phone, $subject, $message);
 
         } else {
             $contactMessage = 'Une erreur est survenue lors de l\'envoi de votre message. Veuillez réessayer.';

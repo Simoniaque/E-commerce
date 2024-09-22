@@ -1,8 +1,21 @@
 <?php
-// user.php
 session_start();
-include('../config.php');
-include('../functions.php');
+
+include_once "../config.php";
+include_once "../API/usersRequests.php";
+include_once "../functions.php";
+
+$user = GetCurrentUser($pdo);
+
+if ($user == false) {
+    header('Location: ../index.php');
+    exit;
+}
+
+if ($user['est_admin'] == 0) {
+    header('Location: ../index.php');
+    exit;
+}
 
 
 if (!isset($_GET['id'])) {
@@ -10,7 +23,12 @@ if (!isset($_GET['id'])) {
 }
 $userID = $_GET['id'];
 
-$userToModify = getUserByID($con, $userID);
+$userToModify = GetUserByID($pdo, $userID,0);
+
+if ($userToModify == false) {
+    die('Utilisateur non trouvé.');
+}
+
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['name'];
@@ -18,14 +36,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'];
     $isAdmin = isset($_POST['admin']) ? 1 : 0;
     $emailVerified = isset($_POST['emailVerified']) ? 1 : 0;
+    $isActive = isset($_POST['isActive']) ? 1 : 0;
 
-    if(EditUser($con, $userID ,$name, $email, $password, $isAdmin, $emailVerified)) {
-        echo '<div class="alert alert-success" role="alert">Utilisateur modifié avec succès.</div>';
+    if(UpdateUser($pdo, $userID ,$name, $email, $password, $isAdmin, $emailVerified, $isActive)) {
+        DisplayDismissibleSuccess('Utilisateur modifié avec succès.');
     } else {
-        echo '<div class="alert alert-danger" role="alert">Erreur lors de la modification de l\'utilisateur.</div>';
+        DisplayDismissibleAlert('Erreur lors de la modification de l\'utilisateur.');
     }
 
-    $userToModify = getUserByID($con, $userID);
+    $userToModify = GetUserByID($pdo, $userID,0);
 }
 ?>
 
@@ -81,6 +100,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <input type="checkbox" id="emailVerified" name="emailVerified" class="" <?php echo $checkedMail?>>
                             <label for="emailVerified" class="form-label">A vérifié son adresse mail</label>
                         </div>
+
+                        <div class="mb-3">
+                            <?php $checkedMail = $userToModify['est_actif'] == 1 ? 'checked' : ''; ?>
+                            <input type="checkbox" id="isActive" name="isActive" class="" <?php echo $checkedMail?>>
+                            <label for="isActive" class="form-label">Est actif</label>
+                        </div>
+
                         
 
                         <button type="submit" class="btn btn-primary">Modifier l'utilisateur</button>
@@ -91,6 +117,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script>
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+    </script>
 </body>
 </html>
