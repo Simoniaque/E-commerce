@@ -24,10 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Vérification de la correspondance des mots de passe
         if ($password !== $password_confirm) {
-            echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
-                    Les mots de passe ne correspondent pas
-                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                  </div>";
+            DisplayDismissibleAlert("Les mots de passe ne correspondent pas");
 
             $allowPasswordReset = true;
         } else {
@@ -98,6 +95,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
     <link rel="stylesheet" href="assets/css/style.css" />
+    <style>
+        .password-requirements {
+            font-size: 0.875em;
+            color: #6c757d;
+        }
+        .password-requirements p {
+            margin: 0;
+            padding: 0.2em 0;
+        }
+        .password-requirements span {
+            display: inline-block;
+            width: 100%;
+            transition: opacity 0.3s ease;
+        }
+        .password-requirements span.hidden {
+            opacity: 0;
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -112,15 +128,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     echo "<form class='p-4 shadow rounded-1 bg-light' method='post'>
                             <div class='form-group mb-3'>
                                 <label>Nouveau mot de passe</label>
-                                <input name='password' type='password' class='form-control'>
+                                <input id='password' name='password' type='password' class='form-control' required>
+                                <div id='passwordHelp' class='password-requirements'>
+                                    <p><span id='length' class='invalid'>Doit contenir au moins 8 caractères</span></p>
+                                    <p><span id='uppercase' class='invalid'>Doit contenir au moins une majuscule</span></p>
+                                    <p><span id='number' class='invalid'>Doit contenir au moins un chiffre</span></p>
+                                    <p><span id='special' class='invalid'>Doit contenir au moins un caractère spécial</span></p>
+                                </div>
                             </div>
                             <div class='form-group mb-3'>
                                 <label>Confirmer mot de passe</label>
-                                <input name='password_confirm' type='password' class='form-control'>
+                                <input id='password_confirm' name='password_confirm' type='password' class='form-control' required>
                             </div>
                             <input type='hidden' name='email' value='$email'>
                             <input type='hidden' name='token' value='$token'>
                             <button type='submit' class='btn btn-dark mb-2'>Réinitialiser mot de passe</button>
+                            <div class='form-group form-check mb-3'>
+                                <input type='checkbox' class='form-check-input' id='togglePassword'>
+                                <label class='form-check-label'>Afficher mot de passe</label>
+                            </div>
                         </form>";
                 } else if ($resetMailForm) {
                     // Formulaire d'envoi de l'email de réinitialisation
@@ -146,6 +172,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        function validateForm() {
+            const password = document.querySelector('#password').value;
+            const passwordConfirm = document.querySelector('#passwordConfirm').value;
+
+            if (password !== passwordConfirm) {
+                alert('Les mots de passe ne correspondent pas.');
+                return false;
+            }
+
+            if (!isValidPassword(password)) {
+                alert('Le mot de passe ne respecte pas les critères de sécurité.');
+                return false;
+            }
+
+            return true;
+        }
+
+        function isValidPassword(password) {
+            const lengthCriteria = /(?=.{8,})/;
+            const uppercaseCriteria = /(?=.*[A-Z])/;
+            const numberCriteria = /(?=.*\d)/;
+            const specialCriteria = /(?=.*[@$!%*?&_])/;
+
+            const lengthValid = lengthCriteria.test(password);
+            const uppercaseValid = uppercaseCriteria.test(password);
+            const numberValid = numberCriteria.test(password);
+            const specialValid = specialCriteria.test(password);
+
+            document.querySelector('#length').className = lengthValid ? 'valid hidden' : 'invalid';
+            document.querySelector('#uppercase').className = uppercaseValid ? 'valid hidden' : 'invalid';
+            document.querySelector('#number').className = numberValid ? 'valid hidden' : 'invalid';
+            document.querySelector('#special').className = specialValid ? 'valid hidden' : 'invalid';
+
+            return lengthValid && uppercaseValid && numberValid && specialValid;
+        }
+
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+        const passwordConfirm = document.querySelector('#password_confirm');
+
+        togglePassword.addEventListener('click', () => {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            passwordConfirm.setAttribute('type', type);
+        });
+
+        document.querySelector('#password').addEventListener('input', () => {
+            isValidPassword(document.querySelector('#password').value);
+        });
+    </script>
+
+    <script>
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+    </script>
+
 </body>
 
 </html>

@@ -137,7 +137,7 @@ $orders = GetOrders($pdo);
                                 echo "
                                 <tr>
                                     
-                                    <th scope='row'>$orderID</th>
+                                    <th scope='row'><a href='orderdetail.php?id=$orderID'/>$orderID</th>
                                     <td>$userEmail</td>
                                     <td>$totalPrice</td>
                                     <td>$fullBillingAddress</td>
@@ -161,7 +161,6 @@ $orders = GetOrders($pdo);
 
 
                                     <td>
-                                    <a href='orders.php?activate_id=$orderID' class='btn btn-dark'>Activer</a>
                                     <a href='orders.php?activate_id=$orderID' class='btn btn-dark'>Activer</a>
                                     <a href='orders.php?delete_id=$orderID' class='btn btn-danger'>Désactiver</a>
                                     </td>

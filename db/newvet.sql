@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mar. 17 sep. 2024 à 11:02
+-- Généré le : lun. 23 sep. 2024 à 00:52
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -60,9 +60,7 @@ INSERT INTO `categories` (`id`, `nom`, `description`, `est_actif`) VALUES
 (2, 'Hauts', 'Explorez notre sélection de hauts, conçus pour s\'adapter à toutes vos envies et à chaque moment de la journée. Du t-shirt basique au chemisier raffiné, en passant par les blouses et les débardeurs, chaque pièce est pensée pour offrir confort et élégance. ', 1),
 (3, 'Pantalons', 'Nos pantalons allient style et fonctionnalité pour vous offrir une allure impeccable. Que vous préfériez les coupes ajustées, les pantalons larges ou les modèles plus casual, notre collection répondra à toutes vos attentes. Fabriqués avec des matériaux de', 1),
 (4, 'Chaussures', 'Complétez votre tenue avec notre gamme de chaussures, alliant confort et style pour chaque pas. Des baskets tendances aux escarpins élégants, en passant par les sandales d\'été et les bottines hivernales, trouvez la paire qui correspond à votre style et à ', 1),
-(5, 'Accessoires', 'Les accessoires sont la touche finale qui sublime votre look. Explorez notre collection de sacs, bijoux, ceintures, et autres petits trésors pour personnaliser vos tenues avec style. Que vous cherchiez une pièce discrète ou un accessoire statement, notre ', 1),
-(9, 'Pulls', 'Découvrez notre collection de pulls, conçus pour vous offrir chaleur et style. Des classiques intemporels aux modèles tendance, nos pulls ajoutent une touche de confort à vos tenues tout au long de l’année. Trouvez votre pièce idéale pour allier douceur e', 1),
-(10, 'Vestes', 'Alliant élégance et praticité, nos modèles vous assurent un look impeccable et un confort optimal. Trouvez la veste parfaite pour compléter votre tenue et affronter chaque journée avec style.', 0);
+(5, 'Accessoires', 'Les accessoires sont la touche finale qui sublime votre look. Explorez notre collection de sacs, bijoux, ceintures, et autres petits trésors pour personnaliser vos tenues avec style. Que vous cherchiez une pièce discrète ou un accessoire statement, notre ', 1);
 
 -- --------------------------------------------------------
 
@@ -80,10 +78,10 @@ CREATE TABLE `categories_en_avant` (
 --
 
 INSERT INTO `categories_en_avant` (`id`, `categorie_id`) VALUES
-(183, 2),
-(184, 4),
-(185, 5),
-(186, 10);
+(195, 1),
+(196, 2),
+(197, 3),
+(198, 4);
 
 -- --------------------------------------------------------
 
@@ -165,7 +163,8 @@ CREATE TABLE `messages_contact` (
   `telephone` varchar(20) DEFAULT NULL,
   `sujet` varchar(255) DEFAULT NULL,
   `message` text NOT NULL,
-  `date_message` datetime DEFAULT current_timestamp()
+  `date_message` datetime DEFAULT current_timestamp(),
+  `traite` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -221,19 +220,16 @@ CREATE TABLE `produits` (
 --
 
 INSERT INTO `produits` (`id`, `categorie_id`, `nom`, `description`, `prix`, `stock`, `date_ajout`, `en_priorite`, `est_actif`) VALUES
-(1, 1, 'Robe Zébrée', 'Robe zébrée élégante pour toutes les occasion', 40.00, 30, '2024-08-13', 0, 1),
-(2, 1, 'Robe Maxi Florale', 'Robe longue avec motif floral, parfaite pour l&#039;été.', 79.99, 0, '2024-08-09', 0, 1),
-(3, 2, 'Chemisier à Manches Longues', 'Chemisier féminin à manches longues.', 29.99, 0, '2024-04-24', 0, 1),
-(4, 2, 'Débardeur Basique', 'Débardeur confortable pour une tenue décontractée.', 14.99, 0, '2024-02-16', 0, 1),
-(5, 3, 'Jean Skinny Stretch', 'Jean stretch et ajusté pour un look moderne.', 49.99, 5, '2024-08-21', 0, 1),
-(6, 4, 'Bottes Hautes', 'Bottes élégantes pour l&#039;hiver.', 89.99, 0, '2024-08-28', 1, 1),
-(7, 4, 'Sandales à Talons', 'Sandales à talons pour les soirées.', 69.99, 20, '2024-01-10', 1, 0),
-(10, 4, 'Chaussure à talon', 'Chaussure à talon en cuir', 49.00, 20, '2018-08-15', 0, 1),
-(11, 3, 'Pantalon Onlraffy-Yo Life', 'Ce produit est fabriqué à partir de polyester recyclé. Le polyester recyclé préserve les ressources naturelles et réduit la quantité de déchets.', 39.99, 50, '2024-08-20', 0, 1),
-(13, 5, 'Sac paille', 'Sac rond en paille avec anses dorées', 25.00, 50, '2024-08-26', 0, 1),
-(22, 3, 'Pantallon Habillé', 'Pantalon fluide à jambes larges, taille réglable avec liens ton sur ton et poches sur les côtés', 35.00, 50, '2024-08-26', 0, 1),
-(28, 5, 'Lunette de Soleil Polarisées', 'Protection UV400 Surdimensionnées Lunettes Classique Grand Cadre Lunettes de Soleil Femmes B2289', 19.99, 100, '2024-08-26', 0, 1),
-(32, 1, 'Pull noir en coton', 'Pull noir confortable et chaud', 35.00, 50, '2024-08-28', 0, 1);
+(1, 1, 'Robe Zébrée', 'Robe zébrée élégante pour toutes les occasion', 40.00, 27, '2024-08-13', 0, 1),
+(2, 1, 'Robe Maxi Florale', 'Robe longue avec motif floral, parfaite pour l&#039;été.', 79.99, 40, '2024-08-09', 0, 1),
+(3, 2, 'Chemisier à Manches Longues', 'Chemisier féminin à manches longues.', 29.99, 39, '2024-04-24', 0, 1),
+(4, 2, 'Débardeur Basique', 'Débardeur confortable pour une tenue décontractée.', 14.99, 10, '2024-02-16', 0, 1),
+(5, 3, 'Jean Skinny Stretch', 'Jean stretch et ajusté pour un look moderne.', 49.99, 10, '2024-08-21', 0, 1),
+(6, 4, 'Bottes Hautes', 'Bottes élégantes pour l&#039;hiver.', 89.99, 10, '2024-08-28', 1, 1),
+(10, 4, 'Chaussure à talon', 'Chaussure à talon en cuir', 49.00, 14, '2018-08-15', 0, 1),
+(13, 5, ' Sac en paille', 'Sac rond en paille avec anses dorées', 20.00, 50, '2024-08-26', 0, 1),
+(22, 3, 'Pantallon Habillé', 'Pantalon fluide à jambes larges, taille réglable avec liens ton sur ton et poches sur les côtés', 35.00, 49, '2024-08-26', 0, 1),
+(28, 5, 'Lunette de Soleil Polarisées', 'Protection UV400 Surdimensionnées Lunettes Classique Grand Cadre Lunettes de Soleil Femmes B2289', 19.99, 95, '2024-08-26', 0, 1);
 
 -- --------------------------------------------------------
 
@@ -251,10 +247,10 @@ CREATE TABLE `produits_en_avant` (
 --
 
 INSERT INTO `produits_en_avant` (`id`, `produit_id`) VALUES
-(130, 3),
-(131, 5),
-(132, 6),
-(129, 22);
+(145, 1),
+(146, 2),
+(147, 3),
+(148, 4);
 
 -- --------------------------------------------------------
 
@@ -273,22 +269,22 @@ CREATE TABLE `produits_materiaux` (
 --
 
 INSERT INTO `produits_materiaux` (`id`, `produit_id`, `materiau_id`) VALUES
-(202, 1, 1),
-(203, 1, 2),
+(263, 1, 1),
+(264, 1, 2),
+(265, 1, 3),
+(266, 1, 4),
 (103, 2, 2),
 (93, 3, 2),
 (94, 4, 1),
 (95, 5, 1),
 (96, 5, 3),
 (98, 6, 3),
-(97, 7, 2),
 (99, 10, 3),
-(100, 11, 2),
-(35, 13, 2),
+(261, 13, 1),
+(262, 13, 4),
 (53, 22, 1),
 (54, 22, 2),
-(110, 28, 2),
-(208, 32, 1);
+(110, 28, 2);
 
 -- --------------------------------------------------------
 
@@ -329,6 +325,13 @@ CREATE TABLE `utilisateurs` (
   `mail_verifie` tinyint(1) DEFAULT 0,
   `est_actif` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `utilisateurs`
+--
+
+INSERT INTO `utilisateurs` (`id`, `nom`, `email`, `mot_de_passe`, `est_admin`, `mail_verifie`, `est_actif`) VALUES
+(1, 'Administrateur', 'admin@newvet.fr', '$2y$10$PjUp3I33SUnaFZZQ9P.7QuB3p9eqK/7anxEmpXPJGJGfFiTVYXpDu', 1, 1, 1);
 
 --
 -- Index pour les tables déchargées
@@ -456,37 +459,37 @@ ALTER TABLE `utilisateurs`
 -- AUTO_INCREMENT pour la table `adresses_utilisateurs`
 --
 ALTER TABLE `adresses_utilisateurs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT pour la table `categories_en_avant`
 --
 ALTER TABLE `categories_en_avant`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=187;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=199;
 
 --
 -- AUTO_INCREMENT pour la table `commandes`
 --
 ALTER TABLE `commandes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `details_commandes`
 --
 ALTER TABLE `details_commandes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `details_paniers`
 --
 ALTER TABLE `details_paniers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=114;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `materiaux`
@@ -498,43 +501,43 @@ ALTER TABLE `materiaux`
 -- AUTO_INCREMENT pour la table `messages_contact`
 --
 ALTER TABLE `messages_contact`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `moyens_paiement`
 --
 ALTER TABLE `moyens_paiement`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `paniers`
 --
 ALTER TABLE `paniers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `produits`
 --
 ALTER TABLE `produits`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT pour la table `produits_en_avant`
 --
 ALTER TABLE `produits_en_avant`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=133;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=149;
 
 --
 -- AUTO_INCREMENT pour la table `produits_materiaux`
 --
 ALTER TABLE `produits_materiaux`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=209;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=269;
 
 --
 -- AUTO_INCREMENT pour la table `utilisateurs`
 --
 ALTER TABLE `utilisateurs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Contraintes pour les tables déchargées

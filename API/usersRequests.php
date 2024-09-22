@@ -543,6 +543,8 @@ function VerifyUser($pdo, $userID)
 
         return false;
     }
+
+    DeleteVerificationToken($pdo, $userID);
     return true;
 }
 
@@ -593,6 +595,9 @@ function ResetPassword($pdo, $userID, $newPassword)
 
         return false;
     }
+
+    DeleteResetPasswordToken($pdo, $userID);
+
     return true;
 }
 
