@@ -309,3 +309,38 @@ function GetMaterialsIDByProduct($pdo, $productID){
 
     return $materialsID;
 }
+
+function AddProduct($pdo, $nom, $description, $prix, $stock, $categorie_id, $materialsId){
+    $query = "INSERT INTO produits (nom, description, prix, stock, categorie_id) VALUES (:nom, :description, :prix, :stock, :categorie_id)";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':nom', $nom, PDO::PARAM_STR);
+    $statement->bindParam(':description', $description, PDO::PARAM_STR);
+    $statement->bindParam(':prix', $prix, PDO::PARAM_STR);
+    $statement->bindParam(':stock', $stock, PDO::PARAM_INT);
+    $statement->bindParam(':categorie_id', $categorie_id, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+
+    $productID = $pdo->lastInsertId();
+
+    foreach ($materialsId as $materialID) {
+        $query = "INSERT INTO produits_materiaux (produit_id, materiau_id) VALUES (:productID, :materialID)";
+        $statement = $pdo->prepare($query);
+        $statement->bindParam(':productID', $productID, PDO::PARAM_INT);
+        $statement->bindParam(':materialID', $materialID, PDO::PARAM_INT);
+
+        if (!@$statement->execute()) {
+            $errorInfo = $statement->errorInfo();
+            $errorMessage = json_encode($errorInfo[2]);
+            echo "<script>console.error($errorMessage);</script>";
+            return false;
+        }
+    }
+
+    return $productID;
+}

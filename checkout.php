@@ -5,6 +5,7 @@ include_once("config.php");
 include_once("functions.php");
 include_once "API/usersRequests.php";
 include_once "API/ordersRequests.php";
+include_once "API/cartsRequests.php";
 
 $user = GetCurrentUser($pdo);
 if (!$user) {

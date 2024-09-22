@@ -33,15 +33,15 @@ include_once ("API/categoriesRequests.php");
         <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
                 <div class="carousel-item active">
-                    <img src="https://imgproduitnewvet.blob.core.windows.net/imagescarousel/img_carousel_1.jpg"
+                    <img src=<?php echo PATH_CAROUSEL_IMAGES."img_carousel_1.jpg"?>
                         class="d-block w-100" alt="pic1">
                 </div>
                 <div class="carousel-item">
-                    <img src="https://imgproduitnewvet.blob.core.windows.net/imagescarousel/img_carousel_2.jpg"
+                    <img src=<?php echo PATH_CAROUSEL_IMAGES."img_carousel_2.jpg"?>
                         class="d-block w-100" alt="pic2">
                 </div>
                 <div class="carousel-item">
-                    <img src="https://imgproduitnewvet.blob.core.windows.net/imagescarousel/img_carousel_3.jpg"
+                    <img src=<?php echo PATH_CAROUSEL_IMAGES."img_carousel_3.jpg"?>
                         class="d-block w-100" alt="pic3">
                 </div>
             </div>

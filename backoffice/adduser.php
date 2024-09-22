@@ -1,8 +1,23 @@
 <?php
-// user.php
 session_start();
-include('../config.php');
-include('../functions.php');
+
+include_once "../config.php";
+include_once "../API/usersRequests.php";
+include_once "../API/categoriesRequests.php";
+include_once "../API/productsRequests.php";
+include_once "../functions.php";
+
+$user = GetCurrentUser($pdo);
+
+if($user === false){
+    header('Location: ../index.php');
+    exit;
+}
+
+if($user['est_admin'] == 0){
+    header('Location: ../index.php');
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['name'];
@@ -11,13 +26,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $isAdmin = isset($_POST['admin']) ? 1 : 0;
     $emailVerified = isset($_POST['emailVerified']) ? 1 : 0;
 
-    if(userAlreadyExists($con, $email)){
-        echo '<div class="alert alert-danger" role="alert">Cette adresse mail est déjà utilisée</div>';
+    if(GetUserByEmail($pdo, $email,0)){
+        DisplayDismissibleAlert("Cet email est déjà utilisé par un autre utilisateur.");
     }else{
-        if(addNewUser($con,$name, $email, $password, $isAdmin, $emailVerified)) {
-            echo '<div class="alert alert-success" role="alert">Utilisateur ajouté avec succès.</div>';
+        if(AddUser($pdo,$name, $email, $password, $isAdmin, $emailVerified)) {
+            DisplayDismissibleSuccess("Utilisateur ajouté avec succès!");
         } else {
-            echo '<div class="alert alert-danger" role="alert">Erreur lors de l\'ajout de l\'utilisateur.</div>';
+            DisplayDismissibleAlert("Erreur lors de l'ajout de l'utilisateur.");
         }
     }
 }

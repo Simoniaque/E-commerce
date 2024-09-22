@@ -78,7 +78,7 @@ $categories = GetCategories($pdo,0);
                                     <td><?php echo $category['nom']; ?></td>
                                     <td><?php echo $category['description']; ?></td>
                                     <td>
-                                        <img src="<?php echo 'https://imgproduitnewvet.blob.core.windows.net/imagescategories/' . $category['id'] . '.png'; ?>" alt="Image de la catégorie" style="width: 100px; height: auto;">
+                                        <img src="<?php echo PATH_CATEGORY_IMAGES . $category['id'] . '.png'; ?>" alt="Image de la catégorie" style="width: 100px; height: auto;">
                                     </td>
                                     <td>
                                         <a class="btn btn-dark btn-sm mb-2" href="category.php?id=<?php echo $category['id']; ?>">Modifier</a>

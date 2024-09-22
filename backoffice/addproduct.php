@@ -1,8 +1,23 @@
 <?php
-// addProduct.php
 session_start();
-include('../config.php');
-include('../functions.php');
+
+include_once "../config.php";
+include_once "../API/usersRequests.php";
+include_once "../API/categoriesRequests.php";
+include_once "../API/productsRequests.php";
+include_once "../functions.php";
+
+$user = GetCurrentUser($pdo);
+
+if($user === false){
+    header('Location: ../index.php');
+    exit;
+}
+
+if($user['est_admin'] == 0){
+    header('Location: ../index.php');
+    exit;
+}
 
 $response = array('success' => false, 'message' => '');
 
@@ -14,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $categorie_id = intval($_POST['categorie_id']);
     $materialsId = isset($_POST['material']) ? array_map('intval', $_POST['material']) : array();
 
-    $newProductId = addProduct($con, $nom, $description, $prix, $stock, $categorie_id, $materialsId);
+    $newProductId = AddProduct($pdo, $nom, $description, $prix, $stock, $categorie_id, $materialsId);
 
     if ($newProductId) {
         $response['success'] = true;
@@ -22,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $response['product_id'] = $newProductId;
 
     } else {
-        $response['message'] = 'Erreur lors de l\'ajout du produit: ' . $con->error;
+        $response['message'] = 'Erreur lors de l\'ajout du produit.';
     }
 
     header('Content-Type: application/json');
@@ -115,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div class="mb-3">
                             <label for='material' class='form-label'>Matériaux:</label><br/>
                             <?php
-                            $materials = getMaterials($con);
+                            $materials = GetMaterials($pdo);
                             foreach ($materials as $material) {
                                 $idMat = $material['id'];
                                 $nomMat = $material['nom'];
@@ -128,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <label for="categorie_id" class="form-label">Catégorie:</label>
                             <select id="categorie_id" name="categorie_id" class="form-select">
                                 <?php
-                                $categories = getCategories($con);
+                                $categories = GetCategories($pdo);
                                 foreach ($categories as $cat) {
                                     echo "<option value='{$cat['id']}'>{$cat['nom']}</option>";
                                 }
@@ -228,7 +243,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     const data = await response.json();
                     if (data.success) {
-                        await handleUploads(data.product_id, ['image1', 'image2', 'image3'], 'imagescontainer');
+                        await handleUploads(data.product_id, ['image1', 'image2', 'image3'], '<?php echo PRODUCT_IMAGES_CONTAINER; ?>');
                         showAlert(data.message, 'success');
                         form.reset(); // Réinitialiser le formulaire si nécessaire
                     } else {

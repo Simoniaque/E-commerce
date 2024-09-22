@@ -1,5 +1,7 @@
 <?php
 
+use Symfony\Component\Validator\Constraints\Length;
+
 function GetUsers($pdo, $activeOnly = 1)
 {
     $query = "SELECT * FROM utilisateurs WHERE est_actif >= :activeOnly";
@@ -295,6 +297,16 @@ function AddUserPaymentMethod($pdo, $userID, $payementType, $cardNumber, $cardNa
 
     $query = "INSERT INTO moyens_paiement (utilisateur_id, type, numero_carte, nom_titulaire, date_expiration, cvv, paypal_email) 
               VALUES (:userID, :payementType, :cardNumber, :cardName, :expirationDate, :cvv, :paypalEmail)";
+
+    //remove all characters except digits in cardNumber
+    $cardNumber = preg_replace('/\D/', '', $cardNumber);
+
+    if (strlen($cardNumber) != 16) {
+        echo "<script>console.error('Le numéro de la carte doit avoir 16 chiffres');</script>";
+        return false;
+    }
+
+    $cardNumber = "**** **** **** " . substr($cardNumber, -4);
 
     $statement = $pdo->prepare($query);
     $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
@@ -757,4 +769,24 @@ function ProcessMessage($pdo, $messageID){
         return false;
     }
     return true;
+}
+
+function AddUser($pdo,$name, $email, $password, $isAdmin, $emailVerified){
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
+    $query = "INSERT INTO utilisateurs (nom, email, mot_de_passe, est_admin, mail_verifie) VALUES (:name, :email, :password, :isAdmin, :emailVerified)";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':name', $name, PDO::PARAM_STR);
+    $statement->bindParam(':email', $email, PDO::PARAM_STR);
+    $statement->bindParam(':password', $hashedPassword, PDO::PARAM_STR);
+    $statement->bindParam(':isAdmin', $isAdmin, PDO::PARAM_INT);
+    $statement->bindParam(':emailVerified', $emailVerified, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+    return true;    
 }

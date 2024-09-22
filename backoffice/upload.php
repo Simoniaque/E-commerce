@@ -1,11 +1,12 @@
 <?php
-require '../vendor/autoload.php'; // Assurez-vous que le chemin est correct
+require '../vendor/autoload.php';
+include_once '../config.php';
 
 use MicrosoftAzure\Storage\Blob\BlobRestProxy;
 use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
 
-$connectionString = "DefaultEndpointsProtocol=https;AccountName=imgproduitnewvet;AccountKey=wn85f9ndBMq16Bis0lEq4ud2iRItnx+b24MI2HU6X1/w8HN1SLW1gZyDRTekph2nJtestcld5GtV+AStwPlIuw==;";
-$blobClient = BlobRestProxy::createBlobService($connectionString);
+
+$blobClient = BlobRestProxy::createBlobService($azureConnectionString);
 
 header('Content-Type: application/json');
 

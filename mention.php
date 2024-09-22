@@ -33,7 +33,7 @@ include("functions.php");
             <p>Le site Newvet est édité par Newvet, [Forme juridique] au capital de [Montant du capital], immatriculée au Registre du Commerce et des Sociétés de Toulouse sous le numéro [Numéro d'immatriculation].</p>
             <p><strong>Siège social :</strong> 50 Rue de Limayrac, 31500 Toulouse, France</p>
             <p><strong>Téléphone :</strong> +33 1 01 01 01 01</p>
-            <p><strong>Email :</strong> contact.newvet@gmail.com</p>
+            <p><strong>Email :</strong> <?php echo MAILJET_SENDER_EMAIL;?></p>
         
 
         

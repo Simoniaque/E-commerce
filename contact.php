@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                      <p><strong>Message :</strong></p><p>$message</p>";
 
         // Adresse e-mail de l'expéditeur
-        $toEmail = 'contact.newvet@gmail.com';  // L'adresse de contact de votre marque
+        $toEmail = MAILJET_SENDER_EMAIL;  // L'adresse de contact de votre marque
 
         // Envoyer l'e-mail
         $emailSent = sendMail($toEmail, $name, $object, $textPart, $htmlPart);
@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </ul>
                         <br/>
                         <p>Notre équipe examinera votre message et vous répondra dans les plus brefs délais.</p>
-                        <p>Si vous avez des questions supplémentaires, n\'hésitez pas à nous contacter à l\'adresse suivante : <a href="mailto:contact.newvet@gmail.com" style="color: #007bff; text-decoration: none;">contact.newvet@gmail.com</a>.</p>
+                        <p>Si vous avez des questions supplémentaires, n\'hésitez pas à nous contacter à l\'adresse suivante : <a href="mailto:'.MAILJET_SENDER_EMAIL.' style="color: #007bff; text-decoration: none;">'.MAILJET_SENDER_EMAIL.'</a>.</p>
                         <p>Merci et à bientôt !</p>
                         <p>Cordialement,<br>L\'équipe de New Vet</p>
                     </div>
@@ -169,7 +169,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                                 <div>
                                                                     <h4 class="mb-3 text-light">Mail</h4>
                                                                     <p class="mb-0">
-                                                                        <a class="link-light link-opacity-75 link-opacity-100-hover text-decoration-none" href="mailto:contact.newvet@gmail.com">contact.newvet@gmail.com</a>
+                                                                        <a class="link-light link-opacity-75 link-opacity-100-hover text-decoration-none" href="mailto:<?php echo MAILJET_SENDER_EMAIL;?>"><?php echo MAILJET_SENDER_EMAIL;?></a>
                                                                     </p>
                                                                 </div>
                                                             </div>

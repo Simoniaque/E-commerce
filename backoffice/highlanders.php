@@ -113,21 +113,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div id="alertImage1" class="alert-container mb-2"></div>
                         <label for="image1">Image 1</label>
                         <input type="file" name="image1" id="image1" class="form-control mb-3" accept="image/jpeg">
-                        <img id="previewImage1" src="https://imgproduitnewvet.blob.core.windows.net/imagescarousel/img_carousel_1.jpg" alt="" class="img-preview mt-2">
+                        <img id="previewImage1" src="<?php echo PATH_CAROUSEL_IMAGES. "img_carousel_1.jpg"?>" alt="" class="img-preview mt-2">
                     </div>
 
                     <div class="mb-3">
                         <div id="alertImage2" class="alert-container mb-2"></div>
                         <label for="image2">Image 2</label>
                         <input type="file" name="image2" id="image2" class="form-control mb-3" accept="image/jpeg">
-                        <img id="previewImage2" src="https://imgproduitnewvet.blob.core.windows.net/imagescarousel/img_carousel_2.jpg" alt="" class="img-preview mt-2">
+                        <img id="previewImage2" src="<?php echo PATH_CAROUSEL_IMAGES. "img_carousel_2.jpg"?>" alt="" class="img-preview mt-2">
                     </div>
 
                     <div class="mb-3">
                         <div id="alertImage3" class="alert-container mb-2"></div>
                         <label for="image3">Image 3</label>
                         <input type="file" name="image3" id="image3" class="form-control mb-3" accept="image/jpeg">
-                        <img id="previewImage3" src="https://imgproduitnewvet.blob.core.windows.net/imagescarousel/img_carousel_3.jpg" alt="" class="img-preview mt-2">
+                        <img id="previewImage3" src="<?php echo PATH_CAROUSEL_IMAGES. "img_carousel_3.jpg"?>" alt="" class="img-preview mt-2">
                     </div>
                     <button id="uploadBtn" class="btn btn-dark">Upload les images</button>
                 </div>

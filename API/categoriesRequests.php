@@ -138,3 +138,19 @@ function UpdateCategory($pdo, $categoryID, $name, $description, $isActive) {
 
     return true;
 }
+
+function AddCategory($pdo, $nom, $description){
+    $query = "INSERT INTO categories (nom, description) VALUES (:nom, :description)";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':nom', $nom, PDO::PARAM_STR);
+    $statement->bindParam(':description', $description, PDO::PARAM_STR);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+
+    return $pdo->lastInsertId();
+}

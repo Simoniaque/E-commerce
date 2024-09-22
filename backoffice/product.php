@@ -103,21 +103,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <label for="image1" class="form-label">Image 1:</label>
                                 <input type="file" id="image1" name="image1" class="form-control" accept="image/webp">
                                 <div class="img-container">
-                                    <img id="previewImage1" src="https://imgproduitnewvet.blob.core.windows.net/imagescontainer/<?php echo $productID; ?>.webp" alt="" class="img-preview mt-2">
+                                    <img id="previewImage1" src="<?php echo PATH_PRODUCTS_IMAGES. $productID; ?>.webp" alt="" class="img-preview mt-2">
                                 </div>
                             </div>
                             <div class="col">
                                 <label for="image2" class="form-label">Image 2:</label>
                                 <input type="file" id="image2" name="image2" class="form-control" accept="image/webp">
                                 <div class="img-container">
-                                    <img id="previewImage2" src="https://imgproduitnewvet.blob.core.windows.net/imagescontainer/<?php echo $productID; ?>_2.webp" alt="" class="img-preview mt-2">
+                                    <img id="previewImage2" src="<?php echo PATH_PRODUCTS_IMAGES. $productID; ?>_2.webp" alt="" class="img-preview mt-2">
                                 </div>
                             </div>
                             <div class="col">
                                 <label for="image3" class="form-label">Image 3:</label>
                                 <input type="file" id="image3" name="image3" class="form-control" accept="image/webp">
                                 <div class="img-container">
-                                    <img id="previewImage3" src="https://imgproduitnewvet.blob.core.windows.net/imagescontainer/<?php echo $productID; ?>_3.webp" alt="" class="img-preview mt-2">
+                                    <img id="previewImage3" src="<?php echo PATH_PRODUCTS_IMAGES. $productID; ?>_3.webp" alt="" class="img-preview mt-2">
                                 </div>
                             </div>
                         </div>
@@ -230,7 +230,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             const formData = new FormData();
             formData.append('file', imageBlob);
             formData.append('blobName', imageName);
-            formData.append('container', 'imagescontainer');
+            formData.append('container', '<?php echo PRODUCT_IMAGES_CONTAINER; ?>');
 
             try {
                 const response = await fetch('upload.php', {
@@ -253,7 +253,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     alert(`Erreur: ${result.message}`);
                 }
             } catch (error) {
-                alert(`Erreur lors de l'upload de ${imageName} vers imagescontainer: ${error.message}`);
+                alert(`Erreur lors de l'upload de ${imageName} vers <?php echo PRODUCT_IMAGES_CONTAINER?>: ${error.message}`);
             }
         }
 

@@ -1,8 +1,22 @@
 <?php
-// addcategory.php
 session_start();
-include('../config.php');
-include('../functions.php');
+
+include_once "../config.php";
+include_once "../API/usersRequests.php";
+include_once "../API/categoriesRequests.php";
+include_once "../functions.php";
+
+$user = GetCurrentUser($pdo);
+
+if($user === false){
+    header('Location: ../index.php');
+    exit;
+}
+
+if($user['est_admin'] == 0){
+    header('Location: ../index.php');
+    exit;
+}
 
 $response = array('success' => false, 'message' => '');
 
@@ -11,14 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nom = $_POST['nom'];
     $description = $_POST['description'];
 
-    $result = addCategory($con, $nom, $description);
+    $result = AddCategory($pdo, $nom, $description);
 
     if ($result) {
         $response['success'] = true;
         $response['message'] = 'Catégorie ajoutée avec succès!';
-        $response['category_id'] = $result; // On suppose que `addCategory` retourne l'ID de la nouvelle catégorie
+        $response['category_id'] = $result;
     } else {
-        $response['message'] = 'Erreur lors de l\'ajout de la catégorie: ' . $con->error;
+        $response['message'] = 'Erreur lors de l\'ajout de la catégorie.';
     }
 
     header('Content-Type: application/json');
@@ -189,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     if (data.success) {
                         // Assurez-vous de spécifier l'ID de la catégorie pour le traitement des images
-                        await uploadImage(formData.get('image1'), 'imagescategories', `${data.category_id}.png`);
+                        await uploadImage(formData.get('image1'), '<?php echo CATEGORY_IMAGES_CONTAINER;?>', `${data.category_id}.png`);
                         showAlert(data.message, 'success');
                         form.reset(); // Réinitialiser le formulaire si nécessaire
                     } else {

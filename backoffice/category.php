@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <label for="image1" class="form-label">Image 1:</label>
                                 <input type="file" id="image1" name="image1" class="form-control" accept="image/png">
                                 <div class="img-container">
-                                    <img id="previewImage1" src="https://imgproduitnewvet.blob.core.windows.net/imagescategories/<?php echo $categoryID; ?>.png" alt="" class="img-preview mt-2">
+                                    <img id="previewImage1" src="<?php echo PATH_CATEGORY_IMAGES. $categoryID .".png"?>" alt="" class="img-preview mt-2">
                                 </div>
                             </div>
                         </div>
@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             const formData = new FormData();
             formData.append('file', imageBlob);
             formData.append('blobName', imageName);
-            formData.append('container', 'imagescategories');
+            formData.append('container', '<?php echo CATEGORY_IMAGES_CONTAINER; ?>');
 
             try {
                 const response = await fetch('upload.php', {
@@ -173,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     alert(`Erreur: ${result.message}`);
                 }
             } catch (error) {
-                alert(`Erreur lors de l'upload de ${imageName} vers imagescategories: ${error.message}`);
+                alert(`Erreur lors de l'upload de ${imageName} vers <?php echo CATEGORY_IMAGES_CONTAINER;?> : ${error.message}`);
             }
         }
 

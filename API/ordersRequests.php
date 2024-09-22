@@ -1,5 +1,20 @@
 <?php
 
+function GetOrders($pdo){
+    $query = "SELECT * FROM commandes";
+
+    $statement = $pdo->prepare($query);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+
+    return $statement->fetchAll(PDO::FETCH_ASSOC);
+}
+
 function GetUserOrderByNumber($pdo, $userID, $orderNumber, $activeOnly = 1) {
     
     $query = "SELECT * FROM commandes WHERE id = :orderNumber AND utilisateur_id = :userID AND est_actif >= :activeOnly LIMIT 1";
@@ -160,6 +175,55 @@ function CreateOrder($pdo, $userID, $totalPrice, $billingAddressID, $shippingAdd
 function DeleteOrder($pdo, $orderID){
     
     $query = "DELETE FROM commandes WHERE id = :orderID";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':orderID', $orderID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+
+    return true;
+}
+
+function UpdateOrderStatus($pdo, $orderID, $status){
+    
+    $query = "UPDATE commandes SET statut = :status WHERE id = :orderID";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':orderID', $orderID, PDO::PARAM_INT);
+    $statement->bindParam(':status', $status, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+
+    return true;
+}
+
+function DeactivateOrder($pdo, $orderID){
+        
+    $query = "UPDATE commandes SET est_actif = 0 WHERE id = :orderID";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':orderID', $orderID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+
+    return true;
+}
+
+function ActivateOrder($pdo, $orderID){
+        
+    $query = "UPDATE commandes SET est_actif = 1 WHERE id = :orderID";
     $statement = $pdo->prepare($query);
     $statement->bindParam(':orderID', $orderID, PDO::PARAM_INT);
 
