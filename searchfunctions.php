@@ -88,11 +88,6 @@ function SearchProducts($pdo, $searchText, $minPrice, $maxPrice, $inStock) {
         }
     }
 
-    //log each product priority
-    foreach($productsToDisplay as $product){
-        debugToConsole($product['product']['nom'] . " : " . $product['priority']);
-    }
-
     // Trier les produits selon la priorité
     usort($productsToDisplay, function($a, $b) {
         return $a['priority'] <=> $b['priority'];

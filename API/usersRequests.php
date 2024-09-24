@@ -293,40 +293,65 @@ function AddUserAddress($pdo, $userId, $voie, $ville, $codePostal, $pays)
 
 function AddUserPaymentMethod($pdo, $userID, $payementType, $cardNumber, $cardName, $expirationDate, $cvv, $paypalEmail)
 {
-    $expirationDate = $expirationDate ? $expirationDate . '-01' : null;
+    if($payementType == "card"){
+        $expirationDate = $expirationDate ? $expirationDate . '-01' : null;
 
-    $query = "INSERT INTO moyens_paiement (utilisateur_id, type, numero_carte, nom_titulaire, date_expiration, cvv, paypal_email) 
-              VALUES (:userID, :payementType, :cardNumber, :cardName, :expirationDate, :cvv, :paypalEmail)";
+        $query = "INSERT INTO moyens_paiement (utilisateur_id, type, numero_carte, nom_titulaire, date_expiration, cvv) 
+                  VALUES (:userID, :payementType, :cardNumber, :cardName, :expirationDate, :cvv)";
+    
+        //remove all characters except digits in cardNumber
+        $cardNumber = preg_replace('/\D/', '', $cardNumber);
+    
+        if (strlen($cardNumber) != 16) {
+            echo "<script>console.error('Le numéro de la carte doit avoir 16 chiffres');</script>";
+            return false;
+        }
+    
+        $cardNumber = "**** **** **** " . substr($cardNumber, -4);
+    
+        $statement = $pdo->prepare($query);
+        $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+        $statement->bindParam(':payementType', $payementType, PDO::PARAM_STR);
+        $statement->bindParam(':cardNumber', $cardNumber, PDO::PARAM_STR);
+        $statement->bindParam(':cardName', $cardName, PDO::PARAM_STR);
+        $statement->bindParam(':expirationDate', $expirationDate, PDO::PARAM_STR);
+        $statement->bindParam(':cvv', $cvv, PDO::PARAM_STR);
+    
+        if (!@$statement->execute()) {
+            $errorInfo = $statement->errorInfo();
+            $errorMessage = json_encode($errorInfo[2]);
+    
+            echo "<script>console.error($errorMessage);</script>";
+    
+            return false;
+        }
+    
+        return true;
+    }else if ($payementType == "paypal"){
 
-    //remove all characters except digits in cardNumber
-    $cardNumber = preg_replace('/\D/', '', $cardNumber);
-
-    if (strlen($cardNumber) != 16) {
-        echo "<script>console.error('Le numéro de la carte doit avoir 16 chiffres');</script>";
+        $query = "INSERT INTO moyens_paiement (utilisateur_id, type, paypal_email) 
+                  VALUES (:userID, :payementType, :paypalEmail)";
+    
+        $statement = $pdo->prepare($query);
+        $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+        $statement->bindParam(':payementType', $payementType, PDO::PARAM_STR);
+        $statement->bindParam(':paypalEmail', $paypalEmail, PDO::PARAM_STR);
+    
+        if (!@$statement->execute()) {
+            $errorInfo = $statement->errorInfo();
+            $errorMessage = json_encode($errorInfo[2]);
+    
+            echo "<script>console.error($errorMessage);</script>";
+    
+            return false;
+        }
+    
+        return true;
+    }else{
+        echo "<script>console.error('Type de paiement non reconnu');</script>";
         return false;
     }
-
-    $cardNumber = "**** **** **** " . substr($cardNumber, -4);
-
-    $statement = $pdo->prepare($query);
-    $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
-    $statement->bindParam(':payementType', $payementType, PDO::PARAM_STR);
-    $statement->bindParam(':cardNumber', $cardNumber, PDO::PARAM_STR);
-    $statement->bindParam(':cardName', $cardName, PDO::PARAM_STR);
-    $statement->bindParam(':expirationDate', $expirationDate, PDO::PARAM_STR);
-    $statement->bindParam(':cvv', $cvv, PDO::PARAM_STR);
-    $statement->bindParam(':paypalEmail', $paypalEmail, PDO::PARAM_STR);
-
-    if (!@$statement->execute()) {
-        $errorInfo = $statement->errorInfo();
-        $errorMessage = json_encode($errorInfo[2]);
-
-        echo "<script>console.error($errorMessage);</script>";
-
-        return false;
-    }
-
-    return true;
+    
 }
 
 

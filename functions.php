@@ -38,8 +38,6 @@ function DisplayUnDismissibleWarning($message)
     </div>";
 }
 
-function DebugToConsole() {}
-
 function ConvertCookieCartToDBCart($pdo, $userID)
 {
     $cartCookieName = 'cart';

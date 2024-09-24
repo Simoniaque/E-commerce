@@ -120,7 +120,7 @@ if ($products) {
                             </div>";
                         }
                     }else{
-                        debugToConsole("No products found in this category");
+                        echo "<script>console.log('Aucun Produit Trouvé')</script>";
                     }
                     ?>
 
