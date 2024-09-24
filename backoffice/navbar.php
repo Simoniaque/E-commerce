@@ -22,6 +22,11 @@
             </a>
         </li>
         <li class="nav-item">
+            <a class="nav-link text-white" href="materials.php">
+                Matériaux
+            </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link text-white" href="users.php">
                 Utilisateurs
             </a>

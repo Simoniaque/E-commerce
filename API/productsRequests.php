@@ -344,3 +344,67 @@ function AddProduct($pdo, $nom, $description, $prix, $stock, $categorie_id, $mat
 
     return $productID;
 }
+
+
+function DisableMaterial($pdo, $materialID){
+    $query = "UPDATE materiaux SET est_actif = 0 WHERE id = :materialID";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':materialID', $materialID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+
+    return true;
+}
+
+function ActivateMaterial($pdo, $materialID){
+    $query = "UPDATE materiaux SET est_actif = 1 WHERE id = :materialID";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':materialID', $materialID, PDO::PARAM_INT);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error($errorMessage);</script>";
+        return false;
+    }
+
+    return true;
+}
+
+function AddMaterial($pdo, $materialName){
+    //check if material name already exists
+
+    $query = "SELECT * FROM materiaux WHERE nom = :materialName";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':materialName', $materialName, PDO::PARAM_STR);
+    
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error('Error while checking if material name already exists: $errorMessage');</script>";
+        return false;
+    }
+
+    if($statement->fetch(PDO::FETCH_ASSOC)){
+        echo "<script>console.error('Material name already exists');</script>";
+        return false;
+    }
+
+    $query = "INSERT INTO materiaux (nom) VALUES (:materialName)";
+    $statement = $pdo->prepare($query);
+    $statement->bindParam(':materialName', $materialName, PDO::PARAM_STR);
+
+    if (!@$statement->execute()) {
+        $errorInfo = $statement->errorInfo();
+        $errorMessage = json_encode($errorInfo[2]);
+        echo "<script>console.error('Error while adding material: $errorMessage');</script>";
+        return false;
+    }
+
+    return true;
+}
