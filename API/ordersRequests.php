@@ -53,20 +53,22 @@ function GetOrderByNumber($pdo, $orderNumber, $activeOnly = 1) {
 }
 
 
-function GetUserOrdersByNewest($pdo, $userID){
-    $query = "SELECT * FROM commandes WHERE utilisateur_id = :userID ORDER BY date_creation DESC";
-
-    $statement = $pdo->prepare($query);
-    $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
-
-    if (!@$statement->execute()) {
-        $errorInfo = $statement->errorInfo();
-        $errorMessage = json_encode($errorInfo[2]);
-        echo "<script>console.error($errorMessage);</script>";
-        return false;
-    }
-
-    return $statement->fetchAll(PDO::FETCH_ASSOC);
+function GetUserOrdersByNewest($pdo, $userID , $activeOnly = 1){
+        
+        $query = "SELECT * FROM commandes WHERE utilisateur_id = :userID AND est_actif >= :activeOnly ORDER BY date_creation DESC";
+    
+        $statement = $pdo->prepare($query);
+        $statement->bindParam(':userID', $userID, PDO::PARAM_INT);
+        $statement->bindParam(':activeOnly', $activeOnly, PDO::PARAM_INT);
+    
+        if (!@$statement->execute()) {
+            $errorInfo = $statement->errorInfo();
+            $errorMessage = json_encode($errorInfo[2]);
+            echo "<script>console.error($errorMessage);</script>";
+            return false;
+        }
+    
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
 }
 
 function GetOrderDetails($pdo, $orderNumber){
